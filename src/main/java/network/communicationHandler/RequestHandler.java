@@ -7,6 +7,7 @@ import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import config.CommonConfigHolder;
 import core.consensus.Consensus;
 import org.json.JSONObject;
 //import com.google.gson.JsonParser;
@@ -15,6 +16,7 @@ import core.blockchain.*;
 import org.json.JSONObject;
 
 import javax.swing.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
@@ -65,6 +67,14 @@ public class RequestHandler {
             case "BlockBroadcast":
                 handleBroadcastBlock(data);
                 break;
+
+            case "IPResponse":
+                handleIPResponse(data);
+                break;
+
+            default:
+                System.out.println("default");
+                System.out.println(data);
 
         }
     }
@@ -175,6 +185,13 @@ public class RequestHandler {
         System.out.println("signature" + response.getSignature());
         System.out.println("proposal id " + response.getProposalID());
         return response;
+    }
+
+    public void handleIPResponse(String data) throws IOException {
+        System.out.println(data);
+        CommonConfigHolder.getInstance().savePeersIPsandPorts(data);
+
+
     }
 
 }

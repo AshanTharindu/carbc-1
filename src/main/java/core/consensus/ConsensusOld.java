@@ -9,7 +9,7 @@ import chainUtil.KeyGenerator;
 import core.blockchain.Block;
 import core.blockchain.Blockchain;
 import core.blockchain.Validation;
-import core.communicationHandler.MessageSender;
+import network.communicationHandler.MessageSender;
 
 import javax.swing.*;
 import java.io.IOException;

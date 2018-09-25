@@ -3,13 +3,9 @@ package utils;
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import core.blockchain.*;
-import core.communicationHandler.MessageSender;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
