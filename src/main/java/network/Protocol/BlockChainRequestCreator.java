@@ -5,13 +5,13 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 
-public class BlockMessageCreator {
+public class BlockChainRequestCreator {
 
-    public static RequestMessage createBlockMessage(JSONObject block){
+    public static RequestMessage createBlockChainRequest(JSONObject block){
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String sender = "myPublicKey";
         String receiver = "yourPublicKey";
-        String messageType = "BlockBroadcast";
+        String messageType = "BlockChainRequest";
 
         RequestMessage requestMessage = new RequestMessage();
         requestMessage.addHeader("timestamp", timestamp.toString());

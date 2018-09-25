@@ -1,20 +1,40 @@
 package chainUtil;
 
 import core.blockchain.Block;
+import core.blockchain.Blockchain;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.security.spec.InvalidKeySpecException;
+import java.util.LinkedList;
 
 public class ChainUtil {
 
+    private static ChainUtil chainUtil;
 
+    //change to private after changes
     public ChainUtil() {}
 
+    public static ChainUtil getInstance() {
+        if (chainUtil == null) {
+            chainUtil = new ChainUtil();
+        }
+        return chainUtil;
+    }
+
+    public String digitalSignature(String data) throws NoSuchProviderException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+        Signature dsa = Signature.getInstance("SHA1withDSA", "SUN");
+        dsa.initSign(KeyGenerator.getInstance().getPrivateKey());
+        byte[] byteArray = data.getBytes();
+        dsa.update(byteArray);
+        return bytesToHex(dsa.sign());
+    }
+
+    public boolean signatureVerification(String publicKey, String signature, String data) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, SignatureException, InvalidKeyException {
+        return verify(KeyGenerator.getInstance().getPublicKey(publicKey),hexStringToByteArray(signature),data);
+    }
 
     public static byte[] sign(PrivateKey privateKey,String data) throws InvalidKeyException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
         //sign the data
@@ -36,7 +56,7 @@ public class ChainUtil {
 //
 //    }
 
-    public static byte[] getHash(String data) throws NoSuchAlgorithmException {
+    public static byte[] getHashByteArray(String data) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         return digest.digest(data.getBytes(StandardCharsets.UTF_8));
     }
@@ -61,14 +81,30 @@ public class ChainUtil {
         return data;
     }
 
-    public static byte[] getBlockHash(Block block) throws NoSuchAlgorithmException {
-        JSONObject jsonBlock = new JSONObject(block);
-        return getHash(jsonBlock.toString());
+    public String getHash(String data) throws NoSuchAlgorithmException {
+        return bytesToHex(getHashByteArray(data));
     }
 
-    public static String getBlockHashString(Block block) throws NoSuchAlgorithmException {
+    public String getBlockHash(Block block) throws NoSuchAlgorithmException {
         JSONObject jsonBlock = new JSONObject(block);
-        return bytesToHex(getHash(jsonBlock.toString()));
+        return getHash((jsonBlock.toString()));
+    }
+
+    public String getBlockChainHash(LinkedList<Block> blockchain) throws NoSuchAlgorithmException {
+        String blockChainString = "";
+        for(Block block: blockchain) {
+            blockChainString+=new JSONObject(block).toString();
+        }
+        return getHash(blockChainString);
+    }
+
+    public String getBlockchainAsJsonString(LinkedList<Block> blockchain) {
+        JSONObject jsonBlockchain = new JSONObject();
+        for(int i = 0; i < blockchain.size(); i++) {
+            jsonBlockchain.put(String.valueOf(i), new JSONObject(blockchain.get(i)).toString());
+        }
+
+        return jsonBlockchain.toString();
     }
 
 }

@@ -23,26 +23,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-public class Consensus {
+public class ConsensusOld {
 
-    private static Consensus consensus;
+    private static ConsensusOld consensusOld;
     public ArrayList<AgreementCollector> agreementCollectors;
     ArrayList<String> agreedTransactiions;
     ArrayList<Block> agreementRequestBlocks;
 
-    private Consensus() {
+    private ConsensusOld() {
         agreedTransactiions = new ArrayList<>();
         agreementCollectors = new ArrayList<>();
         agreementRequestBlocks = new ArrayList<>();
     }
 
-    public static Consensus getInstance() {
-        if (consensus == null) {
-            consensus = new Consensus();
+    public static ConsensusOld getInstance() {
+        if (consensusOld == null) {
+            consensusOld = new ConsensusOld();
         }
-        return consensus;
+        return consensusOld;
     }
-
 
     public boolean requestAgreementForBlock(Block block) throws NoSuchAlgorithmException {
         addToAgreementCollectors(block);
@@ -121,10 +120,10 @@ public class Consensus {
     }
 
     public AgreementCollector getAgreementCollectorByBlock(Block block) throws NoSuchAlgorithmException {
-        long id = AgreementCollector.generateAgreementCollectorId(block);
-        for (int i = 0; i < agreementCollectors.size(); i++) {
-            if (agreementCollectors.get(i).getId() == id) {
-                return agreementCollectors.get(i);
+        String id = AgreementCollector.generateAgreementCollectorId(block);
+        for(AgreementCollector agreementCollector: this.agreementCollectors) {
+            if(agreementCollector.getAgreementCollectorId().equals(id)) {
+                return agreementCollector;
             }
         }
         return null;
@@ -141,24 +140,24 @@ public class Consensus {
         Timestamp receivedBlockTimestamp = new java.sql.Timestamp(parsedDate.getTime());
 
         if (!blockExistence(block)) {
-            Blockchain.getBlockchain().addBlock(block);
+            Blockchain.getInstance().addBlock(block);
             JOptionPane.showMessageDialog(null,"Block Added Successfully");
             System.out.println("block added successfully");
             return true;
         } else {
-            Block existBlock = Blockchain.getBlockchain().getBlockByNumber(receivedBlockNumber);
+            Block existBlock = Blockchain.getInstance().getBlockByNumber(receivedBlockNumber);
             String existingTimeStampString = existBlock.getHeader().getTimestamp();
             Date parsedDate1 = dateFormat.parse(existingTimeStampString);
             Timestamp exsitingTimeStamp = new java.sql.Timestamp(parsedDate1.getTime());
 
             if (exsitingTimeStamp.after(receivedBlockTimestamp)) {
-                Blockchain.getBlockchain().rollBack(receivedBlockNumber);
-                Blockchain.getBlockchain().addBlock(block);
+                Blockchain.getInstance().rollBack(receivedBlockNumber);
+                Blockchain.getInstance().addBlock(block);
                 JOptionPane.showMessageDialog(null,"Block Added Successfully");
                 System.out.println("block added successfully");
                 return true;
             } else if (exsitingTimeStamp.equals(receivedBlockTimestamp)) {
-                Blockchain.getBlockchain().rollBack(receivedBlockNumber);
+                Blockchain.getInstance().rollBack(receivedBlockNumber);
                 return false;
             }
             return false;
@@ -166,7 +165,7 @@ public class Consensus {
     }
 
     public boolean blockExistence(Block block) {
-        if (Blockchain.getBlockchain().getBlockchainArray().size() > block.getHeader().getBlockNumber()) {
+        if (Blockchain.getInstance().getBlockchainArray().size() > block.getHeader().getBlockNumber()) {
             return true;
         }
         return false;
@@ -201,7 +200,7 @@ public class Consensus {
     public boolean addToAgreementCollectors(Block block) throws NoSuchAlgorithmException {
         AgreementCollector agreementCollector = new AgreementCollector(block);
         System.out.println("agreement collector added");
-        System.out.println("agreemenCollector id: " + agreementCollector.getId());
+        System.out.println("agreemenCollector id: " + agreementCollector.getAgreementCollectorId());
         return agreementCollectors.add(agreementCollector);
     }
 
@@ -238,5 +237,9 @@ public class Consensus {
             isValid = scanner.next();
         }
     }
+
+    //new consensusOld protocol
+
+
 
 }

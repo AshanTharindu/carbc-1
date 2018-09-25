@@ -1,22 +1,20 @@
 import Exceptions.FileUtilityException;
-import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
 import core.blockchain.*;
-import core.consensus.Consensus;
-import network.Client.RequestMessage;
 import network.Node;
-import network.Protocol.BlockMessageCreator;
-import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
-import java.security.PublicKey;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class TestSendBlock {
-    public static void main(String[] args) throws FileUtilityException {
+    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
@@ -29,7 +27,7 @@ public class TestSendBlock {
         * A Config common to all: network, blockchain, etc.
         * */
         CommonConfigHolder commonConfigHolder = CommonConfigHolder.getInstance();
-        commonConfigHolder.setConfigUsingResource("peer3");
+        commonConfigHolder.setConfigUsingResource("peer1");
 
         /*
         * when initializing the network
@@ -42,6 +40,7 @@ public class TestSendBlock {
         * */
         node.startListening();
 
+        System.out.println(KeyGenerator.getInstance().getEncodedPublicKeyString(KeyGenerator.getInstance().getPublicKey()));
         try {
             //block creation
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -56,9 +55,9 @@ public class TestSendBlock {
                     new TransactionInfo());
 
             Block block = new Block(blockHeader, transaction);
-//            Consensus.getInstance().requestAgreementForBlock(block);
-//            Consensus.getInstance().addToAgreementCollectors(block);
-//            Consensus.getInstance().agreedTransaction(block.getTransaction());
+//            ConsensusOld.getInstance().requestAgreementForBlock(block);
+//            ConsensusOld.getInstance().addToAgreementCollectors(block);
+//            ConsensusOld.getInstance().agreedTransaction(block.getTransaction());
         }catch (Exception e) {
             e.printStackTrace();
         }

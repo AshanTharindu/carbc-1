@@ -99,7 +99,7 @@ public class KeyGenerator {
         return loadPrivateKey();
     }
 
-    private String getResourcesFilePath(String fileName) {
+    public String getResourcesFilePath(String fileName) {
         URL url = getClass().getClassLoader().getResource(fileName);
         if (url == null) {
             return null;

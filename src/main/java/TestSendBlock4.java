@@ -4,9 +4,7 @@ import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
 import core.blockchain.*;
-import core.communicationHandler.MessageSender;
 import core.consensus.AgreementCollector;
-import core.consensus.Consensus;
 import network.Client.RequestMessage;
 import network.Node;
 import network.Protocol.BlockMessageCreator;
@@ -76,6 +74,11 @@ public class TestSendBlock4 {
                     new TransactionInfo());
 
             Block block = new Block(blockHeader,transaction);
+            ChainUtil chainUtil = new ChainUtil();
+            System.out.println("********************blockhash******************");
+            for(int i = 0; i< 5; i++) {
+                System.out.println(chainUtil.getBlockHash(block));
+            }
             JSONObject jsonObject = new JSONObject(block);
             String myJson = jsonObject.toString();
 
@@ -102,14 +105,14 @@ public class TestSendBlock4 {
 
             System.out.println("agreement collector id:");
             System.out.println(AgreementCollector.generateAgreementCollectorId(block));
-//            Consensus.getInstance().addToAgreementCollectors(block);
+//            ConsensusOld.getInstance().addToAgreementCollectors(block);
 
-//            Consensus.getInstance().requestAgreementForBlock(block);
+//            ConsensusOld.getInstance().requestAgreementForBlock(block);
 
 //            MessageSender.getInstance().requestAgreement(block,1);
 //            MessageSender.getInstance().sendAgreement(block,1,agreement,signatureRaw);
             String msg = "secrectmessage";
-            String h1 = ChainUtil.bytesToHex(ChainUtil.getHash(msg));
+            String h1 = ChainUtil.bytesToHex(ChainUtil.getHashByteArray(msg));
 //            System.out.println("generated hash: "+h1);
 
             JSONObject ourBlock1 = new JSONObject();
@@ -120,8 +123,8 @@ public class TestSendBlock4 {
 //            System.out.println("sending block");
 //            System.out.println(ourBlock1.toString());
 //            node.sendMessageToNeighbour(1, blockMessage);
-//            Consensus.getInstance().requestAgreementForBlock(block);
-//            Consensus.getInstance().requestAgreementForBlock(block);
+//            ConsensusOld.getInstance().requestAgreementForBlock(block);
+//            ConsensusOld.getInstance().requestAgreementForBlock(block);
 //            MessageSender.getInstance().BroadCastBlock(block);
         } catch (Exception e) {
             e.getMessage();

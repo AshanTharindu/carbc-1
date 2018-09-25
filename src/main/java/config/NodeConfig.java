@@ -9,6 +9,7 @@ public class NodeConfig {
     private final Long peerID;
     private int ListenerPort;
     private List<Neighbour> neighbours;
+    private Neighbour registry;
 
 
     public NodeConfig(Long peerID) {
@@ -34,5 +35,16 @@ public class NodeConfig {
 
     public List<Neighbour> getNeighbours() {
         return neighbours;
+    }
+
+    public Neighbour getNeighbourByPublicKey(String publicKey) {
+        Neighbour neighbour = null;
+
+        for(Neighbour peer: neighbours) {
+            if(publicKey.equals(peer.getPublicKey())) {
+                neighbour = peer;
+            }
+        }
+        return neighbour;
     }
 }

@@ -1,0 +1,1 @@
+{"peers":[{"ListeningPort":100,"ip":"1.10.13.245","publicKey":"1"},{"ListeningPort":200,"ip":"2.10.13.245","publicKey":"2"},{"ListeningPort":300,"ip":"3.10.13.245","publicKey":"3"},{"ListeningPort":400,"ip":"4.10.13.245","publicKey":"4"}]}

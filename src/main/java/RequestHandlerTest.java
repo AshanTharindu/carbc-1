@@ -1,7 +1,6 @@
 import com.google.gson.Gson;
 import core.blockchain.*;
-import core.communicationHandler.RequestHandler;
-import core.consensus.Consensus;
+import network.communicationHandler.RequestHandler;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;

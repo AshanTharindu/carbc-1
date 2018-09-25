@@ -6,23 +6,27 @@ import core.blockchain.Transaction;
 //remove this class
 public class Agreement {
 
-    Transaction transaction;
-    Boolean agreed;
+    private String blockHash;
+    private String digitalSignature;
+    private String publicKey;
 
-    public Agreement(Transaction transaction) {
-        this.transaction = transaction;
-        agreed = false;
+    public Agreement(String blockHash, String digitalSignature, String publicKey) {
+        this.blockHash = blockHash;
+        this.digitalSignature = digitalSignature;
+        this.publicKey = publicKey;
     }
 
-    public void setAgreed(Boolean agreed) {
-        this.agreed = agreed;
+    public String getBlockHash() {
+        return blockHash;
     }
 
-    public Transaction getTransaction() {
-        return transaction;
+    public String getDigitalSignature() {
+        return digitalSignature;
     }
 
-    public Boolean getAgreed() {
-        return agreed;
+    public String getPublicKey() {
+        return publicKey;
     }
+
+
 }

@@ -121,7 +121,7 @@ public class Main {
         int blockNumber = (int)blockHeader.getBlockNumber();
         String blockHash = blockHeader.getHash();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss"); //revert this change
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //revert this change
         Date parsedDate = dateFormat.parse(blockHeader.getTimestamp());
         Timestamp blockTimestamp = new java.sql.Timestamp(parsedDate.getTime());
 

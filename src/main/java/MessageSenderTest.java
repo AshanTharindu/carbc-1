@@ -1,5 +1,3 @@
-package utils;
-
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import core.blockchain.*;

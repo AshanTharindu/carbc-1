@@ -1,7 +1,7 @@
 package UI;
 
 import core.blockchain.Block;
-import core.consensus.Consensus;
+import core.consensus.ConsensusOld;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -50,7 +50,7 @@ public class BlockStatusUI {
             public void actionPerformed(ActionEvent e) {
                 try {
                     System.out.println(block.getTransaction().getTransactionInfo().getSmartContractName());
-                    Consensus.getInstance().insertBlock(block);
+                    ConsensusOld.getInstance().insertBlock(block);
                 } catch (ParseException e1) {
                     e1.printStackTrace();
                 } catch (SQLException e1) {

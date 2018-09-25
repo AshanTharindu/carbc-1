@@ -1,13 +1,8 @@
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
-import core.blockchain.Blockchain;
-import core.consensus.Consensus;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Objects;
 
 public class ChainUtilTest {
     public static void main(String[] args) {
@@ -20,7 +15,7 @@ public class ChainUtilTest {
             System.out.println(ChainUtil.bytesToHex(digest.digest(testData.getBytes(StandardCharsets.UTF_8))));
 
             System.out.println("method output");
-            System.out.println(ChainUtil.bytesToHex(ChainUtil.getHash(testData)));
+            System.out.println(ChainUtil.bytesToHex(ChainUtil.getHashByteArray(testData)));
 
         } catch (Exception e) {
             e.getMessage();
@@ -62,13 +57,26 @@ public class ChainUtilTest {
 
             System.out.println("GET HASH TESTING");
             String msg = "secrectmessage";
-            String h1 = ChainUtil.bytesToHex(ChainUtil.getHash(msg));
-            String h2 = ChainUtil.bytesToHex(ChainUtil.getHash(msg));
-            String h3 = ChainUtil.bytesToHex(ChainUtil.getHash(msg));
+            String h1 = ChainUtil.bytesToHex(ChainUtil.getHashByteArray(msg));
+            String h2 = ChainUtil.bytesToHex(ChainUtil.getHashByteArray(msg));
+            String h3 = ChainUtil.bytesToHex(ChainUtil.getHashByteArray(msg));
 
             System.out.println(h1);
             System.out.println(h2);
             System.out.println(h3);
+
+
+            System.out.println("*************SIGNATURE VERIFICATION**************");
+            String data = "agreed";
+            String pkString = KeyGenerator.getInstance().getPublicKeyAsString();
+            for(int i= 0; i<5 ; i++) {
+                System.out.println(ChainUtil.getInstance().digitalSignature(data));
+            }
+            String Digitalsignature = ChainUtil.getInstance().digitalSignature(data);
+            System.out.println(ChainUtil.getInstance().signatureVerification(pkString,Digitalsignature,"agreed"));
+
+
+            System.out.println("getBlockChainHashTest");
         } catch (Exception e) {
             e.getMessage();
         }

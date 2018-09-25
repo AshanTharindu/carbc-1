@@ -1,16 +1,13 @@
 import Exceptions.FileUtilityException;
-import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
 import core.blockchain.*;
-import core.communicationHandler.MessageSender;
+import network.communicationHandler.MessageSender;
 import network.Node;
 import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
-import java.security.PublicKey;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;

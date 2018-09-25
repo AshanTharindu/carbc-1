@@ -28,6 +28,13 @@ public class Client extends Thread{
         this.requestMessage = requestMessage;
     }
 
+
+    public void initTest(String IP, int port, RequestMessage requestMessage) {
+        this.neighbourIP = IP;
+        this.port = port;
+        this.requestMessage = requestMessage;
+    }
+
     @Override
     public void run() {
         EventLoopGroup workerGroup = new NioEventLoopGroup();

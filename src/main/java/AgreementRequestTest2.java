@@ -3,9 +3,8 @@ import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
 import core.blockchain.*;
-import core.communicationHandler.MessageSender;
-import core.consensus.AgreementCollector;
-import core.consensus.Consensus;
+import network.communicationHandler.MessageSender;
+import core.consensus.ConsensusOld;
 import network.Node;
 import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
@@ -85,7 +84,7 @@ public class AgreementRequestTest2 {
 
             System.out.println("block");
             System.out.println(new JSONObject(block).toString());
-            Consensus.getInstance().addToAgreementCollectors(block);
+            ConsensusOld.getInstance().addToAgreementCollectors(block);
             MessageSender.getInstance().requestAgreement(block,1);
 
 

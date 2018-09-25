@@ -3,7 +3,7 @@ package UI;
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import core.blockchain.Block;
-import core.communicationHandler.MessageSender;
+import network.communicationHandler.MessageSender;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

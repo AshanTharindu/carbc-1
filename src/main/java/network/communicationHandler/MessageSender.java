@@ -1,26 +1,22 @@
-package core.communicationHandler;
+package network.communicationHandler;
 
 import chainUtil.ChainUtil;
 import com.google.gson.Gson;
 import core.blockchain.*;
 import chainUtil.KeyGenerator;
 import core.blockchain.Block;
-import core.blockchain.BlockHeader;
 import core.blockchain.Transaction;
 import core.blockchain.TransactionProposal;
+import core.consensus.Consensus;
 import network.Client.RequestMessage;
+import network.Neighbour;
 import network.Node;
-import network.Protocol.BlockMessageCreator;
-import org.json.JSONArray;
+import network.Protocol.*;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 
 public class MessageSender {
@@ -36,22 +32,75 @@ public class MessageSender {
         return messageSender;
     }
 
+    //messages of new protocol
     public void requestIP(int ListeningPort) throws IOException {
 
-        URL whatismyip = new URL("http://checkip.amazonaws.com");
-        BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-        String ip = in.readLine(); //you get the IP as a String
+//        URL whatismyip = new URL("http://checkip.amazonaws.com");
+//        BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+//        String ip = in.readLine(); //you get the IP as a String
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ip",ip);
+//        jsonObject.put("ip",ip);
         jsonObject.put("ListeningPort",ListeningPort);
 
-        RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
-        blockMessage.addHeader("keepActive", "false");
-        blockMessage.addHeader("messageType", "RequestIP");
+        RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
+        requestIPMessage.addHeader("keepActive", "false");
 //        Node.getInstance().sendMessageToNeighbour(1, blockMessage);
-        Node.getInstance().sendMessageToPeer("127.0.0.1", 49211,blockMessage);
+        Node.getInstance().sendMessageToPeer("127.0.0.1", 49154,requestIPMessage);
     }
+
+    public void sendHelloResponse(int listeningPort, String clientIP, int clientPort) {
+        JSONObject portInfo = new JSONObject();
+        portInfo.put("ListeningPort", listeningPort);
+        RequestMessage helloResponse = HelloResponseCreator.createHelloResponseMessage(portInfo);
+        Node.getInstance().sendMessageToPeer(clientIP, clientPort, helloResponse);
+    }
+
+    public void requestBlockchainHash() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+        RequestMessage blockChainRequest = BlockChainHashRequestCreator.createBlockChainHashRequest(jsonObject);
+        blockChainRequest.addHeader("keepActive", "false");
+        Consensus.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
+        Node.getInstance().broadcast(blockChainRequest);
+        System.out.println("requestBlockchainHash");
+    }
+
+    public void requestBlockchain() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+        RequestMessage blockChainRequest = BlockChainRequestCreator.createBlockChainRequest(jsonObject);
+        blockChainRequest.addHeader("keepActive", "false");
+        Node.getInstance().broadcast(blockChainRequest);
+    }
+
+    public void requestBlockchainFromPeer(String ip, int listeningPort) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+        RequestMessage blockChainRequest = BlockChainRequestCreator.createBlockChainRequest(jsonObject);
+        blockChainRequest.addHeader("keepActive", "false");
+        Node.getInstance().sendMessageToPeer(ip,listeningPort,blockChainRequest);
+    }
+
+    public void sendSignedBlockChain(String ip, int listeningPort, String signedBlockchain, String blockchainHash) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("signedBlockchain", signedBlockchain);
+        jsonObject.put("blockchainHash", blockchainHash);
+        jsonObject.put("publicKey",KeyGenerator.getInstance().getPublicKeyAsString());
+        RequestMessage blockSignMessage = BlockChainSignCreator.createBlockChainSignRequest(jsonObject);
+        Node.getInstance().sendMessageToPeer(ip, listeningPort, blockSignMessage);
+        System.out.println("sendSignedBlockChain");
+    }
+
+    public void sendBlockchainToPeer(String ip, int listeningPort, String jsonBlockchain, int blockchainLength) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("blockchain", jsonBlockchain);
+        jsonObject.put("blockchainLength", blockchainLength);
+        RequestMessage blockchainSendMessage = BlockchainSendMessageCreator.createBlockchainSendMessage(jsonObject);
+        Node.getInstance().sendMessageToPeer(ip,listeningPort,blockchainSendMessage);
+        System.out.println("blockchain sent");
+    }
+
 
     public void BroadCastBlock(Block block) {
         JSONObject jsonObject = new JSONObject();
@@ -59,10 +108,20 @@ public class MessageSender {
         RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
         blockMessage.addHeader("keepActive", "false");
         blockMessage.addHeader("messageType", "BlockBroadcast");
-        for(int i = 1; i< 2; i++) {
-            Node.getInstance().sendMessageToNeighbour(i, blockMessage);
+        for(Neighbour neighbour: Node.getInstance().getNodeConfig().getNeighbours()) {
+            Node.getInstance().sendMessageToPeer(neighbour.getIp(),neighbour.getPort(),blockMessage);
         }
     }
+
+    public void sendAgreement(String signedBlock, String blockHash) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("signedBlock", signedBlock);
+        jsonObject.put("blockHash", blockHash);
+        RequestMessage agreementMessage = AgreementCreator.createAgreementRequest(jsonObject);
+        Node.getInstance().broadcast(agreementMessage);
+    }
+
+
 
     public void requestAgreement(Block block, int neighbourIndex) {
         System.out.println("Agreement request send");
@@ -114,4 +173,5 @@ public class MessageSender {
         Gson gson = new Gson();
         return gson.toJson(transaction);
     }
+
 }

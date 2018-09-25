@@ -4,9 +4,7 @@ import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
 import core.blockchain.*;
-import core.communicationHandler.MessageSender;
 import core.consensus.AgreementCollector;
-import core.consensus.Consensus;
 import network.Client.RequestMessage;
 import network.Node;
 import network.Protocol.BlockMessageCreator;
@@ -17,7 +15,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class TestSendBlock2 {
+public class   TestSendBlock2 {
     public static void main(String[] args) throws FileUtilityException {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
@@ -90,41 +88,27 @@ public class TestSendBlock2 {
             String testString = test.toString();
 
             JSONObject convertedTest = new JSONObject(testString);
-//            System.out.println(convertedTest.get("block"));
-//            System.out.println("testString");
-//            System.out.println(testString);
-//            System.out.println(myJson);
 
             JSONObject receivedJSONObject = new JSONObject(testString);
             String jblock = (String)receivedJSONObject.get("block");
-//            System.out.println("++++++++++++++++");
             JSONObject receivedJSONObject1 = new JSONObject(jblock);
-//            System.out.println(receivedJSONObject1.toString());
 
             System.out.println("agreement collector id:");
             System.out.println(AgreementCollector.generateAgreementCollectorId(block));
-//            Consensus.getInstance().addToAgreementCollectors(block);
-
-//            Consensus.getInstance().requestAgreementForBlock(block);
-
-//            MessageSender.getInstance().requestAgreement(block,1);
-//            MessageSender.getInstance().sendAgreement(block,1,agreement,signatureRaw);
+;
             String msg = "secrectmessage";
-            String h1 = ChainUtil.bytesToHex(ChainUtil.getHash(msg));
+            String h1 = ChainUtil.bytesToHex(ChainUtil.getHashByteArray(msg));
 //            System.out.println("generated hash: "+h1);
 
             JSONObject ourBlock1 = new JSONObject();
             ourBlock1.put("string1",h1);
             RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(ourBlock1);
             blockMessage.addHeader("keepActive", "false");
-            blockMessage.addHeader("messageType", "BlockBroadcast");
-//            System.out.println("sending block");
-//            System.out.println(ourBlock1.toString());
-//            node.sendMessageToNeighbour(1, blockMessage);
-//            Consensus.getInstance().requestAgreementForBlock(block);
-            System.out.println("collector size: "+Consensus.getInstance().agreementCollectors.size());
-            Consensus.getInstance().requestAgreementForBlock(block);
+            blockMessage.addHeader("messageType", "test");
+
+//            ConsensusOld.getInstance().requestAgreementForBlock(block);
 //            MessageSender.getInstance().BroadCastBlock(block);
+            Node.getInstance().sendMessageToNeighbour(1, blockMessage);
         } catch (Exception e) {
             e.getMessage();
         }

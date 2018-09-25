@@ -3,8 +3,8 @@ package core.blockchain;
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import com.google.gson.Gson;
-import core.communicationHandler.MessageSender;
-import core.consensus.Consensus;
+import network.communicationHandler.MessageSender;
+import core.consensus.ConsensusOld;
 
 import java.io.IOException;
 import java.security.*;
@@ -182,13 +182,13 @@ public class TransactionProposal {
         //String timestampString = String.valueOf(timestamp);
         String timeStampStr = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
 
-        byte[] hash = ChainUtil.getHash(transaction.toString());
-        BlockHeader blockHeader = new BlockHeader("1",Blockchain.getBlockchain().getBlockchainArray().getLast().getHeader().getHash(),timeStampStr,this.sender,Blockchain.getBlockchain().getBlockchainArray().size()+1,true);
+        byte[] hash = ChainUtil.getHashByteArray(transaction.toString());
+        BlockHeader blockHeader = new BlockHeader("1",Blockchain.getInstance().getBlockchainArray().getLast().getHeader().getHash(),timeStampStr,this.sender,Blockchain.getInstance().getBlockchainArray().size()+1,true);
 
         Block block = new Block(blockHeader,transaction);
         //convert to string
 
-        String blockHash = ChainUtil.getBlockHashString(block);
+        String blockHash = ChainUtil.getInstance().getBlockHash(block);
 
         // set hash to blockheader
         block.getHeader().setHash(blockHash);
@@ -211,7 +211,7 @@ public class TransactionProposal {
             if (response!=null){
                 //connection and send
                 //sendResponse();
-                Consensus.getInstance().agreedTransaction(this.proposalID);
+                ConsensusOld.getInstance().agreedTransaction(this.proposalID);
                 MessageSender.getInstance().sendTransactionValidation(response,1);  //should send transaction response not proposal
                 System.out.println(response);
                 System.out.println("sending response");

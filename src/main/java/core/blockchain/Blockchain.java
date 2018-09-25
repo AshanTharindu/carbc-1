@@ -15,7 +15,7 @@ public class Blockchain {
         this.blockchainArray.add(Block.createGenesis());
     }
 
-    public static Blockchain getBlockchain() {
+    public static Blockchain getInstance() {
         if (blockchain == null){
             blockchain = new Blockchain();
         }
@@ -51,4 +51,6 @@ public class Blockchain {
         }
         return null;
     }
+
+
 }

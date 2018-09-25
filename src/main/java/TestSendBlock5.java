@@ -121,7 +121,7 @@ public class TestSendBlock5 {
 
             System.out.println(new JSONObject(proposal).toString());
 
-            //proposal.sendProposal();
+//            proposal.sendProposal();
 
 
         } catch (Exception e) {

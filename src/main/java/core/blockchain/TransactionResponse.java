@@ -2,7 +2,7 @@ package core.blockchain;
 
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
-import core.communicationHandler.MessageSender;
+import network.communicationHandler.MessageSender;
 
 import java.io.IOException;
 import java.security.*;
@@ -101,7 +101,7 @@ public class TransactionResponse {
 
                                 if (mandatorySignCount==mandatorySignCountInProposal){
                                     Block block = proposal.createBlock(proposal.getProposalID());
-                                    Blockchain.getBlockchain().getBlockchainArray().add(block);
+                                    Blockchain.getInstance().getBlockchainArray().add(block);
                                     MessageSender.getInstance().BroadCastBlock(block);
                                     System.out.println(block);
                                 }
@@ -137,7 +137,7 @@ public class TransactionResponse {
 
                         if (mandatorySignCount==mandatorySignCountInProposal){
                             Block block = proposal.createBlock(proposal.getProposalID());
-                            Blockchain.getBlockchain().getBlockchainArray().add(block);
+                            Blockchain.getInstance().getBlockchainArray().add(block);
                             MessageSender.getInstance().BroadCastBlock(block);
                             System.out.println(block);
                         }
