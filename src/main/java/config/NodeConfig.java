@@ -6,18 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NodeConfig {
-    private final Long peerID;
+    private final String peerID;
     private int ListenerPort;
     private List<Neighbour> neighbours;
     private Neighbour registry;
 
 
-    public NodeConfig(Long peerID) {
+    public NodeConfig(String peerID) {
         this.peerID = peerID;
         this.neighbours = new ArrayList<>();
     }
 
-    public Long getPeerID() {
+    public String getPeerID() {
         return peerID;
     }
 

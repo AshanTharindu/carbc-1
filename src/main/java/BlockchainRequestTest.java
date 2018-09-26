@@ -30,7 +30,7 @@ public class BlockchainRequestTest {
          * when initializing the network
          * */
         Node node = Node.getInstance();
-        //node.init();
+        node.init();
 
         /*
          * when we want our node to start listening

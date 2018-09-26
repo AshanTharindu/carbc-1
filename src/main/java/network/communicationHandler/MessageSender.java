@@ -121,7 +121,26 @@ public class MessageSender {
         Node.getInstance().broadcast(agreementMessage);
     }
 
+    public void requestAdditionalData(String ip, int listeningPort, String blockHash, String signedBlock) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("signedBlock", signedBlock);
+        jsonObject.put("blockHash", blockHash);
+        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+        RequestMessage dataRequestMessage = MessageCreator.createMessage(jsonObject,"RequestAdditionalData");
+        Node.getInstance().sendMessageToPeer(ip,listeningPort, dataRequestMessage);
+        System.out.println("Additional Data Requested");
+    }
 
+    public void requestPeerDetails(String peerID) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+        RequestMessage peerDetailsRequestMessage = MessageCreator.createMessage(jsonObject, "RequestPeerDetails");
+        Node.getInstance().sendMessageToPeer("127.0.0.1", 49154, peerDetailsRequestMessage);
+    }
+
+
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 
     public void requestAgreement(Block block, int neighbourIndex) {
         System.out.println("Agreement request send");

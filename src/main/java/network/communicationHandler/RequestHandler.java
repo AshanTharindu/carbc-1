@@ -76,6 +76,7 @@ public class RequestHandler {
 
             case "HelloResponse":
                 handleHelloResponse(data);
+                break;
 
             case "BlockChainHashRequest":
                 System.out.println("BlockChainHashRequest");
@@ -97,6 +98,10 @@ public class RequestHandler {
             case "Agreement":
                 System.out.println("Agreement");
                 handleReceivedAgreement(data,publicKey);
+
+            case "RequestAdditionalData":
+                System.out.println("RequestAdditionalData");
+                handleRequestAdditionalData(data,publicKey);
 
             default:
                 System.out.println("default");
@@ -165,6 +170,14 @@ public class RequestHandler {
         String signedBlock = jsonObject.getString("signedBlock");
         String blockHash = jsonObject.getString("blockHash");
         Consensus.getInstance().handleReceivedAgreement(signedBlock,blockHash,publickey);
+    }
+
+    public void handleRequestAdditionalData(String data, String publickey) {
+        JSONObject jsonObject = new JSONObject(data);
+        String ip = jsonObject.getString("ip");
+        int listeningPort = jsonObject.getInt("ListeningPort");
+        String signedBlock = jsonObject.getString("signedBlock");
+        String blockHash = jsonObject.getString("blockHash");
     }
 
 

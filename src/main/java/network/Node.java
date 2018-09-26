@@ -1,6 +1,7 @@
 package network;
 
 import Exceptions.FileUtilityException;
+import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import config.NodeConfig;
@@ -15,6 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileUtils;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -35,11 +40,13 @@ public final class Node {
         return instance;
     }
 
-    public void init() throws FileUtilityException {
+    public void init() throws FileUtilityException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
 
         /* Set config and its parameters */
-        Random random = new Random();
-        long peerID = random.nextLong();
+//        Random random = new Random();
+//        long peerID = random.nextLong();
+        String peerID = KeyGenerator.getInstance().getPublicKeyAsString();
+
 
         //Create config
         this.nodeConfig = new NodeConfig(peerID);
@@ -79,11 +86,12 @@ public final class Node {
 
     //revert later
 
-    public void initTest() throws FileUtilityException {
+    public void initTest() throws FileUtilityException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
 
         /* Set config and its parameters */
-        Random random = new Random();
-        long peerID = random.nextLong();
+//        Random random = new Random();
+//        long peerID = random.nextLong();
+        String peerID = KeyGenerator.getInstance().getPublicKeyAsString();
 
         //Create config
         this.nodeConfig = new NodeConfig(peerID);

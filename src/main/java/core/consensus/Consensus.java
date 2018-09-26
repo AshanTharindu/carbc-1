@@ -204,4 +204,9 @@ public class Consensus {
         return null;
     }
 
+    public void requestAdditionalData(Block block) {
+        //String sender = block
+        
+    }
+
 }
