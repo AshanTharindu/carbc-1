@@ -8,10 +8,13 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.net.*;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 
 
 public class FirstNodeTest {
-    public static void main(String[] args) throws FileUtilityException, IOException {
+    public static void main(String[] args) throws FileUtilityException, IOException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
 
         InetAddress inetAddress = InetAddress.getLocalHost();
         System.out.println("IP Address:- " + inetAddress.getHostAddress());

@@ -65,22 +65,10 @@ public class InitiateTransaction {
                 
 
                 String timeStampStr = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+                TransactionProposal proposal = new TransactionProposal(KeyGenerator.getInstance().getEncodedPublicKeyString(KeyGenerator.getInstance().getPublicKey()), validators, "data", "proposal-1", timeStampStr, transactionInfo);
+                System.out.println(proposal.getTransactionInfo().getEvent());
 
-                try {
-                    TransactionProposal proposal = new TransactionProposal(KeyGenerator.getInstance().getEncodedPublicKeyString(KeyGenerator.getInstance().getPublicKey()), validators, "data", "proposal-1", timeStampStr, transactionInfo);
-                    System.out.println(proposal.getTransactionInfo().getEvent());
-
-                    proposal.sendProposal();
-                    ;
-                } catch (InvalidKeySpecException e) {
-                    e.printStackTrace();
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (NoSuchProviderException e) {
-                    e.printStackTrace();
-                }
+                proposal.sendProposal();
             }
         });
     }

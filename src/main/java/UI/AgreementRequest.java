@@ -51,8 +51,6 @@ public class AgreementRequest {
                 try {
                     byte[] signature = ChainUtil.sign(KeyGenerator.getInstance().getPrivateKey(),"agreed");
                     MessageSender.getInstance().sendAgreement(block,1,"agreed",signature);
-                } catch (InvalidKeyException e1) {
-                    e1.printStackTrace();
                 } catch (NoSuchProviderException e1) {
                     e1.printStackTrace();
                 } catch (NoSuchAlgorithmException e1) {

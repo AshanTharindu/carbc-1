@@ -13,6 +13,8 @@ import network.Neighbour;
 import network.Node;
 import network.Protocol.*;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +24,8 @@ import java.security.spec.InvalidKeySpecException;
 public class MessageSender {
 
     private static  MessageSender messageSender;
+    private final Logger log = LoggerFactory.getLogger(Node.class);
+
 
     private MessageSender() {};
 
@@ -35,13 +39,9 @@ public class MessageSender {
     //messages of new protocol
     public void requestIP(int ListeningPort) throws IOException {
 
-//        URL whatismyip = new URL("http://checkip.amazonaws.com");
-//        BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-//        String ip = in.readLine(); //you get the IP as a String
-
         JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("ip",ip);
         jsonObject.put("ListeningPort",ListeningPort);
+        jsonObject.put("nodeID", Node.getInstance().getNodeConfig().getPeerID());
 
         RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
         requestIPMessage.addHeader("keepActive", "false");
@@ -63,6 +63,7 @@ public class MessageSender {
         blockChainRequest.addHeader("keepActive", "false");
         Consensus.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
         Node.getInstance().broadcast(blockChainRequest);
+        log.info("requestBlockchainHash");
         System.out.println("requestBlockchainHash");
     }
 
@@ -82,13 +83,14 @@ public class MessageSender {
         Node.getInstance().sendMessageToPeer(ip,listeningPort,blockChainRequest);
     }
 
-    public void sendSignedBlockChain(String ip, int listeningPort, String signedBlockchain, String blockchainHash) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    public void sendSignedBlockChain(String ip, int listeningPort, String signedBlockchain, String blockchainHash) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("signedBlockchain", signedBlockchain);
         jsonObject.put("blockchainHash", blockchainHash);
         jsonObject.put("publicKey",KeyGenerator.getInstance().getPublicKeyAsString());
         RequestMessage blockSignMessage = BlockChainSignCreator.createBlockChainSignRequest(jsonObject);
         Node.getInstance().sendMessageToPeer(ip, listeningPort, blockSignMessage);
+        log.info("sendSignedBlockChain");
         System.out.println("sendSignedBlockChain");
     }
 
@@ -98,6 +100,7 @@ public class MessageSender {
         jsonObject.put("blockchainLength", blockchainLength);
         RequestMessage blockchainSendMessage = BlockchainSendMessageCreator.createBlockchainSendMessage(jsonObject);
         Node.getInstance().sendMessageToPeer(ip,listeningPort,blockchainSendMessage);
+        log.info("blockchain sent");
         System.out.println("blockchain sent");
     }
 
@@ -113,10 +116,11 @@ public class MessageSender {
         }
     }
 
-    public void sendAgreement(String signedBlock, String blockHash) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
+    public void sendAgreement(String signedBlock, String blockHash) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("signedBlock", signedBlock);
         jsonObject.put("blockHash", blockHash);
+        jsonObject.put("publicKey", KeyGenerator.getInstance().getPublicKeyAsString());
         RequestMessage agreementMessage = AgreementCreator.createAgreementRequest(jsonObject);
         Node.getInstance().broadcast(agreementMessage);
     }
@@ -126,6 +130,7 @@ public class MessageSender {
         jsonObject.put("signedBlock", signedBlock);
         jsonObject.put("blockHash", blockHash);
         jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+        jsonObject.put("publicKey", KeyGenerator.getInstance().getPublicKeyAsString());
         RequestMessage dataRequestMessage = MessageCreator.createMessage(jsonObject,"RequestAdditionalData");
         Node.getInstance().sendMessageToPeer(ip,listeningPort, dataRequestMessage);
         System.out.println("Additional Data Requested");

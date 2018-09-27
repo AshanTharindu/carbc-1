@@ -10,14 +10,18 @@ import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 public class TestSendBlock5 {
-    public static void main(String[] args) throws FileUtilityException {
+    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*

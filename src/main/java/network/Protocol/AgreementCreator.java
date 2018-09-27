@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 
 public class AgreementCreator {
 
-    public static RequestMessage createAgreementRequest(JSONObject agreement) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    public static RequestMessage createAgreementRequest(JSONObject agreement) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
         String receiver = "yourPublicKey";

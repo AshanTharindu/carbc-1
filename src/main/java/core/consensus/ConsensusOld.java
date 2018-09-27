@@ -86,8 +86,7 @@ public class ConsensusOld {
     }
 
     public boolean handleAgreementResponse(Block block, String agreedNodePublicKey, String signatureString, String data)
-            throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException,
-            SignatureException, InvalidKeyException, ParseException, SQLException {
+            throws NoSuchAlgorithmException,ParseException, SQLException {
         PublicKey agreedNode = KeyGenerator.getInstance().getPublicKey(agreedNodePublicKey);
         byte[] signature = ChainUtil.hexStringToByteArray(signatureString);
         boolean verfied = ChainUtil.verify(agreedNode, signature, data);
@@ -119,7 +118,7 @@ public class ConsensusOld {
 
     }
 
-    public AgreementCollector getAgreementCollectorByBlock(Block block) throws NoSuchAlgorithmException {
+    public AgreementCollector getAgreementCollectorByBlock(Block block) {
         String id = AgreementCollector.generateAgreementCollectorId(block);
         for(AgreementCollector agreementCollector: this.agreementCollectors) {
             if(agreementCollector.getAgreementCollectorId().equals(id)) {
@@ -171,7 +170,7 @@ public class ConsensusOld {
         return false;
     }
 
-    public void blockHandler(Block block) throws NoSuchAlgorithmException, ParseException, SQLException {
+    public void blockHandler(Block block) throws NoSuchAlgorithmException {
         if (checkAgreementForBlock(block)) {
             String status = "Agreed block";
             BlockStatusUI blockStatusUI = new BlockStatusUI(block);
@@ -187,7 +186,7 @@ public class ConsensusOld {
         }
     }
 
-    public void checkForEligibilty(Block block) throws NoSuchAlgorithmException, ParseException, SQLException {
+    public void checkForEligibilty(Block block) throws ParseException, SQLException {
         int threshold = 1; //get from the predefined rules
 
         if (getAgreementCollectorByBlock(block).getAgreedNodesCount() == threshold) {
@@ -197,7 +196,7 @@ public class ConsensusOld {
         }
     }
 
-    public boolean addToAgreementCollectors(Block block) throws NoSuchAlgorithmException {
+    public boolean addToAgreementCollectors(Block block) {
         AgreementCollector agreementCollector = new AgreementCollector(block);
         System.out.println("agreement collector added");
         System.out.println("agreemenCollector id: " + agreementCollector.getAgreementCollectorId());
@@ -213,14 +212,14 @@ public class ConsensusOld {
     }
 
     public boolean sendAgreementForBlock(Block block, String agreed, int neighbourIndex) throws
-            InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException, SignatureException, InvalidKeyException {
+            InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException, SignatureException{
         MessageSender.getInstance().sendAgreement(block, 1, agreed,
                 ChainUtil.sign(KeyGenerator.getInstance().getPrivateKey(), agreed));
         //remove from agreementRequestBlocks array
         return true;
     }
 
-    public void handleAgreementRequest(Block block) throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
+    public void handleAgreementRequest(Block block) throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeySpecException {
         AgreementRequest ar = new AgreementRequest(block);
         ar.runAgreementRequestUI();
         Scanner scanner = new Scanner(System.in);

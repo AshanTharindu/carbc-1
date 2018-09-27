@@ -50,7 +50,7 @@ public class Consensus {
 
     //block broadcasting and sending agreements
 
-    public void handleNonApprovedBlock(Block block) throws NoSuchAlgorithmException {
+    public void handleNonApprovedBlock(Block block) {
         if(!isDuplicateBlock(block)) {
             //notify if relevant
             nonApprovedBlocks.add(block);
@@ -65,14 +65,14 @@ public class Consensus {
         return false;
     }
 
-    public void sendAgreementForBlock(Block block) throws NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, NoSuchProviderException, InvalidKeyException, IOException {
+    public void sendAgreementForBlock(Block block) {
         String blockHash = ChainUtil.getInstance().getBlockHash(block);
         String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
         MessageSender.getInstance().sendAgreement(signedBlock,blockHash);
         System.out.println("agreement sent");
     }
 
-    public void handleAgreement(Agreement agreement) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException, SignatureException, InvalidKeyException {
+    public void handleAgreement(Agreement agreement) {
         getAgreementCollector(agreement.getBlockHash()).addAgreementForBlock(agreement);
     }
 
@@ -85,19 +85,19 @@ public class Consensus {
         return null;
     }
 
-    public void handleReceivedAgreement(String signedBlock, String blockHash, String publicKey) throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
+    public void handleReceivedAgreement(String signedBlock, String blockHash, String publicKey) {
         handleAgreement(new Agreement(blockHash,signedBlock,publicKey));
     }
 
 
     //blockchain request methods
-    public synchronized void  handleBlockchainHashRequest(String ip, int listeningPort) throws NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, NoSuchProviderException, InvalidKeyException, IOException {
+    public synchronized void  handleBlockchainHashRequest(String ip, int listeningPort) {
         if(Blockchain.getInstance().getBlockchainArray().size() >=1) {
             sendSignedBlockChain(ip, listeningPort);
         }
     }
 
-    public void sendSignedBlockChain(String ip, int listeningPort) throws NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, NoSuchProviderException, InvalidKeyException, IOException {
+    public void sendSignedBlockChain(String ip, int listeningPort) {
         BlockchainShare blockchainShare = new BlockchainShare(ip, listeningPort);
         String blockchainHash = ChainUtil.getInstance().getBlockChainHash(blockchainShare.getBlockChainInstance());
         blockchainShareDetails.add(blockchainShare);
@@ -123,7 +123,8 @@ public class Consensus {
     }
 
     public synchronized void handleReceivedSignedBlockchain(String publicKey, String ip,int listeningPort,String signedBlockchain,
-                                               String blockchainHash) throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
+                                               String blockchainHash) {
+//        if(ChainUtil.getInstance().verifyUser())
         if(ChainUtil.getInstance().signatureVerification(publicKey,signedBlockchain,blockchainHash)){
             BlockchainReceiver blockchainReceiver = new BlockchainReceiver(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
             blockchainReceiveDetails.add(blockchainReceiver);
@@ -135,9 +136,7 @@ public class Consensus {
 
     }
 
-    public void addReceivedBlockchain(String publicKey, JSONObject blockchain, int blockchainLength)
-            throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException,
-            SQLException, ParseException {
+    public void addReceivedBlockchain(String publicKey, JSONObject blockchain, int blockchainLength) throws SQLException, ParseException {
         LinkedList<Block> blockchainArray = new LinkedList<>();
         for(int i = 0; i< blockchainLength; i++) {
             blockchainArray.add(RequestHandler.getInstance().JSONStringToBlock(blockchain.getString(String.valueOf(i))));
@@ -207,6 +206,14 @@ public class Consensus {
     public void requestAdditionalData(Block block) {
         //String sender = block
         
+    }
+
+    public void handleAdditionalDataRequest(String ip, int listeningPort, String signedBlock, String blockHash, String peerID ) {
+        String data =  getAdditionalDataForBlock(blockHash).toString();
+    }
+
+    public JSONObject getAdditionalDataForBlock(String blockHash) {
+        return new JSONObject();
     }
 
 }

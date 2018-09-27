@@ -10,10 +10,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 
 
 public class Peer3Test {
-    public static void main(String[] args) throws FileUtilityException, IOException {
+    public static void main(String[] args) throws FileUtilityException, IOException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
 
         InetAddress inetAddress = InetAddress.getLocalHost();
         System.out.println("IP Address:- " + inetAddress.getHostAddress());

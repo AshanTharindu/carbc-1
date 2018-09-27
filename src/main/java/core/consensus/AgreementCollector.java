@@ -18,7 +18,7 @@ public class AgreementCollector {
     ArrayList<String> agreedNodes;
     private Rating rating;
 
-    public AgreementCollector(Block block) throws NoSuchAlgorithmException {
+    public AgreementCollector(Block block) {
         agreementCollectorId = generateAgreementCollectorId(block);
         this.block = block;
         agreements = new ArrayList<>();
@@ -36,7 +36,7 @@ public class AgreementCollector {
     }
 
     //adding agreements
-    public boolean addAgreementForBlock(Agreement agreement) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, SignatureException, InvalidKeyException {
+    public boolean addAgreementForBlock(Agreement agreement) {
         if(agreementCollectorId.equals(agreement.getBlockHash())) {
             //check for mandotory
             if(!isDuplicateAgreement(agreement)) {
@@ -53,7 +53,7 @@ public class AgreementCollector {
         return false;
     }
 
-    public static String generateAgreementCollectorId(Block block) throws NoSuchAlgorithmException {
+    public static String generateAgreementCollectorId(Block block) {
         return ChainUtil.getInstance().getBlockHash(block);
     }
 

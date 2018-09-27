@@ -76,7 +76,15 @@ public class ChainUtilTest {
             System.out.println(ChainUtil.getInstance().signatureVerification(pkString,Digitalsignature,"agreed"));
 
 
-            System.out.println("getBlockChainHashTest");
+            System.out.println("publickeyAsStringTest");
+            System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
+            System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
+            System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
+            System.out.println(KeyGenerator.getInstance().getPublicKeyAsString().length());
+
+            System.out.println("public key test");
+            System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
+
         } catch (Exception e) {
             e.getMessage();
         }

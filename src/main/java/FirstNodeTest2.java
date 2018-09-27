@@ -6,9 +6,12 @@ import network.Node;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 
 public class FirstNodeTest2 {
-    public static void main(String[] args) throws FileUtilityException, IOException {
+    public static void main(String[] args) throws FileUtilityException, IOException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
@@ -27,7 +30,7 @@ public class FirstNodeTest2 {
          * when initializing the network
          * */
         Node node = Node.getInstance();
-        node.init();
+        node.initTest();
 
         /*
          * when we want our node to start listening

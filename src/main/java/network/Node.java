@@ -45,7 +45,7 @@ public final class Node {
         /* Set config and its parameters */
 //        Random random = new Random();
 //        long peerID = random.nextLong();
-        String peerID = KeyGenerator.getInstance().getPublicKeyAsString();
+        String peerID = KeyGenerator.getInstance().getPublicKeyAsString().substring(10);
 
 
         //Create config
@@ -91,7 +91,7 @@ public final class Node {
         /* Set config and its parameters */
 //        Random random = new Random();
 //        long peerID = random.nextLong();
-        String peerID = KeyGenerator.getInstance().getPublicKeyAsString();
+        String peerID = KeyGenerator.getInstance().getPublicKeyAsString().substring(0,40);
 
         //Create config
         this.nodeConfig = new NodeConfig(peerID);

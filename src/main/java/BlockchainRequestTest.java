@@ -6,12 +6,16 @@ import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockchainRequestTest {
-    public static void main(String[] args) throws FileUtilityException {
+    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
@@ -30,12 +34,12 @@ public class BlockchainRequestTest {
          * when initializing the network
          * */
         Node node = Node.getInstance();
-        node.init();
+        node.initTest();
 
         /*
          * when we want our node to start listening
          * */
-        //node.startListening();
+        node.startListening();
 
         ArrayList<String> blockchain = new ArrayList<>();
         blockchain.add("block1");

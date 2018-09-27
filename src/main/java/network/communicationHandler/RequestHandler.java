@@ -36,7 +36,7 @@ public class RequestHandler {
     public void handleRequest(Map headers, String data) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, SignatureException, InvalidKeyException, ParseException, SQLException {
         System.out.println("********requestHandler*******");
         String messageType = (String)headers.get("messageType");
-        String publicKey = (String)headers.get("sender");
+        String peerID = (String)headers.get("sender");
         switch (messageType) {
 
             //request of the old protocol
@@ -93,15 +93,15 @@ public class RequestHandler {
 
             case "BlockchainSend":
                 System.out.println("BlockchainSend");
-                handleReceivedBlockchainRequest(data,publicKey);
+                handleReceivedBlockchainRequest(data,peerID);
 
             case "Agreement":
                 System.out.println("Agreement");
-                handleReceivedAgreement(data,publicKey);
+                handleReceivedAgreement(data,peerID);
 
             case "RequestAdditionalData":
                 System.out.println("RequestAdditionalData");
-                handleRequestAdditionalData(data,publicKey);
+                handleRequestAdditionalData(data,peerID);
 
             default:
                 System.out.println("default");
@@ -178,6 +178,7 @@ public class RequestHandler {
         int listeningPort = jsonObject.getInt("ListeningPort");
         String signedBlock = jsonObject.getString("signedBlock");
         String blockHash = jsonObject.getString("blockHash");
+
     }
 
 
@@ -245,25 +246,7 @@ public class RequestHandler {
         Consensus.getInstance().handleNonApprovedBlock(decodedBLock);
     }
 
-    public Block JSONStringToBlock(String JSONblock) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
-//        byte[] prevhash = ChainUtil.hexStringToByteArray("1234");
-//        byte[] hash = ChainUtil.hexStringToByteArray("5678");
-//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//        byte[] data = ChainUtil.hexStringToByteArray("1456");
-//        byte[] signatue1 = ChainUtil.hexStringToByteArray("3332");
-//        byte[] signatue2 = ChainUtil.hexStringToByteArray("3442");
-//        PublicKey publicKey = KeyGenerator.getInstance().getPublicKey();
-//        Validator validator1 = new Validator("val1pubkey","owner",true,3);
-//        Validator validator2 = new Validator("val2pubkey","seller",true,4);
-//        ArrayList<Validation> validations = new ArrayList<>();
-//        validations.add(new Validation(validator1,"3332"));
-//        validations.add(new Validation(validator2,"3442"));
-//        BlockHeader blockHeader = new BlockHeader("101","1234",timestamp,
-//                "senderPubkey",123,true);
-//        Transaction transaction = new Transaction("senderpubkey",validations,
-//                "tran1",new TransactionInfo());
-
-//        Block block = new Block(blockHeader,transaction);
+    public Block JSONStringToBlock(String JSONblock) {
         JSONObject jsonObject = new JSONObject(JSONblock);
         Gson gson = new GsonBuilder().serializeNulls().create();
         Block block = gson.fromJson(JSONblock,Block.class);
