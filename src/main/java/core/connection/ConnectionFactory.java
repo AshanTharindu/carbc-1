@@ -1,14 +1,14 @@
 package core.connection;
 
 import java.sql.Connection;
-        import java.sql.DriverManager;
-        import java.sql.SQLException;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class ConnectionFactory {
     String driverClassName = "com.mysql.jdbc.Driver";
     String connectionUrl = "jdbc:mysql://localhost:3306/CarBC?verifyServerCertificate=false&useSSL=true";
-    String dbUser = "root";
-    String dbPwd = "";
+    String dbUser = "admin";
+    String dbPwd = "admin123";
 
     private static ConnectionFactory connectionFactory = null;
 
