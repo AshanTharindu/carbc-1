@@ -15,6 +15,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -233,6 +234,10 @@ public class Consensus {
 
     public JSONObject getAdditionalDataForBlock(String blockHash) {
         return new JSONObject();
+    }
+
+    public void requestTransactionData(String vehicleID, String location, Timestamp date, String peerID) {
+        
     }
 
 }
