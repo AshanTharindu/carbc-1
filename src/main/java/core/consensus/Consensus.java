@@ -2,7 +2,6 @@ package core.consensus;
 
 import chainUtil.ChainUtil;
 import core.blockchain.Block;
-import core.blockchain.Blockchain;
 import core.blockchain.Transaction;
 import core.smartContract.BlockValidity;
 import network.communicationHandler.MessageSender;
@@ -53,7 +52,7 @@ public class Consensus {
 
     //2->block broadcasting and sending agreements
 
-    public void handleNonApprovedBlock(Block block) throws NoSuchAlgorithmException, SQLException {
+    public synchronized void handleNonApprovedBlock(Block block) throws NoSuchAlgorithmException, SQLException {
 
         if(!isDuplicateBlock(block)) {
             //notify if relevant
@@ -70,6 +69,7 @@ public class Consensus {
     }
 
 
+    //no need of synchronizing
     public boolean isDuplicateBlock(Block block) {
         if(nonApprovedBlocks.contains(block)) {
             return true;
@@ -77,6 +77,7 @@ public class Consensus {
         return false;
     }
 
+    //no need of synchronizing
     public void sendAgreementForBlock(Block block) {
         String blockHash = ChainUtil.getInstance().getBlockHash(block);
         String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
@@ -84,10 +85,12 @@ public class Consensus {
         System.out.println("agreement sent");
     }
 
+    //no need of synchronizing
     public void handleAgreement(Agreement agreement) {
         getAgreementCollector(agreement.getBlockHash()).addAgreementForBlock(agreement);
     }
 
+    //no need of synchronizing
     private AgreementCollector getAgreementCollector(String id) {
         for(AgreementCollector agreementCollector: this.agreementCollectors) {
             if(agreementCollector.getAgreementCollectorId().equals(id)) {
@@ -97,6 +100,7 @@ public class Consensus {
         return null;
     }
 
+    //no need of synchronizing
     public void handleReceivedAgreement(String signedBlock, String blockHash, String publicKey) {
         handleAgreement(new Agreement(blockHash,signedBlock,publicKey));
     }
@@ -109,7 +113,7 @@ public class Consensus {
 //        }
     }
 
-    public void sendSignedBlockChain(String ip, int listeningPort) {
+    public synchronized void sendSignedBlockChain(String ip, int listeningPort) {
         BlockchainShare blockchainShare = new BlockchainShare(ip, listeningPort);
         String blockchainHash = ChainUtil.getInstance().getBlockChainHash(blockchainShare.getBlockChainInstance());
         blockchainShareDetails.add(blockchainShare);
@@ -118,13 +122,15 @@ public class Consensus {
 
     }
 
+    //no need of synchronizing
     public void sendBlockchain(String ip, int listeningPort) {
-        BlockchainShare blockchainShare = getBlockchanSharefromIP(ip,listeningPort);
+        BlockchainShare blockchainShare = getBlockchainShareFromIP(ip,listeningPort);
         String jsonBlockchain = ChainUtil.getInstance().getBlockchainAsJsonString(blockchainShare.getBlockChainInstance());
         MessageSender.getInstance().sendBlockchainToPeer(ip,listeningPort,jsonBlockchain, blockchainShare.getBlockChainInstance().size());
     }
 
-    public BlockchainShare getBlockchanSharefromIP(String ip, int listeningPort) {
+    //no need of synchronizing
+    public BlockchainShare getBlockchainShareFromIP(String ip, int listeningPort) {
         String id = ip+String.valueOf(listeningPort);
         for(BlockchainShare blockchainShare : blockchainShareDetails) {
             if(id.equals(blockchainShare.getId())) {
@@ -148,7 +154,7 @@ public class Consensus {
 
     }
 
-    public void addReceivedBlockchain(String publicKey, JSONObject blockchain, int blockchainLength) throws SQLException, ParseException {
+    public synchronized void addReceivedBlockchain(String publicKey, JSONObject blockchain, int blockchainLength) throws SQLException, ParseException {
 //        LinkedList<Block> blockchainArray = new LinkedList<>();
 //        for(int i = 0; i< blockchainLength; i++) {
 //            blockchainArray.add(RequestHandler.getInstance().JSONStringToBlock(blockchain.getString(String.valueOf(i))));
@@ -171,11 +177,11 @@ public class Consensus {
         return blockchainRequest;
     }
 
-    public void setBlockchainRequest(int blockchainRequest) {
+    public synchronized void setBlockchainRequest(int blockchainRequest) {
         this.blockchainRequest = blockchainRequest;
     }
 
-    public String findCorrectBlockchain() {
+    public synchronized String findCorrectBlockchain() {
         HashMap<String, Integer> counter = new HashMap<String, Integer>();
         for(BlockchainReceiver blockchainReceiver: blockchainReceiveDetails) {
             if (counter.containsKey(blockchainReceiver.getId())) {
@@ -199,13 +205,14 @@ public class Consensus {
     }
 
 
+    //no need of synchronizing
     public void requestBlockchain() {
         BlockchainReceiver blockchainReceiver = getBlockchainReceiverfromPK(findCorrectBlockchain());
         requestedBlockchainHash = blockchainReceiver.getBlockchainHash();
         MessageSender.getInstance().requestBlockchainFromPeer(blockchainReceiver.getIp(),blockchainReceiver.getListeningPort());
     }
 
-
+    //no need of synchronizing
     public BlockchainReceiver getBlockchainReceiverfromPK(String publicKey) {
         for(BlockchainReceiver blockchainReceiver: blockchainReceiveDetails) {
             if(publicKey.equals(blockchainReceiver.getId())) {

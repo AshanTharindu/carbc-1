@@ -19,10 +19,12 @@ import java.text.ParseException;
 public class Handler extends Thread{
     String messageType;
     String data;
+    String peerID;
 
-    public Handler(String messageType, String data){
+    public Handler(String messageType, String data, String peerID){
         this.messageType = messageType;
         this.data = data;
+        this.peerID = peerID;
     }
 
     @Override
@@ -60,11 +62,11 @@ public class Handler extends Thread{
 
                 case "BlockchainSend":
                     System.out.println("BlockchainSend");
-//                    handleReceivedBlockchainRequest(publicKey);
+                    handleReceivedBlockchainRequest();
 
                 case "Agreement":
                     System.out.println("Agreement");
-//                    handleReceivedAgreement(publicKey);
+                    handleReceivedAgreement();
 
                 default:
                     System.out.println("default");
@@ -133,22 +135,22 @@ public class Handler extends Thread{
         Consensus.getInstance().sendBlockchain(ip,listeningPort);
     }
 
-    public void handleReceivedBlockchainRequest(String data,String publicKey) throws ParseException, NoSuchAlgorithmException, IOException, SQLException, NoSuchProviderException, InvalidKeySpecException {
+    public void handleReceivedBlockchainRequest() throws ParseException, NoSuchAlgorithmException, IOException, SQLException, NoSuchProviderException, InvalidKeySpecException {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("ListeningPort");
         int blockchainLength = jsonObject.getInt("blockchainLength");
         JSONObject jsonBlockchain = new JSONObject(jsonObject.getString("blockchain"));
-        Consensus.getInstance().addReceivedBlockchain(publicKey,jsonBlockchain,blockchainLength);
+        Consensus.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
     }
 
-    public void handleReceivedAgreement(String data, String publickey) throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
+    public void handleReceivedAgreement() throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("ListeningPort");
         String signedBlock = jsonObject.getString("signedBlock");
         String blockHash = jsonObject.getString("blockHash");
-        Consensus.getInstance().handleReceivedAgreement(signedBlock,blockHash,publickey);
+        Consensus.getInstance().handleReceivedAgreement(signedBlock, blockHash, peerID);
     }
 
     // 0-> block comes

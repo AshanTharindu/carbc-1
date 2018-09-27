@@ -27,6 +27,9 @@ public class RequestHandler {
         String messageType = (String)headers.get("messageType");
         String peerID = (String)headers.get("sender");
 
+        Handler handler = new Handler(messageType, data, peerID);
+        handler.start();
+
     }
 
 }

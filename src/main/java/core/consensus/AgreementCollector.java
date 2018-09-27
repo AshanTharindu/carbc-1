@@ -83,7 +83,7 @@ public class AgreementCollector {
     }
 
     //adding agreements
-    public boolean addAgreementForBlock(Agreement agreement) {
+    public synchronized boolean addAgreementForBlock(Agreement agreement) {
         if(agreementCollectorId.equals(agreement.getBlockHash())) {
             //check for mandotory
             if(!isDuplicateAgreement(agreement)) {
@@ -104,6 +104,7 @@ public class AgreementCollector {
         return ChainUtil.getInstance().getBlockHash(block);
     }
 
+    //no need synchronizing
     public boolean isDuplicateAgreement(Agreement agreement) {
         if(agreements.contains(agreement)) {
             return true;
