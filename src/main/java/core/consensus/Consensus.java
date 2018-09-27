@@ -4,6 +4,7 @@ import chainUtil.ChainUtil;
 import core.blockchain.Block;
 import core.blockchain.Blockchain;
 import core.blockchain.Transaction;
+import core.smartContract.BlockValidity;
 import network.communicationHandler.MessageSender;
 import network.communicationHandler.RequestHandler;
 import org.json.JSONObject;
@@ -50,13 +51,24 @@ public class Consensus {
 
     //block broadcasting and sending agreements
 
-    public void handleNonApprovedBlock(Block block) {
+    //2->block broadcasting and sending agreements
+
+    public void handleNonApprovedBlock(Block block) throws NoSuchAlgorithmException, SQLException {
+
         if(!isDuplicateBlock(block)) {
             //notify if relevant
             nonApprovedBlocks.add(block);
             agreementCollectors.add(new AgreementCollector(block));
+
+            //now need to check the relevant party is registered as with desired roles
+            //if want, we can check the validity of the block creator/transaction creator
+            BlockValidity blockValidity = new BlockValidity(block);
+            if (blockValidity.isSecondaryPartyValid()){
+                //pop up notification to confirm
+            }
         }
     }
+
 
     public boolean isDuplicateBlock(Block block) {
         if(nonApprovedBlocks.contains(block)) {
@@ -92,9 +104,9 @@ public class Consensus {
 
     //blockchain request methods
     public synchronized void  handleBlockchainHashRequest(String ip, int listeningPort) {
-        if(Blockchain.getInstance().getBlockchainArray().size() >=1) {
-            sendSignedBlockChain(ip, listeningPort);
-        }
+//        if(Blockchain.getInstance().getBlockchainArray().size() >=1) {
+//            sendSignedBlockChain(ip, listeningPort);
+//        }
     }
 
     public void sendSignedBlockChain(String ip, int listeningPort) {
@@ -137,22 +149,22 @@ public class Consensus {
     }
 
     public void addReceivedBlockchain(String publicKey, JSONObject blockchain, int blockchainLength) throws SQLException, ParseException {
-        LinkedList<Block> blockchainArray = new LinkedList<>();
-        for(int i = 0; i< blockchainLength; i++) {
-            blockchainArray.add(RequestHandler.getInstance().JSONStringToBlock(blockchain.getString(String.valueOf(i))));
-        }
-
-        String blockchainHash = ChainUtil.getInstance().getBlockChainHash(blockchainArray);
-        if(requestedBlockchainHash.equals(blockchainHash)) {
-            addBlockchain(blockchainArray);
-        }
+//        LinkedList<Block> blockchainArray = new LinkedList<>();
+//        for(int i = 0; i< blockchainLength; i++) {
+//            blockchainArray.add(RequestHandler.getInstance().JSONStringToBlock(blockchain.getString(String.valueOf(i))));
+//        }
+//
+//        String blockchainHash = ChainUtil.getInstance().getBlockChainHash(blockchainArray);
+//        if(requestedBlockchainHash.equals(blockchainHash)) {
+//            addBlockchain(blockchainArray);
+//        }
     }
 
     public void addBlockchain(LinkedList<Block> blockchain) throws SQLException, ParseException {
-        //add to blockchain
-        for(int i = 1; i< blockchain.size(); i++ ) {
-            Blockchain.getInstance().addBlock(blockchain.get(i));
-        }
+//        //add to blockchain
+//        for(int i = 1; i< blockchain.size(); i++ ) {
+//            Blockchain.getInstance().addBlock(blockchain.get(i));
+//        }
     }
 
     public int getBlockchainRequest() {

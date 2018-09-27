@@ -8,7 +8,6 @@ import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import core.blockchain.Block;
 import core.blockchain.Blockchain;
-import core.blockchain.Validation;
 import network.communicationHandler.MessageSender;
 
 import javax.swing.*;
@@ -44,45 +43,45 @@ public class ConsensusOld {
     }
 
     public boolean requestAgreementForBlock(Block block) throws NoSuchAlgorithmException {
-        addToAgreementCollectors(block);
-        ArrayList<String> validators = new ArrayList<>();
-        ArrayList<Validation> validations = block.getTransaction().getValidations();
-        for (Validation validation : validations) {
-            validators.add(validation.getValidator().getValidator());
-            MessageSender.getInstance().requestAgreement(block, 1);
-        }
-
-        //send the block to validators in the validators array for agreements
+//        addToAgreementCollectors(block);
+//        ArrayList<String> validators = new ArrayList<>();
+//        ArrayList<Validation> validations = block.getTransaction().getValidations();
+//        for (Validation validation : validations) {
+//            validators.add(validation.getValidator().getValidator());
+//            MessageSender.getInstance().requestAgreement(block, 1);
+//        }
+//
+//        //send the block to validators in the validators array for agreements
         return true;
     }
 
 
     public boolean checkAgreementForBlock(Block block) {
-        System.out.println("inside check agreement");
-        String transID = block.getTransaction().getTransactionID();
-
-        for (String transactionId : agreedTransactiions) {
-            if (transactionId.equals(transID)) {
-                System.out.println("transaction found");
-                return true;
-            }
-        }
+//        System.out.println("inside check agreement");
+//        String transID = block.getTransaction().getTransactionID();
+//
+//        for (String transactionId : agreedTransactiions) {
+//            if (transactionId.equals(transID)) {
+//                System.out.println("transaction found");
+//                return true;
+//            }
+//        }
         return false;
     }
 
     public boolean agreedTransaction(String transactionID) {
-        if (!agreedTransactiions.contains(transactionID)) {
-            agreedTransactiions.add(transactionID);
-            System.out.println("Agreed Transaction added, id: " + transactionID);
-            return true;
-        } else {
+//        if (!agreedTransactiions.contains(transactionID)) {
+//            agreedTransactiions.add(transactionID);
+//            System.out.println("Agreed Transaction added, id: " + transactionID);
+//            return true;
+//        } else {
             return false;
-        }
+//        }
     }
 
     public void addRequestAgreementBlock(Block block) {
-        agreementRequestBlocks.add(block);
-        System.out.println("added to agreementRequestBlocks array");
+//        agreementRequestBlocks.add(block);
+//        System.out.println("added to agreementRequestBlocks array");
     }
 
     public boolean handleAgreementResponse(Block block, String agreedNodePublicKey, String signatureString, String data)
@@ -129,44 +128,44 @@ public class ConsensusOld {
     }
 
     public boolean insertBlock(Block block) throws ParseException, SQLException {
-        System.out.println("inside insert block");
-        long receivedBlockNumber = block.getHeader().getBlockNumber();
-        String receivedBlockTimestampString = block.getHeader().getTimestamp();
-
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-        Date parsedDate = dateFormat.parse(receivedBlockTimestampString);
-        Timestamp receivedBlockTimestamp = new java.sql.Timestamp(parsedDate.getTime());
-
-        if (!blockExistence(block)) {
-            Blockchain.getInstance().addBlock(block);
-            JOptionPane.showMessageDialog(null,"Block Added Successfully");
-            System.out.println("block added successfully");
-            return true;
-        } else {
-            Block existBlock = Blockchain.getInstance().getBlockByNumber(receivedBlockNumber);
-            String existingTimeStampString = existBlock.getHeader().getTimestamp();
-            Date parsedDate1 = dateFormat.parse(existingTimeStampString);
-            Timestamp exsitingTimeStamp = new java.sql.Timestamp(parsedDate1.getTime());
-
-            if (exsitingTimeStamp.after(receivedBlockTimestamp)) {
-                Blockchain.getInstance().rollBack(receivedBlockNumber);
-                Blockchain.getInstance().addBlock(block);
-                JOptionPane.showMessageDialog(null,"Block Added Successfully");
-                System.out.println("block added successfully");
-                return true;
-            } else if (exsitingTimeStamp.equals(receivedBlockTimestamp)) {
-                Blockchain.getInstance().rollBack(receivedBlockNumber);
-                return false;
-            }
+//        System.out.println("inside insert block");
+//        long receivedBlockNumber = block.getHeader().getBlockNumber();
+//        String receivedBlockTimestampString = block.getHeader().getTimestamp();
+//
+//
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+//        Date parsedDate = dateFormat.parse(receivedBlockTimestampString);
+//        Timestamp receivedBlockTimestamp = new java.sql.Timestamp(parsedDate.getTime());
+//
+//        if (!blockExistence(block)) {
+//            Blockchain.getInstance().addBlock(block);
+//            JOptionPane.showMessageDialog(null,"Block Added Successfully");
+//            System.out.println("block added successfully");
+//            return true;
+//        } else {
+//            Block existBlock = Blockchain.getInstance().getBlockByNumber(receivedBlockNumber);
+//            String existingTimeStampString = existBlock.getHeader().getTimestamp();
+//            Date parsedDate1 = dateFormat.parse(existingTimeStampString);
+//            Timestamp exsitingTimeStamp = new java.sql.Timestamp(parsedDate1.getTime());
+//
+//            if (exsitingTimeStamp.after(receivedBlockTimestamp)) {
+//                Blockchain.getInstance().rollBack(receivedBlockNumber);
+//                Blockchain.getInstance().addBlock(block);
+//                JOptionPane.showMessageDialog(null,"Block Added Successfully");
+//                System.out.println("block added successfully");
+//                return true;
+//            } else if (exsitingTimeStamp.equals(receivedBlockTimestamp)) {
+//                Blockchain.getInstance().rollBack(receivedBlockNumber);
+//                return false;
+//            }
             return false;
-        }
+//        }
     }
 
     public boolean blockExistence(Block block) {
-        if (Blockchain.getInstance().getBlockchainArray().size() > block.getHeader().getBlockNumber()) {
-            return true;
-        }
+//        if (Blockchain.getInstance().getBlockchainArray().size() > block.getHeader().getBlockNumber()) {
+//            return true;
+//        }
         return false;
     }
 

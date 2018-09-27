@@ -6,7 +6,6 @@ import core.blockchain.*;
 import chainUtil.KeyGenerator;
 import core.blockchain.Block;
 import core.blockchain.Transaction;
-import core.blockchain.TransactionProposal;
 import core.consensus.Consensus;
 import network.Client.RequestMessage;
 import network.Neighbour;
@@ -169,24 +168,24 @@ public class MessageSender {
         Node.getInstance().sendMessageToNeighbour(neighbourIndex, blockMessage);
     }
 
-    public void reqestTransactionValidation(TransactionProposal transactionProposal, int neighbourIndex) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("transactionProposal",new JSONObject(transactionProposal).toString());
-        RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
-        blockMessage.addHeader("keepActive", "false");
-        blockMessage.addHeader("messageType", "TransactionProposal");
-        Node.getInstance().sendMessageToNeighbour(neighbourIndex, blockMessage);
-    }
-
-    public void sendTransactionValidation(TransactionResponse transactionResponse, int neighbourIndex) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("transactionResponse",new Gson().toJson(transactionResponse));
-        //jsonObject.put("signature",ChainUtil.bytesToHex(signature));
-        RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
-        blockMessage.addHeader("keepActive", "false");
-        blockMessage.addHeader("messageType", "TransactionValidation");
-        Node.getInstance().sendMessageToNeighbour(neighbourIndex, blockMessage);
-    }
+//    public void reqestTransactionValidation(TransactionProposal transactionProposal, int neighbourIndex) {
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("transactionProposal",new JSONObject(transactionProposal).toString());
+//        RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
+//        blockMessage.addHeader("keepActive", "false");
+//        blockMessage.addHeader("messageType", "TransactionProposal");
+//        Node.getInstance().sendMessageToNeighbour(neighbourIndex, blockMessage);
+//    }
+//
+//    public void sendTransactionValidation(TransactionResponse transactionResponse, int neighbourIndex) {
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("transactionResponse",new Gson().toJson(transactionResponse));
+//        //jsonObject.put("signature",ChainUtil.bytesToHex(signature));
+//        RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
+//        blockMessage.addHeader("keepActive", "false");
+//        blockMessage.addHeader("messageType", "TransactionValidation");
+//        Node.getInstance().sendMessageToNeighbour(neighbourIndex, blockMessage);
+//    }
 
     public String blockToJSON(Block block) {
         Gson gson = new Gson();

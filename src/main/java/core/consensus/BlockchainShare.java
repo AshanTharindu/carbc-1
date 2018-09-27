@@ -13,10 +13,10 @@ public class BlockchainShare {
     private LinkedList<Block> blockChainInstance;
 
     public BlockchainShare(String ip, int listeningPort) {
-        this.ip = ip;
-        this.listeningPort = listeningPort;
-        id = ip + String.valueOf(listeningPort);
-        blockChainInstance = Blockchain.getInstance().getBlockchainArray();
+//        this.ip = ip;
+//        this.listeningPort = listeningPort;
+//        id = ip + String.valueOf(listeningPort);
+//        blockChainInstance = Blockchain.getInstance().getBlockchainArray();
     }
 
     public String getId() {

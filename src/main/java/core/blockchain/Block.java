@@ -5,67 +5,41 @@ import chainUtil.ChainUtil;
 import java.security.PublicKey;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Block {
+    private BlockHeader blockHeader;
+    private BlockBody blockBody;
 
-    private BlockHeader header;
-    private Transaction transactions;
-
-    private String genesisMsg;
-
-
-    public Block(BlockHeader header, Transaction transactions) {
-        this.header = header;
-        this.transactions = transactions;
+    public Block(BlockHeader blockHeader, BlockBody blockBody){
+        this.blockHeader = blockHeader;
+        this.blockBody = blockBody;
     }
-
-//       private String version;
-//    private byte[] previoushash;
-//    private byte[] hash;
-//    private Timestamp timestamp;
-//    //private int txCount;
-//    private PublicKey signer;
-//    private long blockNumber;
-//    private boolean isApproved;
-
-
     public Block(BlockHeader genesisHeader){
-        this.header =genesisHeader;
+        this.blockHeader =genesisHeader;
     }
 
-
-    public BlockHeader getHeader() {
-        return header;
+    public BlockHeader getBlockHeader() {
+        return blockHeader;
     }
 
-    public Transaction getTransaction() {
-        return transactions;
+    public void setBlockHeader(BlockHeader blockHeader) {
+        this.blockHeader = blockHeader;
     }
 
-
-    public void setHeader(BlockHeader header) {
-        this.header = header;
+    public BlockBody getBlockBody() {
+        return blockBody;
     }
 
-    public void setTransaction(Transaction transactions) {
-        this.transactions = transactions;
+    public void setBlockBody(BlockBody blockBody) {
+        this.blockBody = blockBody;
     }
 
-
-
-
-
-    public static Block createGenesis(){
-        Calendar calendar = Calendar.getInstance();
-        java.util.Date now = calendar.getTime();
-        String timeStampStr = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
-
-        //String currentTimestampString = String.valueOf(currentTimestamp);
-
-        BlockHeader blockHeader = new BlockHeader("1","genesis Block",timeStampStr,"developer",
-                (long)1,true);
+    public static Block createGenesis() throws ParseException {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        BlockHeader blockHeader = new BlockHeader("genesis Block", timestamp, (long)1);
         Block genesisBlock = new Block(blockHeader);
         return genesisBlock;
     }
@@ -73,10 +47,4 @@ public class Block {
     public void broadcast(){
 
     }
-    public boolean sendBlockToValidator(Validator validator){
-        String publicKey = validator.getValidator();
-        //send block to validator
-        return false;
-    }
-
 }
