@@ -61,7 +61,11 @@ public class AgreementCollector {
 
                 if (role.equals(validatorRole)){
                     String secondaryPartyAddress = jsonObject.getString("address");
-                    mandatoryValidators.put(validatorRole, secondaryPartyAddress);
+
+                    synchronized (this) {
+                        mandatoryValidators.put(validatorRole, secondaryPartyAddress);
+                    }
+
                     isPresent = true;
                     break;
                 }

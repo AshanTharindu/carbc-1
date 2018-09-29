@@ -1,6 +1,7 @@
 package core.connection;
 
 import chainUtil.ChainUtil;
+import core.blockchain.BlockInfo;
 import org.json.JSONObject;
 
 import java.sql.*;
@@ -17,7 +18,7 @@ public class BlockJDBCDAO {
 
         if (transactionType.equals("I")){
             query = "INSERT INTO `Identity`(`block_hash`, `role`, `name`) " +
-                    "VALUES (?,?,?)";
+                    "VALUES (?,?,?,?)";
         }
 
         try {
@@ -43,8 +44,9 @@ public class BlockJDBCDAO {
 
             PreparedStatement psmt = connection.prepareStatement(query);
             psmt.setString(1, identity.getBlock_hash());
-            psmt.setString(2, identity.getRole());
-            psmt.setString(3, identity.getName());
+            psmt.setString(2, identity.getPublic_key());
+            psmt.setString(3, identity.getRole());
+            psmt.setString(4, identity.getName());
             psmt.executeUpdate();
 
             System.out.println("Block is Added Successfully");
@@ -96,12 +98,23 @@ public class BlockJDBCDAO {
     //get an identity of a person by address
     public JSONObject getIdentityByAddress(String address) throws SQLException {
         String query = "SELECT `data` FROM `Blockchain` WHERE `address` = ?";
+        return getIdentity(address);
+    }
+
+    //get an identity of a person by address
+    public JSONObject getIdentityByRole(String role) throws SQLException {
+        String query = "SELECT `data` FROM `Blockchain` WHERE `role` = ?";
+        return getIdentity(role);
+    }
+
+    public JSONObject getIdentity(String type) throws SQLException {
+        String query = "SELECT `data` FROM `Blockchain` WHERE `role` = ?";
         JSONObject identity = null;
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(query);
-            ptmt.setString(1, address);
+            ptmt.setString(1, type);
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
@@ -109,8 +122,6 @@ public class BlockJDBCDAO {
                 identity = new JSONObject(data);
                 return identity;
 
-//                String role = jsonData.getString("role");
-//                String name = jsonData.getString("name");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -127,6 +138,7 @@ public class BlockJDBCDAO {
         }
 
     }
+
 
     //get an identity related transactions
     public void updateIdentityTableAtBlockchainReceipt() throws SQLException {

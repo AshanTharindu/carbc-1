@@ -1,4 +1,4 @@
-package core.connection;
+package core.blockchain;
 
 import org.json.JSONObject;
 

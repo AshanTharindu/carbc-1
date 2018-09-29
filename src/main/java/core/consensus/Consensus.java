@@ -5,15 +5,9 @@ import core.blockchain.Block;
 import core.blockchain.Transaction;
 import core.smartContract.BlockValidity;
 import network.communicationHandler.MessageSender;
-import network.communicationHandler.RequestHandler;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -142,7 +136,7 @@ public class Consensus {
     }
 
     public synchronized void handleReceivedSignedBlockchain(String publicKey, String ip,int listeningPort,String signedBlockchain,
-                                               String blockchainHash) {
+                                                            String blockchainHash) {
 //        if(ChainUtil.getInstance().verifyUser())
         if(ChainUtil.getInstance().signatureVerification(publicKey,signedBlockchain,blockchainHash)){
             BlockchainReceiver blockchainReceiver = new BlockchainReceiver(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
@@ -225,7 +219,7 @@ public class Consensus {
 
     public void requestAdditionalData(Block block) {
         //String sender = block
-        
+
     }
 
     public void handleAdditionalDataRequest(String ip, int listeningPort, String signedBlock, String blockHash, String peerID ) {
@@ -237,7 +231,7 @@ public class Consensus {
     }
 
     public void requestTransactionData(String vehicleID, String location, Timestamp date, String peerID) {
-        
+
     }
 
 }

@@ -6,12 +6,12 @@
   },
   "ServiceRepair":{
     "id": 2,
-    "params":{"vehicleId":"","location":"","repairInfo":{}, "secondaryParty":[{"name": "Janashakthi", "role":"ServiceStation", "address":"address"}]},
+    "params":{"vehicleId":"","location":"","repairInfo":{}, "secondaryParty":{"ServiceStation":{"name": "Janashakthi", "address":"address"}}},
     "mandatoryValidators": ["ServiceStation"]
   },
   "Insure":{
     "id": 3,
-    "params":[{"secondaryParty":[{"InsuranceCompany": ""}]},"Vehicle ID", "Insurance Company", "Insurance Type", "Insurance validity"],
+    "params":[{"secondaryParty":{"InsuranceCompany":{"address": ""}}},"Vehicle ID", "Insurance Company", "Insurance Type", "Insurance validity"],
     "mandatoryValidators": []
   },
   "Lease":{
