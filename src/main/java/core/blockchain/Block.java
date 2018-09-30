@@ -1,7 +1,11 @@
 package core.blockchain;
 
 import chainUtil.ChainUtil;
+import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -44,7 +48,9 @@ public class Block {
         return genesisBlock;
     }
 
-    public void broadcast(){
+    public void broadcast(){}
 
+    public String getBlockHash(){
+        return ChainUtil.getInstance().getBlockHash(blockBody);
     }
 }

@@ -2,8 +2,12 @@ package core.consensus;
 
 import chainUtil.ChainUtil;
 import core.blockchain.Block;
+import core.blockchain.BlockInfo;
 import core.blockchain.Transaction;
+import core.connection.BlockJDBCDAO;
+import core.connection.Identity;
 import core.smartContract.BlockValidity;
+import core.smartContract.TimeKeeper;
 import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
 
@@ -22,6 +26,7 @@ public class Consensus {
     private ArrayList<AgreementCollector> agreementCollectors;
     private ArrayList<BlockchainShare> blockchainShareDetails;
     private ArrayList<BlockchainReceiver> blockchainReceiveDetails;
+    private ArrayList<Block> approvedBlocks;
     private int blockchainRequest;
     private String requestedBlockchainHash;
 
@@ -33,6 +38,7 @@ public class Consensus {
         agreementCollectors = new ArrayList<>();
         blockchainShareDetails = new ArrayList<>();
         blockchainReceiveDetails = new ArrayList<>();
+        approvedBlocks = new ArrayList<>();
         blockchainRequest = 0;
     }
 
@@ -48,6 +54,18 @@ public class Consensus {
 
         if(!isDuplicateBlock(block)) {
             nonApprovedBlocks.add(block);
+            boolean isPresent = false;
+            for (Block b: this.nonApprovedBlocks){
+                if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())){
+                    isPresent = true;
+                    break;
+                }
+            }
+            if (!isPresent){
+                TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
+                timeKeeper.start();
+            }
+
             AgreementCollector agreementCollector = new AgreementCollector(block);
             agreementCollectors.add(agreementCollector);
             agreementCollector.start();
@@ -63,6 +81,83 @@ public class Consensus {
         }
     }
 
+    public void checkAgreementsForBlock(String preBlockHash) throws SQLException {
+        ArrayList<Block> qualifiedBlocks = new ArrayList<>();
+        for (Block b: this.nonApprovedBlocks){
+            if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)){
+                String blockHash = b.getBlockHeader().getHash();
+                AgreementCollector agreementCollector = getAgreementCollector(blockHash);
+
+                synchronized (agreementCollectors){
+                    if (agreementCollector.getMandatoryValidators().size() == 0){
+                        if (agreementCollector.getAgreements().size() >= agreementCollector.getThreshold()){
+                            qualifiedBlocks.add(b);
+                            this.agreementCollectors.remove(agreementCollector);
+                        }
+                    }else{
+                        //blocks with insufficient agreements
+                    }
+                }
+            }
+        }
+        addBlockToBlockchain(qualifiedBlocks);
+    }
+
+    public Block selectQualifiedBlock(ArrayList<Block> qualifiedBlocks) throws SQLException {
+        Block qualifiedBlock = null;
+
+        if (qualifiedBlocks.size() != 0){
+            qualifiedBlock = qualifiedBlocks.get(0);
+            Timestamp blockTimestamp = qualifiedBlock.getBlockHeader().getBlockTime();
+
+            synchronized (nonApprovedBlocks){
+                for (Block b: qualifiedBlocks){
+                    if (blockTimestamp.after(b.getBlockHeader().getBlockTime())){
+                        this.nonApprovedBlocks.remove(qualifiedBlock);
+                        qualifiedBlock = b;
+                        blockTimestamp = b.getBlockHeader().getBlockTime();
+                    }else{
+                        this.nonApprovedBlocks.remove(b);
+                    }
+                }
+            }
+            //TODO: for now we discard all delayed blocks. only consider blocks that got enough agreements within the specific time period
+//            this.approvedBlocks.add(qualifiedBlock);
+        }else{
+            //need to restart the timer again
+        }
+        return qualifiedBlock;
+    }
+
+    public void addBlockToBlockchain(ArrayList<Block> qualifiedBlocks) throws SQLException {
+        Block block = selectQualifiedBlock(qualifiedBlocks);
+
+        if (block != null){
+            BlockInfo blockInfo = new BlockInfo();
+            blockInfo.setPreviousHash(block.getBlockHeader().getPreviousHash());
+            blockInfo.setHash(block.getBlockHeader().getHash());
+            blockInfo.setBlockTime(block.getBlockHeader().getBlockTime());
+            blockInfo.setBlockNumber(block.getBlockHeader().getBlockNumber());
+            blockInfo.setTransactionId(block.getBlockBody().getTransaction().getTransactionId());
+            blockInfo.setSender(block.getBlockBody().getTransaction().getSender());
+            blockInfo.setEvent(block.getBlockBody().getTransaction().getEvent());
+            blockInfo.setData(block.getBlockBody().getTransaction().getData().toString());
+            blockInfo.setAddress(block.getBlockBody().getTransaction().getAddress());
+
+            Identity identity= null;
+            if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")){
+                JSONObject body = block.getBlockBody().getTransaction().getData();
+                String publicKey = body.getString("publicKey");
+                String role = body.getString("role");
+                String name = body.getString("name");
+
+                identity = new Identity(block.getBlockHeader().getHash(), publicKey, role, name);
+            }
+            //TODO: need to check that this is the right block to add based on the previous hash
+            BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
+            blockJDBCDAO.addBlockToBlockchain(blockInfo, identity);
+        }
+    }
 
     //no need of synchronizing
     public boolean isDuplicateBlock(Block block) {
@@ -118,10 +213,13 @@ public class Consensus {
     }
 
     //no need of synchronizing
-    public void sendBlockchain(String ip, int listeningPort) {
-        BlockchainShare blockchainShare = getBlockchainShareFromIP(ip,listeningPort);
-        String jsonBlockchain = ChainUtil.getInstance().getBlockchainAsJsonString(blockchainShare.getBlockChainInstance());
-        MessageSender.getInstance().sendBlockchainToPeer(ip,listeningPort,jsonBlockchain, blockchainShare.getBlockChainInstance().size());
+    public void sendBlockchain(String ip, int listeningPort) throws Exception {
+        JSONObject blockchainInfo = ChainUtil.getInstance().getBlockchain(0);
+        MessageSender.getInstance().sendBlockchainToPeer(
+                ip,
+                listeningPort,
+                blockchainInfo.getString("blockchain"),
+                blockchainInfo.getInt("count"));
     }
 
     //no need of synchronizing
@@ -234,4 +332,7 @@ public class Consensus {
 
     }
 
+    public ArrayList<Block> getBlocksToBeAdded() {
+        return approvedBlocks;
+    }
 }

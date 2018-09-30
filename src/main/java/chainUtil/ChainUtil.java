@@ -1,12 +1,15 @@
 package chainUtil;
 
 import core.blockchain.Block;
+import core.blockchain.BlockBody;
+import core.connection.BlockJDBCDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 
 public class ChainUtil {
@@ -134,6 +137,11 @@ public class ChainUtil {
         return getHash((jsonBlock.toString()));
     }
 
+    public String getBlockHash(BlockBody blockBody) {
+        JSONObject jsonBlock = new JSONObject(blockBody);
+        return getHash((jsonBlock.toString()));
+    }
+
     public String getBlockChainHash(LinkedList<Block> blockchain) {
         String blockChainString = "";
         for(Block block: blockchain) {
@@ -151,17 +159,21 @@ public class ChainUtil {
         return jsonBlockchain.toString();
     }
 
-    public String getBlockchainAsJsonString(ResultSet resultSet) throws Exception {
-        JSONArray blockchainJSONArray = convertResultSetIntoJSON(resultSet);
+    public JSONObject getBlockchain(int from) throws Exception {
+        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
+        ResultSet rs = blockJDBCDAO.getBlockchain(from);
+        return convertResultSetIntoJSON(rs);
 
-        String blockchainString = blockchainJSONArray.toString();
-        return blockchainString;
     }
 
 
-    public static JSONArray convertResultSetIntoJSON(ResultSet resultSet) throws Exception {
+    public JSONObject convertResultSetIntoJSON(ResultSet resultSet) throws Exception {
+        JSONObject result = new JSONObject();
+        int count = 0;
+
         JSONArray jsonArray = new JSONArray();
         while (resultSet.next()) {
+            count++;
             int total_rows = resultSet.getMetaData().getColumnCount();
             JSONObject obj = new JSONObject();
 
@@ -184,7 +196,9 @@ public class ChainUtil {
             }
             jsonArray.put(obj);
         }
-        return jsonArray;
+        result.put("blockchainSize", count);
+        result.put("blockchain", jsonArray.toString());
+        return result;
     }
 
     public boolean verifyUser(String peerID, String publicKey) {

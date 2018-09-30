@@ -2,6 +2,7 @@ package core.smartContract;
 
 import config.EventConfigHolder;
 import core.connection.BlockJDBCDAO;
+import core.connection.IdentityJDBC;
 import core.blockchain.Block;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,7 +23,7 @@ public class BlockValidity {
         JSONObject data = block.getBlockBody().getTransaction().getData();
         JSONObject eventConfig = EventConfigHolder.getInstance().getEventJson();
 
-        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
+        IdentityJDBC identityJDBC = new IdentityJDBC();
 
         JSONObject params = eventConfig.getJSONObject(event).getJSONObject("params");
 
@@ -37,7 +38,7 @@ public class BlockValidity {
                 String secondaryPartyAddress = jsonObject.getString("address");
                 String secondaryPartyRole = jsonObject.getString("role");
 
-                JSONObject identity = blockJDBCDAO.getIdentityByAddress(secondaryPartyAddress);
+                JSONObject identity = identityJDBC.getIdentityByAddress(secondaryPartyAddress);
 
                 //if want, can check the name also
 
