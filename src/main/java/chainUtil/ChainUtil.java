@@ -167,7 +167,6 @@ public class ChainUtil {
 
     }
 
-
     public JSONObject convertResultSetIntoJSON(ResultSet resultSet) throws Exception {
         JSONObject result = new JSONObject();
         int count = 0;

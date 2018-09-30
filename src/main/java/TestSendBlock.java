@@ -43,21 +43,21 @@ public class TestSendBlock {
         System.out.println(KeyGenerator.getInstance().getEncodedPublicKeyString(KeyGenerator.getInstance().getPublicKey()));
         try {
             //block creation
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Validator validator1 = new Validator("val1pubkey", "owner", "true", 3);
-            Validator validator2 = new Validator("val2pubkey", "seller", "true", 4);
-            ArrayList<Validation> validations = new ArrayList<>();
-            validations.add(new Validation(validator1, "3332"));
-            validations.add(new Validation(validator2, "3442"));
-            BlockHeader blockHeader = new BlockHeader("101", "1234", "",
-                    "senderPubkey", 123, true);
-            Transaction transaction = new Transaction("senderpubkey", validations, "1456",
-                    new TransactionInfo());
-
-            Block block = new Block(blockHeader, transaction);
-//            ConsensusOld.getInstance().requestAgreementForBlock(block);
-//            ConsensusOld.getInstance().addToAgreementCollectors(block);
-//            ConsensusOld.getInstance().agreedTransaction(block.getTransaction());
+//            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//            Validator validator1 = new Validator("val1pubkey", "owner", "true", 3);
+//            Validator validator2 = new Validator("val2pubkey", "seller", "true", 4);
+//            ArrayList<Validation> validations = new ArrayList<>();
+//            validations.add(new Validation(validator1, "3332"));
+//            validations.add(new Validation(validator2, "3442"));
+//            BlockHeader blockHeader = new BlockHeader("101", "1234", "",
+//                    "senderPubkey", 123, true);
+//            Transaction transaction = new Transaction("senderpubkey", validations, "1456",
+//                    new TransactionInfo());
+//
+//            Block block = new Block(blockHeader, transaction);
+////            ConsensusOld.getInstance().requestAgreementForBlock(block);
+////            ConsensusOld.getInstance().addToAgreementCollectors(block);
+////            ConsensusOld.getInstance().agreedTransaction(block.getTransaction());
         }catch (Exception e) {
             e.printStackTrace();
         }

@@ -6,6 +6,8 @@ import core.consensus.Consensus;
 import core.blockchain.Block;
 import network.Node;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -20,6 +22,8 @@ public class Handler extends Thread{
     String messageType;
     String data;
     String peerID;
+    private final Logger log = LoggerFactory.getLogger(Handler.class);
+
 
     public Handler(String messageType, String data, String peerID){
         this.messageType = messageType;
@@ -182,16 +186,16 @@ public class Handler extends Thread{
     }
 
     public void handleRequestedPeerDetails(String data) {
-        JSONObject jsonObject = new JSONObject(data);
-        String ip = jsonObject.getString("ip");
-        String peerID = jsonObject.getString("peerID");
-        int listeningPort = jsonObject.getInt("listeningPort");
-        String peerDetails = jsonObject.getString("peerDetails");
-        String signature = jsonObject.getString("signature");
-        String signedData = jsonObject.getString("signedData");
-        String publicKey = jsonObject.getString("publicKey");
+        if(peerID.equals("Bootstrap Node")) {
+            JSONObject jsonObject = new JSONObject(data);
+            JSONObject peerDetails = jsonObject.getJSONObject("peerDetails");
+            String signature = jsonObject.getString("signature");
+            String signedData = jsonObject.getString("signedData");
+            String publicKey = jsonObject.getString("publicKey");
+            log.info("Peer Details Received");
+            Consensus.getInstance().handleRequestedPeerDetails(peerDetails,signature,signedData,publicKey);
+        }
 
     }
-
 
 }

@@ -23,7 +23,7 @@ import java.sql.Timestamp;
 public class MessageSender {
 
     private static  MessageSender messageSender;
-    private final Logger log = LoggerFactory.getLogger(Node.class);
+    private final Logger log = LoggerFactory.getLogger(MessageSender.class);
 
 
     private MessageSender() {};
@@ -137,16 +137,18 @@ public class MessageSender {
 
     public void requestPeerDetails(String peerID) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+        jsonObject.put("peerID", peerID);
+        jsonObject.put("listeningPort",Node.getInstance().getNodeConfig().getListenerPort());
         RequestMessage peerDetailsRequestMessage = MessageCreator.createMessage(jsonObject, "RequestPeerDetails");
         Node.getInstance().sendMessageToPeer("127.0.0.1", 49154, peerDetailsRequestMessage);
+        log.info("Peer Details Requested");
     }
 
-    public void requestTransactionData(String vehicleID, String location, Timestamp date, String peerID) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("vehicleID", vehicleID);
-        jsonObject.put("location", location);
-        jsonObject.put("date", date);
+    public void requestTransactionData(JSONObject requestDetails, Neighbour dataOwner) {
+        requestDetails.put("listeningPort", Node.getInstance().getNodeConfig().getListenerPort());
+        RequestMessage transactionDataRequestMessage = MessageCreator.createMessage(requestDetails, "RequestTransactionData");
+        Node.getInstance().sendMessageToPeer(dataOwner.getIp(), dataOwner.getPort(), transactionDataRequestMessage);
+        log.info("Transaction Data Requested from: {}", dataOwner.getPeerID());
     }
 
 

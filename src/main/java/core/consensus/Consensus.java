@@ -12,6 +12,8 @@ import network.Node;
 import core.smartContract.TimeKeeper;
 import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -24,6 +26,7 @@ import java.util.LinkedList;
 public class Consensus {
 
     private static Consensus consensus;
+    private final Logger log = LoggerFactory.getLogger(Consensus.class);
     private ArrayList<Block> nonApprovedBlocks;
     private ArrayList<AgreementCollector> agreementCollectors;
     private ArrayList<BlockchainShare> blockchainShareDetails;
@@ -31,7 +34,7 @@ public class Consensus {
     private ArrayList<Block> approvedBlocks;
     private int blockchainRequest;
     private String requestedBlockchainHash;
-    private ArrayList<String> requestedPeerDetails;
+    private ArrayList<DataRequester> requestedTransactionDataDetails;
 
     //to automate agreement process
     private ArrayList<Transaction> addedTransaction;
@@ -41,7 +44,7 @@ public class Consensus {
         agreementCollectors = new ArrayList<>();
         blockchainShareDetails = new ArrayList<>();
         blockchainReceiveDetails = new ArrayList<>();
-        requestedPeerDetails = new ArrayList<>();
+        requestedTransactionDataDetails = new ArrayList<>();
         approvedBlocks = new ArrayList<>();
         blockchainRequest = 0;
     }
@@ -56,16 +59,16 @@ public class Consensus {
     //block broadcasting and sending agreements
     public synchronized void handleNonApprovedBlock(Block block) throws NoSuchAlgorithmException, SQLException {
 
-        if(!isDuplicateBlock(block)) {
+        if (!isDuplicateBlock(block)) {
             nonApprovedBlocks.add(block);
             boolean isPresent = false;
-            for (Block b: this.nonApprovedBlocks){
-                if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())){
+            for (Block b : this.nonApprovedBlocks) {
+                if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
                     isPresent = true;
                     break;
                 }
             }
-            if (!isPresent){
+            if (!isPresent) {
                 TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                 timeKeeper.start();
             }
@@ -79,7 +82,7 @@ public class Consensus {
             //now need to check the relevant party is registered as with desired roles
             //if want, we can check the validity of the block creator/transaction creator
             BlockValidity blockValidity = new BlockValidity(block);
-            if (blockValidity.isSecondaryPartyValid()){
+            if (blockValidity.isSecondaryPartyValid()) {
                 //pop up notification to confirm
             }
         }
@@ -87,18 +90,18 @@ public class Consensus {
 
     public void checkAgreementsForBlock(String preBlockHash) throws SQLException {
         ArrayList<Block> qualifiedBlocks = new ArrayList<>();
-        for (Block b: this.nonApprovedBlocks){
-            if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)){
+        for (Block b : this.nonApprovedBlocks) {
+            if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)) {
                 String blockHash = b.getBlockHeader().getHash();
                 AgreementCollector agreementCollector = getAgreementCollector(blockHash);
 
-                synchronized (agreementCollectors){
-                    if (agreementCollector.getMandatoryValidators().size() == 0){
-                        if (agreementCollector.getAgreements().size() >= agreementCollector.getThreshold()){
+                synchronized (agreementCollectors) {
+                    if (agreementCollector.getMandatoryValidators().size() == 0) {
+                        if (agreementCollector.getAgreements().size() >= agreementCollector.getThreshold()) {
                             qualifiedBlocks.add(b);
                             this.agreementCollectors.remove(agreementCollector);
                         }
-                    }else{
+                    } else {
                         //blocks with insufficient agreements
                     }
                 }
@@ -110,24 +113,24 @@ public class Consensus {
     public Block selectQualifiedBlock(ArrayList<Block> qualifiedBlocks) throws SQLException {
         Block qualifiedBlock = null;
 
-        if (qualifiedBlocks.size() != 0){
+        if (qualifiedBlocks.size() != 0) {
             qualifiedBlock = qualifiedBlocks.get(0);
             Timestamp blockTimestamp = qualifiedBlock.getBlockHeader().getBlockTime();
 
-            synchronized (nonApprovedBlocks){
-                for (Block b: qualifiedBlocks){
-                    if (blockTimestamp.after(b.getBlockHeader().getBlockTime())){
+            synchronized (nonApprovedBlocks) {
+                for (Block b : qualifiedBlocks) {
+                    if (blockTimestamp.after(b.getBlockHeader().getBlockTime())) {
                         this.nonApprovedBlocks.remove(qualifiedBlock);
                         qualifiedBlock = b;
                         blockTimestamp = b.getBlockHeader().getBlockTime();
-                    }else{
+                    } else {
                         this.nonApprovedBlocks.remove(b);
                     }
                 }
             }
             //TODO: for now we discard all delayed blocks. only consider blocks that got enough agreements within the specific time period
 //            this.approvedBlocks.add(qualifiedBlock);
-        }else{
+        } else {
             //need to restart the timer again
         }
         return qualifiedBlock;
@@ -136,7 +139,7 @@ public class Consensus {
     public void addBlockToBlockchain(ArrayList<Block> qualifiedBlocks) throws SQLException {
         Block block = selectQualifiedBlock(qualifiedBlocks);
 
-        if (block != null){
+        if (block != null) {
             BlockInfo blockInfo = new BlockInfo();
             blockInfo.setPreviousHash(block.getBlockHeader().getPreviousHash());
             blockInfo.setHash(block.getBlockHeader().getHash());
@@ -148,8 +151,8 @@ public class Consensus {
             blockInfo.setData(block.getBlockBody().getTransaction().getData().toString());
             blockInfo.setAddress(block.getBlockBody().getTransaction().getAddress());
 
-            Identity identity= null;
-            if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")){
+            Identity identity = null;
+            if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
                 JSONObject body = block.getBlockBody().getTransaction().getData();
                 String publicKey = body.getString("publicKey");
                 String role = body.getString("role");
@@ -165,7 +168,7 @@ public class Consensus {
 
     //no need of synchronizing
     public boolean isDuplicateBlock(Block block) {
-        if(nonApprovedBlocks.contains(block)) {
+        if (nonApprovedBlocks.contains(block)) {
             return true;
         }
         return false;
@@ -175,7 +178,7 @@ public class Consensus {
     public void sendAgreementForBlock(Block block) {
         String blockHash = ChainUtil.getInstance().getBlockHash(block);
         String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
-        MessageSender.getInstance().sendAgreement(signedBlock,blockHash);
+        MessageSender.getInstance().sendAgreement(signedBlock, blockHash);
         System.out.println("agreement sent");
     }
 
@@ -186,8 +189,8 @@ public class Consensus {
 
     //no need of synchronizing
     private AgreementCollector getAgreementCollector(String id) {
-        for(AgreementCollector agreementCollector: this.agreementCollectors) {
-            if(agreementCollector.getAgreementCollectorId().equals(id)) {
+        for (AgreementCollector agreementCollector : this.agreementCollectors) {
+            if (agreementCollector.getAgreementCollectorId().equals(id)) {
                 return agreementCollector;
             }
         }
@@ -201,7 +204,7 @@ public class Consensus {
 
 
     //blockchain request methods
-    public synchronized void  handleBlockchainHashRequest(String ip, int listeningPort) {
+    public synchronized void handleBlockchainHashRequest(String ip, int listeningPort) {
 //        if(Blockchain.getInstance().getBlockchainArray().size() >=1) {
 //            sendSignedBlockChain(ip, listeningPort);
 //        }
@@ -212,7 +215,7 @@ public class Consensus {
         String blockchainHash = ChainUtil.getInstance().getBlockChainHash(blockchainShare.getBlockChainInstance());
         blockchainShareDetails.add(blockchainShare);
         String signedBlockchainHash = ChainUtil.getInstance().digitalSignature(blockchainHash);
-        MessageSender.getInstance().sendSignedBlockChain(ip,listeningPort,signedBlockchainHash,blockchainHash);
+        MessageSender.getInstance().sendSignedBlockChain(ip, listeningPort, signedBlockchainHash, blockchainHash);
 
     }
 
@@ -228,23 +231,23 @@ public class Consensus {
 
     //no need of synchronizing
     public BlockchainShare getBlockchainShareFromIP(String ip, int listeningPort) {
-        String id = ip+String.valueOf(listeningPort);
-        for(BlockchainShare blockchainShare : blockchainShareDetails) {
-            if(id.equals(blockchainShare.getId())) {
+        String id = ip + String.valueOf(listeningPort);
+        for (BlockchainShare blockchainShare : blockchainShareDetails) {
+            if (id.equals(blockchainShare.getId())) {
                 return blockchainShare;
             }
         }
         return null;
     }
 
-    public synchronized void handleReceivedSignedBlockchain(String publicKey, String ip,int listeningPort,String signedBlockchain,
+    public synchronized void handleReceivedSignedBlockchain(String publicKey, String ip, int listeningPort, String signedBlockchain,
                                                             String blockchainHash) {
 //        if(ChainUtil.getInstance().verifyUser())
-        if(ChainUtil.getInstance().signatureVerification(publicKey,signedBlockchain,blockchainHash)){
-            BlockchainReceiver blockchainReceiver = new BlockchainReceiver(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
+        if (ChainUtil.getInstance().signatureVerification(publicKey, signedBlockchain, blockchainHash)) {
+            BlockchainReceiver blockchainReceiver = new BlockchainReceiver(publicKey, ip, listeningPort, signedBlockchain, blockchainHash);
             blockchainReceiveDetails.add(blockchainReceiver);
-            blockchainRequest -=1;
-            if(blockchainRequest == 0) {
+            blockchainRequest -= 1;
+            if (blockchainRequest == 0) {
                 requestBlockchain();
             }
         }
@@ -280,7 +283,7 @@ public class Consensus {
 
     public synchronized String findCorrectBlockchain() {
         HashMap<String, Integer> counter = new HashMap<String, Integer>();
-        for(BlockchainReceiver blockchainReceiver: blockchainReceiveDetails) {
+        for (BlockchainReceiver blockchainReceiver : blockchainReceiveDetails) {
             if (counter.containsKey(blockchainReceiver.getId())) {
                 counter.put(blockchainReceiver.getId(), counter.get(blockchainReceiver.getId()) + 1);
             } else {
@@ -292,8 +295,8 @@ public class Consensus {
         int max = 0;
         String publicKey = "";
 
-        for(String key : counter.keySet()) {
-            if(counter.get(key) > max) {
+        for (String key : counter.keySet()) {
+            if (counter.get(key) > max) {
                 max = counter.get(key);
                 publicKey = key;
             }
@@ -306,13 +309,13 @@ public class Consensus {
     public void requestBlockchain() {
         BlockchainReceiver blockchainReceiver = getBlockchainReceiverfromPK(findCorrectBlockchain());
         requestedBlockchainHash = blockchainReceiver.getBlockchainHash();
-        MessageSender.getInstance().requestBlockchainFromPeer(blockchainReceiver.getIp(),blockchainReceiver.getListeningPort());
+        MessageSender.getInstance().requestBlockchainFromPeer(blockchainReceiver.getIp(), blockchainReceiver.getListeningPort());
     }
 
     //no need of synchronizing
     public BlockchainReceiver getBlockchainReceiverfromPK(String publicKey) {
-        for(BlockchainReceiver blockchainReceiver: blockchainReceiveDetails) {
-            if(publicKey.equals(blockchainReceiver.getId())) {
+        for (BlockchainReceiver blockchainReceiver : blockchainReceiveDetails) {
+            if (publicKey.equals(blockchainReceiver.getId())) {
                 return blockchainReceiver;
             }
         }
@@ -324,42 +327,65 @@ public class Consensus {
 
     }
 
-    public void handleAdditionalDataRequest(String ip, int listeningPort, String signedBlock, String blockHash, String peerID ) {
-        String data =  getAdditionalDataForBlock(blockHash).toString();
+    public void handleAdditionalDataRequest(String ip, int listeningPort, String signedBlock, String blockHash, String peerID) {
+        String data = getAdditionalDataForBlock(blockHash).toString();
     }
 
     public JSONObject getAdditionalDataForBlock(String blockHash) {
         return new JSONObject();
     }
 
-    public void requestTransactionData(String vehicleID, String location, Timestamp date, String peerID) {
-        Neighbour node = Node.getInstance().getPeerDetails(peerID);
-        if(node != null) {
-            JSONObject requestTransactionData = new JSONObject();
-            requestTransactionData.put("vehicleID", vehicleID);
-            requestTransactionData.put("date", date);
+    public void requestTransactionData(String vehicleID, Timestamp date, String peerID) {
+        Neighbour dataOwner = Node.getInstance().getPeerDetails(peerID);
+        if (dataOwner != null) {
+            DataRequester dataRequester = new DataRequester(peerID, vehicleID, dataOwner, date);
+            requestedTransactionDataDetails.add(dataRequester);
+            requestTransactionDataFromDataOwner(vehicleID, date, dataOwner);
+        } else {
+            log.info("No Peer Details found for: {}", peerID);
+            DataRequester dataRequester = new DataRequester(peerID, vehicleID, date);
+            requestedTransactionDataDetails.add(dataRequester);
+            MessageSender.getInstance().requestPeerDetails(peerID);
         }
     }
 
-
-    public void requestPeerDetails(String peerID) {
-
-        MessageSender.getInstance().requestPeerDetails(peerID);
+    public void requestTransactionDataFromDataOwner(String vehicleID, Timestamp date, Neighbour dataOwner) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("vehicleID", vehicleID);
+        jsonObject.put("dataOwner", dataOwner.getPeerID());
+        jsonObject.put("date", date);
+        String nodeID = Node.getInstance().getNodeConfig().getNodeID();
+        jsonObject.put("signature", ChainUtil.getInstance().digitalSignature(nodeID));
+        jsonObject.put("signedData", nodeID);
+        MessageSender.getInstance().requestTransactionData(jsonObject, dataOwner);
     }
 
-    public void handleRequestedPeerDetails(String peerDetails, String signature, String signedData, String publicKey) {
-        JSONObject jsonObject = new JSONObject(peerDetails);
-        String ip = jsonObject.getString("ip");
-        String peerID = jsonObject.getString("peerID");
-        int listeningPort = jsonObject.getInt("listeningPort");
 
-        if(ChainUtil.getInstance().verifyUser("o",publicKey)) {
+    public void handleRequestedPeerDetails(JSONObject peerDetails, String signature, String signedData, String publicKey) {
+        String ip = peerDetails.getString("ip");
+        String peerID = peerDetails.getString("nodeID");
+        int listeningPort = peerDetails.getInt("port");
 
+        if (ChainUtil.getInstance().signatureVerification(publicKey, signature, signedData)) {
+            Neighbour dataOwner = new Neighbour(peerID, ip, listeningPort);
+            DataRequester dataRequester = getDataRequester(peerID);
+            dataRequester.setDataOwner(dataOwner);
+            requestTransactionDataFromDataOwner(dataRequester.getVehicleID(), dataRequester.getDate(), dataOwner);
         }
-
     }
 
     public ArrayList<Block> getBlocksToBeAdded() {
         return approvedBlocks;
+    }
+
+    public DataRequester getDataRequester(String peerID) {
+        for (DataRequester dataRequester : requestedTransactionDataDetails) {
+            if (peerID.equals(dataRequester.getPeerID())) {
+                log.info("data requester found for : {}", peerID);
+                return dataRequester;
+            }
+        }
+        log.info("No data requester found for : {}", peerID);
+        return null;
     }
 }

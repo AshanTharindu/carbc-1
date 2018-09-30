@@ -17,7 +17,7 @@ public class OwnershipExchangeAgreementHandler{
 
         //TODO: wrong
         validator.put("NewOwner", secondaryParties.getString("NewOwner"));
-        validator.put("RMV", blockJDBCDAO.getIdentityByRole("RMV"));
+//        validator.put("RMV", blockJDBCDAO.getIdentityByRole("RMV"));
 
         return secondaryParties;
     }

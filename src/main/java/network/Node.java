@@ -2,7 +2,6 @@ package network;
 
 import Exceptions.FileUtilityException;
 import chainUtil.KeyGenerator;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import config.CommonConfigHolder;
 import config.NodeConfig;
 import constants.Constants;
@@ -109,7 +108,6 @@ public final class Node {
 //            Neighbour neighbour = new Neighbour(neightbourIP, neightbourPort);
 //            nodeConfig.addNeighbour(neighbour);
 //        }
-
         log.info("Initializing Node:{}", peerID);
 
     }
