@@ -5,11 +5,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-<<<<<<< HEAD
-import java.sql.Timestamp;
-=======
+
 import java.sql.ResultSet;
->>>>>>> acb912932d71868ba4c2cb2b81d8b708daf3c768
 import java.util.LinkedList;
 
 public class ChainUtil {

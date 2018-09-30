@@ -144,13 +144,13 @@ public class Handler extends Thread{
         Consensus.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
     }
 
-    public void handleReceivedAgreement() throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
+    public void handleReceivedAgreement(){
         JSONObject jsonObject = new JSONObject(data);
-        String ip = jsonObject.getString("ip");
-        int listeningPort = jsonObject.getInt("ListeningPort");
+        String signature = jsonObject.getString("digitalSignature");
         String signedBlock = jsonObject.getString("signedBlock");
         String blockHash = jsonObject.getString("blockHash");
-        Consensus.getInstance().handleReceivedAgreement(signedBlock, blockHash, peerID);
+        String publicKey = jsonObject.getString("publicKey");
+        Consensus.getInstance().handleReceivedAgreement(signature, signedBlock, blockHash, publicKey);
     }
 
     // 0-> block comes

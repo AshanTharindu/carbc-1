@@ -44,15 +44,15 @@ public class Consensus {
     }
 
     //block broadcasting and sending agreements
-
-    //2->block broadcasting and sending agreements
-
     public synchronized void handleNonApprovedBlock(Block block) throws NoSuchAlgorithmException, SQLException {
 
         if(!isDuplicateBlock(block)) {
-            //notify if relevant
             nonApprovedBlocks.add(block);
-            agreementCollectors.add(new AgreementCollector(block));
+            AgreementCollector agreementCollector = new AgreementCollector(block);
+            agreementCollectors.add(agreementCollector);
+            agreementCollector.start();
+
+            //TODO: there is a problem here. Regardless of the block validity we anyway append the agreement collector to the arraylist. so whats the point of doing block validity below??
 
             //now need to check the relevant party is registered as with desired roles
             //if want, we can check the validity of the block creator/transaction creator
@@ -96,8 +96,8 @@ public class Consensus {
     }
 
     //no need of synchronizing
-    public void handleReceivedAgreement(String signedBlock, String blockHash, String publicKey) {
-        handleAgreement(new Agreement(blockHash,signedBlock,publicKey));
+    public void handleReceivedAgreement(String signature, String signedBlock, String blockHash, String publicKey) {
+        handleAgreement(new Agreement(signature, blockHash, signedBlock, publicKey));
     }
 
 

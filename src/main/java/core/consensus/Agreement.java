@@ -5,15 +5,16 @@ import core.blockchain.Transaction;
 
 //remove this class
 public class Agreement {
-
-    private String blockHash;
     private String digitalSignature;
-    private String publicKey;
+    private String signedBlock;
+    private String blockHash;
+    private String address;
 
-    public Agreement(String blockHash, String digitalSignature, String publicKey) {
+    public Agreement(String signature, String signedBlock, String blockHash, String publicKey) {
+        this.digitalSignature = signature;
         this.blockHash = blockHash;
-        this.digitalSignature = digitalSignature;
-        this.publicKey = publicKey;
+        this.signedBlock = signedBlock;
+        this.address = publicKey;
     }
 
     public String getBlockHash() {
@@ -25,8 +26,10 @@ public class Agreement {
     }
 
     public String getPublicKey() {
-        return publicKey;
+        return address;
     }
 
-
+    public String getSignedBlock() {
+        return signedBlock;
+    }
 }

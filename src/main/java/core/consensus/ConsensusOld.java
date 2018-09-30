@@ -7,7 +7,6 @@ import UI.BlockStatusUI2;
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import core.blockchain.Block;
-import core.blockchain.Blockchain;
 import network.communicationHandler.MessageSender;
 
 import javax.swing.*;
@@ -195,7 +194,7 @@ public class ConsensusOld {
         }
     }
 
-    public boolean addToAgreementCollectors(Block block) {
+    public boolean addToAgreementCollectors(Block block) throws SQLException {
         AgreementCollector agreementCollector = new AgreementCollector(block);
         System.out.println("agreement collector added");
         System.out.println("agreemenCollector id: " + agreementCollector.getAgreementCollectorId());

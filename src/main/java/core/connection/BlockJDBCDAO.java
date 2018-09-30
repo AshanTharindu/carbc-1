@@ -97,18 +97,17 @@ public class BlockJDBCDAO {
 
     //get an identity of a person by address
     public JSONObject getIdentityByAddress(String address) throws SQLException {
-        String query = "SELECT `data` FROM `Blockchain` WHERE `address` = ?";
-        return getIdentity(address);
+        String query = "SELECT public_key, role, name FROM `Identity` WHERE `address` = ?";
+        return getIdentity(query, address);
     }
 
     //get an identity of a person by address
     public JSONObject getIdentityByRole(String role) throws SQLException {
-        String query = "SELECT `data` FROM `Blockchain` WHERE `role` = ?";
-        return getIdentity(role);
+        String query = "SELECT public_key, role, name FROM `Identity` WHERE `role` = ?";
+        return getIdentity(query, role);
     }
 
-    public JSONObject getIdentity(String type) throws SQLException {
-        String query = "SELECT `data` FROM `Blockchain` WHERE `role` = ?";
+    public JSONObject getIdentity(String query, String type) throws SQLException {
         JSONObject identity = null;
 
         try {
@@ -118,8 +117,16 @@ public class BlockJDBCDAO {
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
-                String data = resultSet.getString("data");
-                identity = new JSONObject(data);
+                String publicKey = resultSet.getString("public_key");
+                String role = resultSet.getString("role");
+                String name = resultSet.getString("name");
+
+                identity.put("publicKey", publicKey);
+                identity.put("role", role);
+                identity.put("name", name);
+
+//                String data = resultSet.getString("data");
+//                identity = new JSONObject(data);
                 return identity;
 
             }
