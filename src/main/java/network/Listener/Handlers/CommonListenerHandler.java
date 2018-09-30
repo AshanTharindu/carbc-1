@@ -31,18 +31,12 @@ public class CommonListenerHandler extends ChannelInboundHandlerAdapter {
             RequestMessage requestMessage = (RequestMessage) msg;
             Map<String, String> headers = requestMessage.readHeaders(); //TODO: Inspect headers
             String data = requestMessage.readData();
-//            Handler.getInstance().handle(data, headers);
 
             //adding client ip to Json Object
             String clientIP = ((InetSocketAddress)ctx.channel().remoteAddress()).getAddress().getHostAddress();
             JSONObject receivedObject = new JSONObject(data);
             receivedObject.put("ip", clientIP);
             RequestHandler.getInstance().handleRequest(headers,receivedObject.toString());
-//            RequestHandler.getInstance().handleRequest(headers,data);
-            //-------------------------------------------
-            // call the workflow methods here after checking the headers
-            // can use switch-case and call the methods
-            //-----------------------------------------------
 
             System.out.println("=====================================");
             System.out.println("        at the server side           ");

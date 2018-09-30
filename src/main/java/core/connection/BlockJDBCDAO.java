@@ -1,6 +1,7 @@
 package core.connection;
 
 import chainUtil.ChainUtil;
+import core.blockchain.BlockInfo;
 import org.json.JSONObject;
 
 import java.sql.*;
@@ -17,7 +18,7 @@ public class BlockJDBCDAO {
 
         if (transactionType.equals("I")){
             query = "INSERT INTO `Identity`(`block_hash`, `role`, `name`) " +
-                    "VALUES (?,?,?)";
+                    "VALUES (?,?,?,?)";
         }
 
         try {
@@ -43,8 +44,9 @@ public class BlockJDBCDAO {
 
             PreparedStatement psmt = connection.prepareStatement(query);
             psmt.setString(1, identity.getBlock_hash());
-            psmt.setString(2, identity.getRole());
-            psmt.setString(3, identity.getName());
+            psmt.setString(2, identity.getPublic_key());
+            psmt.setString(3, identity.getRole());
+            psmt.setString(4, identity.getName());
             psmt.executeUpdate();
 
             System.out.println("Block is Added Successfully");
@@ -63,9 +65,11 @@ public class BlockJDBCDAO {
     }
 
 
-    public String getBlockchain(long blockNumber) throws SQLException {
+    public ResultSet getBlockchain(long blockNumber) throws SQLException {
 
-        String queryString = "SELECT * FROM `Blockchain` WHERE `block_number` = ?";
+        String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
+                "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
+                "FROM `Blockchain` WHERE `block_number` >= ? AND `validity` = `T`";
         String blockchain = "";
 
         try {
@@ -74,9 +78,9 @@ public class BlockJDBCDAO {
             ptmt.setLong(1, blockNumber);
             resultSet = ptmt.executeQuery();
 
-            if (resultSet.next()){
-                blockchain = ChainUtil.getInstance().getBlockchainAsJsonString(resultSet);
-            }
+//            if (resultSet.next()){
+//                blockchain = ChainUtil.getInstance().getBlockchainAsJsonString(resultSet);
+//            }
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -88,45 +92,13 @@ public class BlockJDBCDAO {
                 ptmt.close();
             if (connection != null)
                 connection.close();
-            return blockchain;
+            return resultSet;
         }
     }
 
 
-    //get an identity of a person by address
-    public JSONObject getIdentityByAddress(String address) throws SQLException {
-        String query = "SELECT `data` FROM `Blockchain` WHERE `address` = ?";
-        JSONObject identity = null;
 
-        try {
-            connection = ConnectionFactory.getInstance().getConnection();
-            ptmt = connection.prepareStatement(query);
-            ptmt.setString(1, address);
-            resultSet = ptmt.executeQuery();
 
-            if (resultSet.next()){
-                String data = resultSet.getString("data");
-                identity = new JSONObject(data);
-                return identity;
-
-//                String role = jsonData.getString("role");
-//                String name = jsonData.getString("name");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (resultSet != null)
-                resultSet.close();
-            if (ptmt != null)
-                ptmt.close();
-            if (connection != null)
-                connection.close();
-            return identity;
-        }
-
-    }
 
     //get an identity related transactions
     public void updateIdentityTableAtBlockchainReceipt() throws SQLException {

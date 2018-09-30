@@ -1,11 +1,5 @@
 package network.communicationHandler;
 
-
-import java.io.IOException;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.Map;
 
 public class RequestHandler {
@@ -26,6 +20,9 @@ public class RequestHandler {
         System.out.println("********requestHandler*******");
         String messageType = (String)headers.get("messageType");
         String peerID = (String)headers.get("sender");
+
+        Handler handler = new Handler(messageType, data, peerID);
+        handler.start();
 
     }
 

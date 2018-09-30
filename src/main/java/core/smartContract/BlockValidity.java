@@ -2,11 +2,13 @@ package core.smartContract;
 
 import config.EventConfigHolder;
 import core.connection.BlockJDBCDAO;
+import core.connection.IdentityJDBC;
 import core.blockchain.Block;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 
 public class BlockValidity {
     private Block block;
@@ -21,26 +23,47 @@ public class BlockValidity {
         JSONObject data = block.getBlockBody().getTransaction().getData();
         JSONObject eventConfig = EventConfigHolder.getInstance().getEventJson();
 
-        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
+        IdentityJDBC identityJDBC = new IdentityJDBC();
 
         JSONObject params = eventConfig.getJSONObject(event).getJSONObject("params");
 
-        JSONArray secondaryParties = params.getJSONArray("secondaryParty");
+        JSONObject secondaryParties = params.getJSONObject("SecondaryParty");
 
-        for (int i = 0; i < secondaryParties.length(); i++){
-            JSONObject jsonObject = secondaryParties.getJSONObject(i);
-            String secondaryPartyAddress = jsonObject.getString("address");
-            String secondaryPartyRole = jsonObject.getString("role");
+        Iterator<String> keys = secondaryParties.keys();
+        while ( keys.hasNext() ){
+            String key = (String)keys.next(); // First key in your json object
 
-            JSONObject identity = blockJDBCDAO.getIdentityByAddress(secondaryPartyAddress);
+            if (secondaryParties.get(key) instanceof JSONObject) {
+                JSONObject jsonObject = secondaryParties.getJSONObject(key);
+                String secondaryPartyAddress = jsonObject.getString("address");
+                String secondaryPartyRole = jsonObject.getString("role");
 
-            //if want, can check the name also
+                JSONObject identity = identityJDBC.getIdentityByAddress(secondaryPartyAddress);
 
-            if (!identity.getString("role").equals(secondaryPartyRole)){
-                return false;
+                //if want, can check the name also
+
+                if (!identity.getString("role").equals(secondaryPartyRole)){
+                    return false;
+                }
             }
 
         }
+
+        ////old version
+//        for (int i = 0; i < secondaryParties.length(); i++){
+//            JSONObject jsonObject = secondaryParties.getJSONObject(i);
+//            String secondaryPartyAddress = jsonObject.getString("address");
+//            String secondaryPartyRole = jsonObject.getString("role");
+//
+//            JSONObject identity = blockJDBCDAO.getIdentityByAddress(secondaryPartyAddress);
+//
+//            //if want, can check the name also
+//
+//            if (!identity.getString("role").equals(secondaryPartyRole)){
+//                return false;
+//            }
+//
+//        }
         return true;
     }
 

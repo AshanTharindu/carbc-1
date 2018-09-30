@@ -39,12 +39,12 @@ public class AgreementRequest {
 
 
     public AgreementRequest(Block block) {
-        vehicleIDText.setText(block.getTransaction().getTransactionInfo().getVehicleId());
-        eventText.setText(block.getTransaction().getTransactionInfo().getEvent());
-        para1Text.setText(String.valueOf(block.getTransaction().getTransactionInfo().getParameters()[0]));
-        para2Text.setText(String.valueOf(block.getTransaction().getTransactionInfo().getParameters()[1]));
-        senderPubKeyText.setText(block.getTransaction().getSender());
-        roleText.setText(block.getTransaction().getValidations().get(0).getValidator().getRole());
+//        vehicleIDText.setText(block.getTransaction().getTransactionInfo().getVehicleId());
+//        eventText.setText(block.getTransaction().getTransactionInfo().getEvent());
+//        para1Text.setText(String.valueOf(block.getTransaction().getTransactionInfo().getParameters()[0]));
+//        para2Text.setText(String.valueOf(block.getTransaction().getTransactionInfo().getParameters()[1]));
+//        senderPubKeyText.setText(block.getTransaction().getSender());
+//        roleText.setText(block.getTransaction().getValidations().get(0).getValidator().getRole());
         agreed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

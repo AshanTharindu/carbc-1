@@ -3,13 +3,13 @@ package core.blockchain;
 import org.json.JSONObject;
 
 public class Transaction {
-    private long transactionId;
+    private String transactionId;
     private String sender;
     private String event;
     private JSONObject data;
     private String address;
 
-    public Transaction(long transactionId, String sender, String event, JSONObject data, String address){
+    public Transaction(String transactionId, String sender, String event, JSONObject data, String address){
         this.transactionId = transactionId;
         this.sender = sender;
         this.event = event;
@@ -17,7 +17,7 @@ public class Transaction {
         this.address = address;
     }
 
-    public long getTransactionId() {
+    public String getTransactionId() {
         return transactionId;
     }
 

@@ -19,10 +19,12 @@ import java.text.ParseException;
 public class Handler extends Thread{
     String messageType;
     String data;
+    String peerID;
 
-    public Handler(String messageType, String data){
+    public Handler(String messageType, String data, String peerID){
         this.messageType = messageType;
         this.data = data;
+        this.peerID = peerID;
     }
 
     @Override
@@ -60,11 +62,11 @@ public class Handler extends Thread{
 
                 case "BlockchainSend":
                     System.out.println("BlockchainSend");
-//                    handleReceivedBlockchainRequest(publicKey);
+                    handleReceivedBlockchainRequest();
 
                 case "Agreement":
                     System.out.println("Agreement");
-//                    handleReceivedAgreement(publicKey);
+                    handleReceivedAgreement();
 
                 case "RequestedPeerDetails":
                     System.out.println("RequestedPeerDetails");
@@ -74,21 +76,7 @@ public class Handler extends Thread{
                     System.out.println("default");
 
             }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-            } catch (IOException e) {
-            e.printStackTrace();
-            } catch (ParseException e) {
-            e.printStackTrace();
-            } catch (SQLException e) {
-            e.printStackTrace();
-            } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -132,29 +120,29 @@ public class Handler extends Thread{
         Consensus.getInstance().handleReceivedSignedBlockchain(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
     }
 
-    public void handleBlockChainRequest() {
+    public void handleBlockChainRequest() throws Exception {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("ListeningPort");
         Consensus.getInstance().sendBlockchain(ip,listeningPort);
     }
 
-    public void handleReceivedBlockchainRequest(String data,String publicKey) throws ParseException, NoSuchAlgorithmException, IOException, SQLException, NoSuchProviderException, InvalidKeySpecException {
+    public void handleReceivedBlockchainRequest() throws ParseException, NoSuchAlgorithmException, IOException, SQLException, NoSuchProviderException, InvalidKeySpecException {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("ListeningPort");
         int blockchainLength = jsonObject.getInt("blockchainLength");
         JSONObject jsonBlockchain = new JSONObject(jsonObject.getString("blockchain"));
-        Consensus.getInstance().addReceivedBlockchain(publicKey,jsonBlockchain,blockchainLength);
+        Consensus.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
     }
 
-    public void handleReceivedAgreement(String data, String publickey) throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
+    public void handleReceivedAgreement(){
         JSONObject jsonObject = new JSONObject(data);
-        String ip = jsonObject.getString("ip");
-        int listeningPort = jsonObject.getInt("ListeningPort");
+        String signature = jsonObject.getString("digitalSignature");
         String signedBlock = jsonObject.getString("signedBlock");
         String blockHash = jsonObject.getString("blockHash");
-        Consensus.getInstance().handleReceivedAgreement(signedBlock,blockHash,publickey);
+        String publicKey = jsonObject.getString("publicKey");
+        Consensus.getInstance().handleReceivedAgreement(signature, signedBlock, blockHash, publicKey);
     }
 
     // 0-> block comes

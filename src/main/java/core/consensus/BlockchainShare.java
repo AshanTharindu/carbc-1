@@ -1,7 +1,6 @@
 package core.consensus;
 
 import core.blockchain.Block;
-import core.blockchain.Blockchain;
 
 import java.util.LinkedList;
 

@@ -5,36 +5,112 @@ import chainUtil.KeyGenerator;
 import config.EventConfigHolder;
 import core.blockchain.Block;
 import core.connection.BlockJDBCDAO;
+import core.connection.IdentityJDBC;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class AgreementCollector {
+public class AgreementCollector extends Thread{
 
     private String agreementCollectorId;
     private Block block;
     private Agreement[] mandotaryAgreements;
-    private ArrayList<Agreement> agreements;
-    ArrayList<String> agreedNodes;
+    private ArrayList<String> agreedNodes;
     private Rating rating;
 
-    JSONObject mandatoryValidators;
+    private ArrayList<String> mandatoryValidators;
+    private ArrayList<String> specialValidators;
+    private ArrayList<Agreement> agreements;
+    private BlockJDBCDAO blockJDBCDAO;
+    private IdentityJDBC identityJDBC;
+    private int threshold;
 
-    public AgreementCollector(Block block) {
+    public AgreementCollector(Block block) throws SQLException {
         agreementCollectorId = generateAgreementCollectorId(block);
         this.block = block;
         agreements = new ArrayList<>();
         mandotaryAgreements = new Agreement[2]; //get from the block
         rating = new Rating(block);
+        blockJDBCDAO = new BlockJDBCDAO();
+        identityJDBC = new IdentityJDBC();
+        mandatoryValidators = new ArrayList<>();
+        specialValidators = new ArrayList<>();
+        threshold = 5;
 
-        setMandotaryAgreements();
+        setMandatoryAgreements();
+
+        //TODO: Here we have assumed that all the agreements come after creating this agreement collector
+        //TODO: I have not handled the other case
     }
 
-    public void setMandotaryAgreements(){
+    public void setMandatoryAgreements() throws SQLException {
+
+        synchronized (this){
+            String event = this.block.getBlockBody().getTransaction().getEvent();
+            JSONObject blockData = block.getBlockBody().getTransaction().getData();
+            JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
+            JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
+
+            switch (event){
+                case "ExchangeOwnership":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("NewOwner")
+                            .getString("address"));
+
+                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
+                    getMandatoryValidators().add(obj.getString("publicKey"));
+                    break;
+
+                case "ServiceRepair":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("ServiceStation")
+                            .getString("address"));
+                    for (int i = 0; i < thirdParties.length(); i++){
+                        getSpecialValidators().add(thirdParties.getString(i));
+                    }
+                    break;
+
+                case "Insure":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("InsuranceCompany")
+                            .getString("address"));
+                    break;
+
+                case "Lease":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("LeasingCompany")
+                            .getString("address"));
+                    break;
+
+                case "BankLoan":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("Bank")
+                            .getString("address"));
+                    break;
+
+                case "RenewRegistration":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("RMV")
+                            .getString("address"));
+                    break;
+
+                case "RegisterVehicle":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("RMV")
+                            .getString("address"));
+                    break;
+
+                case "RenewInsurance":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("InsuranceCompany")
+                            .getString("address"));
+                    break;
+
+                case "BuySpareParts":
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("SparePartProvider")
+                            .getString("address"));
+                    break;
+
+            }
+        }
+    }
+
+    public void setMandotaryAgreementsOld(){
         String event = this.block.getBlockBody().getTransaction().getEvent();
 
         JSONObject eventDetail = EventConfigHolder.getInstance()
@@ -61,7 +137,11 @@ public class AgreementCollector {
 
                 if (role.equals(validatorRole)){
                     String secondaryPartyAddress = jsonObject.getString("address");
-                    mandatoryValidators.put(validatorRole, secondaryPartyAddress);
+
+                    synchronized (this) {
+//                        mandatoryValidators.put(validatorRole, secondaryPartyAddress);
+                    }
+
                     isPresent = true;
                     break;
                 }
@@ -73,9 +153,9 @@ public class AgreementCollector {
         //now need to check the relevant part is registered as a mandatory validator
     }
 
-    public boolean addAgreedNode(String agreedNode) {
-        if(!agreedNodes.contains(agreedNode)){
-            agreedNodes.add(agreedNode);
+    public synchronized boolean addAgreedNode(String agreedNode) {
+        if(!getAgreedNodes().contains(agreedNode)){
+            getAgreedNodes().add(agreedNode);
             return true;
         }else {
             return false;
@@ -83,18 +163,29 @@ public class AgreementCollector {
     }
 
     //adding agreements
-    public boolean addAgreementForBlock(Agreement agreement) {
+    public synchronized boolean addAgreementForBlock(Agreement agreement) {
         if(agreementCollectorId.equals(agreement.getBlockHash())) {
-            //check for mandotory
             if(!isDuplicateAgreement(agreement)) {
                 PublicKey publicKey = KeyGenerator.getInstance().getInstance().getPublicKey(agreement.getPublicKey());
-                if(ChainUtil.getInstance().signatureVerification(agreement.getPublicKey(),agreement.getDigitalSignature(),
-                        agreement.getBlockHash())){
-                    agreements.add(agreement);
-                    // add rating
-                    System.out.println("agreement added successfully");
-                }
+                if(ChainUtil.getInstance()
+                        .signatureVerification(agreement.getPublicKey(),
+                                agreement.getDigitalSignature(),
+                                agreement.getBlockHash()))
+                {
 
+                    getAgreements().add(agreement);
+                    //check for mandatory
+                    if (getMandatoryValidators().contains(agreement.getPublicKey())){
+                        getMandatoryValidators().remove(agreement.getPublicKey());
+                        // add rating
+                    }else if (getSpecialValidators().contains(agreement.getPublicKey())){
+                        getSpecialValidators().remove(agreement.getPublicKey());
+                        // add rating
+                    }
+
+                    System.out.println("agreement added successfully");
+                    return true;
+                }
             }
         }
         return false;
@@ -104,8 +195,9 @@ public class AgreementCollector {
         return ChainUtil.getInstance().getBlockHash(block);
     }
 
+    //no need synchronizing
     public boolean isDuplicateAgreement(Agreement agreement) {
-        if(agreements.contains(agreement)) {
+        if(getAgreements().contains(agreement)) {
             return true;
         }
         return false;
@@ -132,9 +224,27 @@ public class AgreementCollector {
     }
 
     public int getAgreedNodesCount() {
-        return agreedNodes.size();
+        return getAgreedNodes().size();
     }
 
 
+    public ArrayList<String> getMandatoryValidators() {
+        return mandatoryValidators;
+    }
 
+    public ArrayList<String> getSpecialValidators() {
+        return specialValidators;
+    }
+
+    public BlockJDBCDAO getBlockJDBCDAO() {
+        return blockJDBCDAO;
+    }
+
+    public int getThreshold() {
+        return threshold;
+    }
+
+    public IdentityJDBC getIdentityJDBC() {
+        return identityJDBC;
+    }
 }
