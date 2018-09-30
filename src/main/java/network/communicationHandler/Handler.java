@@ -66,6 +66,10 @@ public class Handler extends Thread{
                     System.out.println("Agreement");
 //                    handleReceivedAgreement(publicKey);
 
+                case "RequestedPeerDetails":
+                    System.out.println("RequestedPeerDetails");
+                    handleRequestedPeerDetails(data);
+
                 default:
                     System.out.println("default");
 
@@ -97,16 +101,18 @@ public class Handler extends Thread{
     public void handleHelloRequest() {
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
+        String peerID = clientInfo.getString("nodeID");
         int listeningPort = clientInfo.getInt("ListeningPort");
         MessageSender.getInstance().sendHelloResponse(Node.getInstance().getNodeConfig().getListenerPort(),ip, listeningPort);
-        Node.getInstance().addActiveNeighbour(ip, listeningPort);
+        Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
 
     public void handleHelloResponse() {
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
+        String peerID = clientInfo.getString("nodeID");
         int listeningPort = clientInfo.getInt("ListeningPort");
-        Node.getInstance().addActiveNeighbour(ip, listeningPort);
+        Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
 
     public void handleBlockChainHashRequest() throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
@@ -186,5 +192,18 @@ public class Handler extends Thread{
 
         return block;
     }
+
+    public void handleRequestedPeerDetails(String data) {
+        JSONObject jsonObject = new JSONObject(data);
+        String ip = jsonObject.getString("ip");
+        String peerID = jsonObject.getString("peerID");
+        int listeningPort = jsonObject.getInt("listeningPort");
+        String peerDetails = jsonObject.getString("peerDetails");
+        String signature = jsonObject.getString("signature");
+        String signedData = jsonObject.getString("signedData");
+        String publicKey = jsonObject.getString("publicKey");
+
+    }
+
 
 }

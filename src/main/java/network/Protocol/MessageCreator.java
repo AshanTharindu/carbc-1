@@ -1,6 +1,5 @@
 package network.Protocol;
 
-import chainUtil.KeyGenerator;
 import network.Client.RequestMessage;
 import network.Node;
 import org.json.JSONObject;
@@ -11,7 +10,7 @@ public class MessageCreator {
 
     public static RequestMessage createMessage(JSONObject object, String Type){
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String sender = Node.getInstance().getNodeConfig().getPeerID();
+        String sender = Node.getInstance().getNodeConfig().getNodeID();
         String receiver = "yourPublicKey";
         String messageType = Type;
 

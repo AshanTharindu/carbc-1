@@ -2,7 +2,6 @@ package network.communicationHandler;
 
 import chainUtil.ChainUtil;
 import com.google.gson.Gson;
-import core.blockchain.*;
 import chainUtil.KeyGenerator;
 import core.blockchain.Block;
 import core.blockchain.Transaction;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Timestamp;
 
 public class MessageSender {
 
@@ -40,8 +40,7 @@ public class MessageSender {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ListeningPort",ListeningPort);
-        jsonObject.put("nodeID", Node.getInstance().getNodeConfig().getPeerID());
-
+        jsonObject.put("nodeID", Node.getInstance().getNodeConfig().getNodeID());
         RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
         requestIPMessage.addHeader("keepActive", "false");
 //        Node.getInstance().sendMessageToNeighbour(1, blockMessage);
@@ -51,6 +50,7 @@ public class MessageSender {
     public void sendHelloResponse(int listeningPort, String clientIP, int clientPort) {
         JSONObject portInfo = new JSONObject();
         portInfo.put("ListeningPort", listeningPort);
+        portInfo.put("nodeID", Node.getInstance().getNodeConfig().getNodeID());
         RequestMessage helloResponse = HelloResponseCreator.createHelloResponseMessage(portInfo);
         Node.getInstance().sendMessageToPeer(clientIP, clientPort, helloResponse);
     }
@@ -142,6 +142,12 @@ public class MessageSender {
         Node.getInstance().sendMessageToPeer("127.0.0.1", 49154, peerDetailsRequestMessage);
     }
 
+    public void requestTransactionData(String vehicleID, String location, Timestamp date, String peerID) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("vehicleID", vehicleID);
+        jsonObject.put("location", location);
+        jsonObject.put("date", date);
+    }
 
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

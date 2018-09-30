@@ -4,6 +4,8 @@ import chainUtil.ChainUtil;
 import core.blockchain.Block;
 import core.blockchain.Transaction;
 import core.smartContract.BlockValidity;
+import network.Neighbour;
+import network.Node;
 import network.communicationHandler.MessageSender;
 import network.communicationHandler.RequestHandler;
 import org.json.JSONObject;
@@ -30,6 +32,7 @@ public class Consensus {
     private ArrayList<BlockchainReceiver> blockchainReceiveDetails;
     private int blockchainRequest;
     private String requestedBlockchainHash;
+    private ArrayList<String> requestedPeerDetails;
 
     //to automate agreement process
     private ArrayList<Transaction> addedTransaction;
@@ -39,6 +42,7 @@ public class Consensus {
         agreementCollectors = new ArrayList<>();
         blockchainShareDetails = new ArrayList<>();
         blockchainReceiveDetails = new ArrayList<>();
+        requestedPeerDetails = new ArrayList<>();
         blockchainRequest = 0;
     }
 
@@ -229,7 +233,30 @@ public class Consensus {
     }
 
     public void requestTransactionData(String vehicleID, String location, Timestamp date, String peerID) {
-        
+        Neighbour node = Node.getInstance().getPeerDetails(peerID);
+        if(node != null) {
+            JSONObject requestTransactionData = new JSONObject();
+            requestTransactionData.put("vehicleID", vehicleID);
+            requestTransactionData.put("date", date);
+        }
+    }
+
+
+    public void requestPeerDetails(String peerID) {
+
+        MessageSender.getInstance().requestPeerDetails(peerID);
+    }
+
+    public void handleRequestedPeerDetails(String peerDetails, String signature, String signedData, String publicKey) {
+        JSONObject jsonObject = new JSONObject(peerDetails);
+        String ip = jsonObject.getString("ip");
+        String peerID = jsonObject.getString("peerID");
+        int listeningPort = jsonObject.getInt("listeningPort");
+
+        if(ChainUtil.getInstance().verifyUser("o",publicKey)) {
+
+        }
+
     }
 
 }
