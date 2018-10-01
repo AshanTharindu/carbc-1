@@ -194,10 +194,8 @@ public class Consensus {
     }
 
 
-
-
     public void requestAdditionalData(Block block) {
-        //String sender = block
+        String blockHash = ChainUtil.getInstance().getBlockHash(block.getBlockBody());
 
     }
 
