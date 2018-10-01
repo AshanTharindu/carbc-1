@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import chainUtil.KeyGenerator;
 import core.blockchain.Block;
 import core.blockchain.Transaction;
+import core.consensus.BlockchainRequester;
 import core.consensus.Consensus;
 import network.Client.RequestMessage;
 import network.Neighbour;
@@ -60,7 +61,7 @@ public class MessageSender {
         jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
         RequestMessage blockChainRequest = BlockChainHashRequestCreator.createBlockChainHashRequest(jsonObject);
         blockChainRequest.addHeader("keepActive", "false");
-        Consensus.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
+        BlockchainRequester.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
         Node.getInstance().broadcast(blockChainRequest);
         log.info("requestBlockchainHash");
         System.out.println("requestBlockchainHash");

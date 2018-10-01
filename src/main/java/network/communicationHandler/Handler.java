@@ -2,6 +2,7 @@ package network.communicationHandler;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import core.consensus.BlockchainRequester;
 import core.consensus.Consensus;
 import core.blockchain.Block;
 import core.consensus.TransactionDataCollector;
@@ -112,7 +113,7 @@ public class Handler extends Thread{
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
         int listeningPort = clientInfo.getInt("ListeningPort");
-        Consensus.getInstance().handleBlockchainHashRequest(ip,listeningPort);
+        BlockchainRequester.getInstance().handleBlockchainHashRequest(ip,listeningPort);
     }
 
     public void handleBlockChainSignRequest() throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
@@ -122,14 +123,14 @@ public class Handler extends Thread{
         String signedBlockchain = jsonObject.getString("signedBlockchain");
         String blockchainHash = jsonObject.getString("blockchainHash");
         String publicKey = jsonObject.getString("publicKey"); //get from header
-        Consensus.getInstance().handleReceivedSignedBlockchain(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
+        BlockchainRequester.getInstance().handleReceivedSignedBlockchain(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
     }
 
     public void handleBlockChainRequest() throws Exception {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("ListeningPort");
-        Consensus.getInstance().sendBlockchain(ip,listeningPort);
+        BlockchainRequester.getInstance().sendBlockchain(ip,listeningPort);
     }
 
     public void handleReceivedBlockchainRequest() throws ParseException, NoSuchAlgorithmException, IOException, SQLException, NoSuchProviderException, InvalidKeySpecException {
@@ -138,7 +139,7 @@ public class Handler extends Thread{
         int listeningPort = jsonObject.getInt("ListeningPort");
         int blockchainLength = jsonObject.getInt("blockchainLength");
         JSONObject jsonBlockchain = new JSONObject(jsonObject.getString("blockchain"));
-        Consensus.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
+        BlockchainRequester.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
     }
 
     public void handleReceivedAgreement(){
