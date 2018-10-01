@@ -2,6 +2,7 @@ import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
 import core.consensus.Consensus;
+import core.consensus.TransactionDataCollector;
 import network.Node;
 import org.slf4j.impl.SimpleLogger;
 
@@ -37,6 +38,6 @@ public class TransactionDataTest {
          * */
         node.startListening();
 
-        Consensus.getInstance().requestTransactionData("ca83838", new Timestamp(System.currentTimeMillis()),"abcd1234");
+        TransactionDataCollector.getInstance().requestTransactionData("ca83838", new Timestamp(System.currentTimeMillis()),"abcd1234");
     }
 }

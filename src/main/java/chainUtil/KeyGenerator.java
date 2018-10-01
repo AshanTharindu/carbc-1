@@ -1,5 +1,9 @@
 package chainUtil;
 
+import core.consensus.Consensus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.URL;
 import java.security.*;
@@ -10,6 +14,7 @@ import java.security.spec.X509EncodedKeySpec;
 public class KeyGenerator {
 
     private static KeyGenerator keyGenerator;
+    private final Logger log = LoggerFactory.getLogger(KeyGenerator.class);
 
     public KeyGenerator(){};
 
@@ -28,15 +33,14 @@ public class KeyGenerator {
             keyGen.initialize(512, random);
             KeyPair pair = keyGen.generateKeyPair();
             PublicKey publicKey = pair.getPublic();
-            System.out.println("pub genarated");
-
+            log.info("PublicKey Generated");
             PrivateKey privateKey = pair.getPrivate();
-            System.out.println("prv genarated");
+            log.info("PrivateKey Generated");
 
             // Store Public Key.
             X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
             FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources" + "/public.key");
-            System.out.println("pub stored");
+            log.info("PublicKey Stored");
             fos.write(x509EncodedKeySpec.getEncoded());
             fos.close();
 
@@ -47,7 +51,7 @@ public class KeyGenerator {
             fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources" + "/private.key");
             fos.write(pkcs8EncodedKeySpec.getEncoded());
             fos.close();
-            System.out.println("prv stored");
+            log.info("PrivateKey Stored");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {
@@ -63,6 +67,7 @@ public class KeyGenerator {
 
     private PublicKey loadPublicKey() {
         // Read Public Key.
+        System.out.println(getResourcesFilePath("public.key"));
         File filePublicKey = new File(getResourcesFilePath("public.key"));
         FileInputStream fis = null;
         KeyFactory keyFactory = null;
@@ -125,6 +130,7 @@ public class KeyGenerator {
 
     public PublicKey getPublicKey() {
         if (getResourcesFilePath("public.key") == null) {
+            log.info("inside getPublicKey if statement");
             generateKeyPair();
         }
         return loadPublicKey();

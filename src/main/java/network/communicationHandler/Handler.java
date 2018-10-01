@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import core.consensus.Consensus;
 import core.blockchain.Block;
+import core.consensus.TransactionDataCollector;
 import network.Node;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -193,7 +194,7 @@ public class Handler extends Thread{
             String signedData = jsonObject.getString("signedData");
             String publicKey = jsonObject.getString("publicKey");
             log.info("Peer Details Received");
-            Consensus.getInstance().handleRequestedPeerDetails(peerDetails,signature,signedData,publicKey);
+            TransactionDataCollector.getInstance().handleRequestedPeerDetails(peerDetails,signature,signedData,publicKey);
         }
 
     }

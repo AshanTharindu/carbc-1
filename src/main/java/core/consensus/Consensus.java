@@ -34,7 +34,6 @@ public class Consensus {
     private ArrayList<Block> approvedBlocks;
     private int blockchainRequest;
     private String requestedBlockchainHash;
-    private ArrayList<DataRequester> requestedTransactionDataDetails;
 
     //to automate agreement process
     private ArrayList<Transaction> addedTransaction;
@@ -44,7 +43,6 @@ public class Consensus {
         agreementCollectors = new ArrayList<>();
         blockchainShareDetails = new ArrayList<>();
         blockchainReceiveDetails = new ArrayList<>();
-        requestedTransactionDataDetails = new ArrayList<>();
         approvedBlocks = new ArrayList<>();
         blockchainRequest = 0;
     }
@@ -335,57 +333,8 @@ public class Consensus {
         return new JSONObject();
     }
 
-    public void requestTransactionData(String vehicleID, Timestamp date, String peerID) {
-        Neighbour dataOwner = Node.getInstance().getPeerDetails(peerID);
-        if (dataOwner != null) {
-            DataRequester dataRequester = new DataRequester(peerID, vehicleID, dataOwner, date);
-            requestedTransactionDataDetails.add(dataRequester);
-            requestTransactionDataFromDataOwner(vehicleID, date, dataOwner);
-        } else {
-            log.info("No Peer Details found for: {}", peerID);
-            DataRequester dataRequester = new DataRequester(peerID, vehicleID, date);
-            requestedTransactionDataDetails.add(dataRequester);
-            MessageSender.getInstance().requestPeerDetails(peerID);
-        }
-    }
-
-    public void requestTransactionDataFromDataOwner(String vehicleID, Timestamp date, Neighbour dataOwner) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("vehicleID", vehicleID);
-        jsonObject.put("dataOwner", dataOwner.getPeerID());
-        jsonObject.put("date", date);
-        String nodeID = Node.getInstance().getNodeConfig().getNodeID();
-        jsonObject.put("signature", ChainUtil.getInstance().digitalSignature(nodeID));
-        jsonObject.put("signedData", nodeID);
-        MessageSender.getInstance().requestTransactionData(jsonObject, dataOwner);
-    }
-
-
-    public void handleRequestedPeerDetails(JSONObject peerDetails, String signature, String signedData, String publicKey) {
-        String ip = peerDetails.getString("ip");
-        String peerID = peerDetails.getString("nodeID");
-        int listeningPort = peerDetails.getInt("port");
-
-        if (ChainUtil.getInstance().signatureVerification(publicKey, signature, signedData)) {
-            Neighbour dataOwner = new Neighbour(peerID, ip, listeningPort);
-            DataRequester dataRequester = getDataRequester(peerID);
-            dataRequester.setDataOwner(dataOwner);
-            requestTransactionDataFromDataOwner(dataRequester.getVehicleID(), dataRequester.getDate(), dataOwner);
-        }
-    }
-
     public ArrayList<Block> getBlocksToBeAdded() {
         return approvedBlocks;
     }
 
-    public DataRequester getDataRequester(String peerID) {
-        for (DataRequester dataRequester : requestedTransactionDataDetails) {
-            if (peerID.equals(dataRequester.getPeerID())) {
-                log.info("data requester found for : {}", peerID);
-                return dataRequester;
-            }
-        }
-        log.info("No data requester found for : {}", peerID);
-        return null;
-    }
 }
