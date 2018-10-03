@@ -25,7 +25,6 @@ public class Handler extends Thread{
     String messageType;
     String data;
     String peerID;
-    private final Logger log = LoggerFactory.getLogger(Handler.class);
 
 
     public Handler(String messageType, String data, String peerID){
@@ -83,8 +82,6 @@ public class Handler extends Thread{
                     System.out.println("default");
 
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
