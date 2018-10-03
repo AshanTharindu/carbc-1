@@ -208,4 +208,12 @@ public class ChainUtil {
         return false;
     }
 
+    public String getPreviousHash() {
+        return "previousHash";
+    }
+
+    public long getRecentBlockNumber() {
+        return 101;
+    }
+
 }

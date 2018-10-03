@@ -105,7 +105,7 @@ public class MessageSender {
     }
 
 
-    public void BroadCastBlock(Block block) {
+    public void broadCastBlock(Block block) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("block",blockToJSON(block));
         RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
