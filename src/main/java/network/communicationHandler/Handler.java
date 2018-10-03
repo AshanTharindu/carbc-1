@@ -52,31 +52,41 @@ public class Handler extends Thread{
 
                 case "HelloResponse":
                     handleHelloResponse();
+                    break;
 
                 case "BlockChainHashRequest":
                     System.out.println("BlockChainHashRequest");
                     handleBlockChainHashRequest();
+                    break;
 
                 case "BlockChainSign":
                     System.out.println("BlockChainSign");
-                    System.out.println();
                     handleBlockChainSignRequest();
+                    break;
 
                 case "BlockChainRequest":
                     System.out.println("BlockChainRequest");
                     handleBlockChainRequest();
+                    break;
+
 
                 case "BlockchainSend":
                     System.out.println("BlockchainSend");
                     handleReceivedBlockchainRequest();
+                    break;
+
 
                 case "Agreement":
                     System.out.println("Agreement");
                     handleReceivedAgreement();
+                    break;
+
 
                 case "RequestedPeerDetails":
                     System.out.println("RequestedPeerDetails");
                     handleRequestedPeerDetails(data);
+                    break;
+
 
                 default:
                     System.out.println("default");

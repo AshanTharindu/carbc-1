@@ -7,8 +7,8 @@ import java.sql.SQLException;
 public class ConnectionFactory {
     String driverClassName = "com.mysql.jdbc.Driver";
     String connectionUrl = "jdbc:mysql://localhost:3306/CarBC?verifyServerCertificate=false&useSSL=true";
-    String dbUser = "admin";
-    String dbPwd = "admin123";
+    String dbUser = "root";
+    String dbPwd = "1066";
 
     private static ConnectionFactory connectionFactory = null;
 

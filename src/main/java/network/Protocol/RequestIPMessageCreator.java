@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 
-public class RequestIPMessageCreator {
+public class    RequestIPMessageCreator {
 
     public static RequestMessage createRequestIPMessage(JSONObject jsonObject){
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());

@@ -3,6 +3,7 @@ import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
+import controller.Controller;
 import core.blockchain.*;
 import core.consensus.AgreementCollector;
 import network.Client.RequestMessage;
@@ -114,6 +115,9 @@ public class   TestSendBlock2 {
 ////            ConsensusOld.getInstance().requestAgreementForBlock(block);
 ////            MessageSender.getInstance().BroadCastBlock(block);
 //            Node.getInstance().sendMessageToNeighbour(1, blockMessage);
+
+            Controller controller = new Controller();
+            controller.sendTransaction("V","ExchangeOwnership", new JSONObject());
         } catch (Exception e) {
             e.getMessage();
         }
