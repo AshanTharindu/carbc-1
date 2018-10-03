@@ -7,7 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-
+import java.sql.Timestamp;
+import java.sql.ResultSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -166,7 +167,6 @@ public class ChainUtil {
 
     }
 
-
     public JSONObject convertResultSetIntoJSON(ResultSet resultSet) throws Exception {
         JSONObject result = new JSONObject();
         int count = 0;
@@ -206,6 +206,14 @@ public class ChainUtil {
             return true;
         }
         return false;
+    }
+
+    public String getPreviousHash() {
+        return "previousHash";
+    }
+
+    public long getRecentBlockNumber() {
+        return 101;
     }
 
 }

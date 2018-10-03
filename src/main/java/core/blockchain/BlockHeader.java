@@ -1,5 +1,7 @@
 package core.blockchain;
 
+import chainUtil.ChainUtil;
+
 import java.sql.Timestamp;
 
 public class BlockHeader {
@@ -11,11 +13,11 @@ public class BlockHeader {
 
     public BlockHeader(){}
 
-    public BlockHeader(String previousHash, Timestamp blockTime,
-                       long blockNumber){
+    public BlockHeader(String previousHash, String hash, Timestamp blockTime){
         this.previousHash = previousHash;
         this.blockTime = blockTime;
-        this.blockNumber = blockNumber;
+        this.hash = hash;
+        this.blockNumber = ChainUtil.getInstance().getRecentBlockNumber() + 1;
     }
 
     public String getPreviousHash() {

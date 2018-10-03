@@ -2,10 +2,10 @@ package network.communicationHandler;
 
 import chainUtil.ChainUtil;
 import com.google.gson.Gson;
-import core.blockchain.*;
 import chainUtil.KeyGenerator;
 import core.blockchain.Block;
 import core.blockchain.Transaction;
+import core.consensus.BlockchainRequester;
 import core.consensus.Consensus;
 import network.Client.RequestMessage;
 import network.Neighbour;
@@ -19,11 +19,12 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Timestamp;
 
 public class MessageSender {
 
     private static  MessageSender messageSender;
-    private final Logger log = LoggerFactory.getLogger(Node.class);
+    private final Logger log = LoggerFactory.getLogger(MessageSender.class);
 
 
     private MessageSender() {};
@@ -40,8 +41,7 @@ public class MessageSender {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ListeningPort",ListeningPort);
-        jsonObject.put("nodeID", Node.getInstance().getNodeConfig().getPeerID());
-
+        jsonObject.put("nodeID", Node.getInstance().getNodeConfig().getNodeID());
         RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
         requestIPMessage.addHeader("keepActive", "false");
 //        Node.getInstance().sendMessageToNeighbour(1, blockMessage);
@@ -51,6 +51,7 @@ public class MessageSender {
     public void sendHelloResponse(int listeningPort, String clientIP, int clientPort) {
         JSONObject portInfo = new JSONObject();
         portInfo.put("ListeningPort", listeningPort);
+        portInfo.put("nodeID", Node.getInstance().getNodeConfig().getNodeID());
         RequestMessage helloResponse = HelloResponseCreator.createHelloResponseMessage(portInfo);
         Node.getInstance().sendMessageToPeer(clientIP, clientPort, helloResponse);
     }
@@ -60,7 +61,7 @@ public class MessageSender {
         jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
         RequestMessage blockChainRequest = BlockChainHashRequestCreator.createBlockChainHashRequest(jsonObject);
         blockChainRequest.addHeader("keepActive", "false");
-        Consensus.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
+        BlockchainRequester.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
         Node.getInstance().broadcast(blockChainRequest);
         log.info("requestBlockchainHash");
         System.out.println("requestBlockchainHash");
@@ -104,7 +105,7 @@ public class MessageSender {
     }
 
 
-    public void BroadCastBlock(Block block) {
+    public void broadCastBlock(Block block) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("block",blockToJSON(block));
         RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
@@ -137,11 +138,19 @@ public class MessageSender {
 
     public void requestPeerDetails(String peerID) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+        jsonObject.put("peerID", peerID);
+        jsonObject.put("listeningPort",Node.getInstance().getNodeConfig().getListenerPort());
         RequestMessage peerDetailsRequestMessage = MessageCreator.createMessage(jsonObject, "RequestPeerDetails");
         Node.getInstance().sendMessageToPeer("127.0.0.1", 49154, peerDetailsRequestMessage);
+        log.info("Peer Details Requested");
     }
 
+    public void requestTransactionData(JSONObject requestDetails, Neighbour dataOwner) {
+        requestDetails.put("listeningPort", Node.getInstance().getNodeConfig().getListenerPort());
+        RequestMessage transactionDataRequestMessage = MessageCreator.createMessage(requestDetails, "RequestTransactionData");
+        Node.getInstance().sendMessageToPeer(dataOwner.getIp(), dataOwner.getPort(), transactionDataRequestMessage);
+        log.info("Transaction Data Requested from: {}", dataOwner.getPeerID());
+    }
 
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

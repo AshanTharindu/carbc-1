@@ -51,6 +51,7 @@ public class AgreementRequestTest2 {
 //            validations.add(new Validation(validator1,"3332"));
 //            BlockHeader blockHeader = new BlockHeader("101","1234",timeStampStr,
 //                    "senderPubkey",123,true);
+//            BlockHeader blockHeader = new BlockHeader("101","1234",timeStampStr, "senderPubkey",123,true);
 //            blockHeader.setHash("##blockHash##");
 //            Validator validator3 = new Validator(KeyGenerator.getInstance().getEncodedPublicKeyString(KeyGenerator.getInstance().getPublicKey()),"owner","true",3);
 //            Validator validator4 = new Validator("v2","seller","true",4);

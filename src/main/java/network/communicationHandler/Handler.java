@@ -2,8 +2,10 @@ package network.communicationHandler;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import core.consensus.BlockchainRequester;
 import core.consensus.Consensus;
 import core.blockchain.Block;
+import core.consensus.TransactionDataCollector;
 import network.Node;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -23,6 +25,8 @@ public class Handler extends Thread{
     String messageType;
     String data;
     String peerID;
+    private final Logger log = LoggerFactory.getLogger(Handler.class);
+
 
     public Handler(String messageType, String data, String peerID){
         this.messageType = messageType;
@@ -71,25 +75,15 @@ public class Handler extends Thread{
                     System.out.println("Agreement");
                     handleReceivedAgreement();
 
+                case "RequestedPeerDetails":
+                    System.out.println("RequestedPeerDetails");
+                    handleRequestedPeerDetails(data);
+
                 default:
                     System.out.println("default");
 
             }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-            } catch (IOException e) {
-            e.printStackTrace();
-            } catch (ParseException e) {
-            e.printStackTrace();
-            } catch (SQLException e) {
-            e.printStackTrace();
-            } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,23 +98,25 @@ public class Handler extends Thread{
     public void handleHelloRequest() {
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
+        String peerID = clientInfo.getString("nodeID");
         int listeningPort = clientInfo.getInt("ListeningPort");
         MessageSender.getInstance().sendHelloResponse(Node.getInstance().getNodeConfig().getListenerPort(),ip, listeningPort);
-        Node.getInstance().addActiveNeighbour(ip, listeningPort);
+        Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
 
     public void handleHelloResponse() {
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
+        String peerID = clientInfo.getString("nodeID");
         int listeningPort = clientInfo.getInt("ListeningPort");
-        Node.getInstance().addActiveNeighbour(ip, listeningPort);
+        Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
 
     public void handleBlockChainHashRequest() throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
         int listeningPort = clientInfo.getInt("ListeningPort");
-        Consensus.getInstance().handleBlockchainHashRequest(ip,listeningPort);
+        BlockchainRequester.getInstance().handleBlockchainHashRequest(ip,listeningPort);
     }
 
     public void handleBlockChainSignRequest() throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
@@ -130,14 +126,14 @@ public class Handler extends Thread{
         String signedBlockchain = jsonObject.getString("signedBlockchain");
         String blockchainHash = jsonObject.getString("blockchainHash");
         String publicKey = jsonObject.getString("publicKey"); //get from header
-        Consensus.getInstance().handleReceivedSignedBlockchain(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
+        BlockchainRequester.getInstance().handleReceivedSignedBlockchain(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
     }
 
     public void handleBlockChainRequest() throws Exception {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("ListeningPort");
-        Consensus.getInstance().sendBlockchain(ip,listeningPort);
+        BlockchainRequester.getInstance().sendBlockchain(ip,listeningPort);
     }
 
     public void handleReceivedBlockchainRequest() throws ParseException, NoSuchAlgorithmException, IOException, SQLException, NoSuchProviderException, InvalidKeySpecException {
@@ -146,7 +142,7 @@ public class Handler extends Thread{
         int listeningPort = jsonObject.getInt("ListeningPort");
         int blockchainLength = jsonObject.getInt("blockchainLength");
         JSONObject jsonBlockchain = new JSONObject(jsonObject.getString("blockchain"));
-        Consensus.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
+        BlockchainRequester.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
     }
 
     public void handleReceivedAgreement(){
@@ -174,6 +170,19 @@ public class Handler extends Thread{
         Block block = gson.fromJson(JSONblock,Block.class);
 
         return block;
+    }
+
+    public void handleRequestedPeerDetails(String data) {
+        if(peerID.equals("Bootstrap Node")) {
+            JSONObject jsonObject = new JSONObject(data);
+            JSONObject peerDetails = jsonObject.getJSONObject("peerDetails");
+            String signature = jsonObject.getString("signature");
+            String signedData = jsonObject.getString("signedData");
+            String publicKey = jsonObject.getString("publicKey");
+            log.info("Peer Details Received");
+            TransactionDataCollector.getInstance().handleRequestedPeerDetails(peerDetails,signature,signedData,publicKey);
+        }
+
     }
 
 }

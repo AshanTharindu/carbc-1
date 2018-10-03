@@ -41,34 +41,34 @@ public class BlockchainRequestTest {
          * */
         node.startListening();
 
-        ArrayList<String> blockchain = new ArrayList<>();
-        blockchain.add("block1");
-        blockchain.add("block2");
-        blockchain.add("block3");
-        JSONObject jsonObject = new JSONObject(blockchain);
-        System.out.println(jsonObject.toString());
-
-        Map<Integer, Integer> h = new HashMap<Integer, Integer>();
-        int arr[] = new int[]{2, 2, 1, 3, 5, 5, 5, 9, 9, 0};
-        for (int i = 0; i < arr.length; i++) {
-            if (h.containsKey(arr[i])) {
-                h.put(arr[i], h.get(arr[i]) + 1);
-            } else {
-                h.put(arr[i], 1);
-            }
-        }
-        System.out.println(h);
-
-        int max = 0;
-        int key2 = 0;
-        for(int key : h.keySet()) {
-            if(h.get(key) > max) {
-                max = h.get(key);
-                key2 = key;
-            }
-        }
-        System.out.println("max is: "+max);
-        System.out.println("key is: "+key2);
+//        ArrayList<String> blockchain = new ArrayList<>();
+//        blockchain.add("block1");
+//        blockchain.add("block2");
+//        blockchain.add("block3");
+//        JSONObject jsonObject = new JSONObject(blockchain);
+//        System.out.println(jsonObject.toString());
+//
+//        Map<Integer, Integer> h = new HashMap<Integer, Integer>();
+//        int arr[] = new int[]{2, 2, 1, 3, 5, 5, 5, 9, 9, 0};
+//        for (int i = 0; i < arr.length; i++) {
+//            if (h.containsKey(arr[i])) {
+//                h.put(arr[i], h.get(arr[i]) + 1);
+//            } else {
+//                h.put(arr[i], 1);
+//            }
+//        }
+//        System.out.println(h);
+//
+//        int max = 0;
+//        int key2 = 0;
+//        for(int key : h.keySet()) {
+//            if(h.get(key) > max) {
+//                max = h.get(key);
+//                key2 = key;
+//            }
+//        }
+//        System.out.println("max is: "+max);
+//        System.out.println("key is: "+key2);
 
     }
 }

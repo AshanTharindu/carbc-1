@@ -1,7 +1,6 @@
 package network;
 
 import Exceptions.FileUtilityException;
-import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import config.NodeConfig;
@@ -22,7 +21,6 @@ import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public final class Node {
     private final Logger log = LoggerFactory.getLogger(Node.class);
@@ -110,7 +108,6 @@ public final class Node {
 //            Neighbour neighbour = new Neighbour(neightbourIP, neightbourPort);
 //            nodeConfig.addNeighbour(neighbour);
 //        }
-
         log.info("Initializing Node:{}", peerID);
 
     }
@@ -166,9 +163,10 @@ public final class Node {
         for (int i = 0; i < peers.length(); i++) {
             JSONObject peersJson = peers.getJSONObject(i);
             String peerIP = peersJson.getString("ip");
+            String peerID = peersJson.getString("peerID");
             int peerPort = peersJson.getInt("ListeningPort");
 //            String peerPublicKey = peersJson.getString("publicKey");
-            Neighbour neighbour = new Neighbour(peerIP,peerPort);
+            Neighbour neighbour = new Neighbour(peerID, peerIP,peerPort);
             tempNeighbour.add(neighbour);
         }
     }
@@ -177,6 +175,7 @@ public final class Node {
         for(Neighbour neighbour: neighbours) {
             JSONObject portInfo = new JSONObject();
             portInfo.put("ListeningPort",nodeConfig.getListenerPort());
+            portInfo.put("nodeID", nodeConfig.getNodeID());
             RequestMessage helloMsg = HelloMessageCreator.createHelloMessage(portInfo);
             sendMessageToPeer(neighbour.getIp(),neighbour.getPort(),helloMsg);
         }
@@ -191,10 +190,9 @@ public final class Node {
         talkToPeers(tempNeighbour);
     }
 
-    public void addActiveNeighbour(String ip, int port) {
-        nodeConfig.addNeighbour(new Neighbour(ip, port));
-        System.out.println("Active member added");
-        System.out.println("*******************neighbour list******************");
+    public void addActiveNeighbour(String peerID, String ip, int port) {
+        nodeConfig.addNeighbour(new Neighbour(peerID, ip, port));
+        log.info("Active Peer Added: {}" , peerID);
         for(Neighbour neighbour: nodeConfig.getNeighbours()) {
             System.out.println("IP: "+ neighbour.getIp() + " port: " + neighbour.getPort());
         }
@@ -203,5 +201,15 @@ public final class Node {
     public NodeConfig getNodeConfig() {
         return nodeConfig;
     }
+
+    public Neighbour getPeerDetails(String peerID) {
+        for(Neighbour neighbour: nodeConfig.getNeighbours()) {
+            if(peerID.equals(neighbour.getPeerID())) {
+                return neighbour;
+            }
+        }
+        return null;
+    }
+
 
 }

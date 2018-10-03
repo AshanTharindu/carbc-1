@@ -103,6 +103,7 @@ public class BlockAddingTest2 {
 //            MessageSender.getInstance().BroadCastBlock(block);
 
 
+
         } catch (Exception e) {
             e.getMessage();
         }

@@ -4,14 +4,15 @@ public class Neighbour {
     private String ip;
     private int port;
     private String publicKey;
+    private String peerID;
 
     public Neighbour(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
 
-    public Neighbour(String publicKey, String ip, int port) {
-        this.publicKey = publicKey;
+    public Neighbour(String peerID, String ip, int port) {
+        this.peerID = peerID;
         this.ip = ip;
         this.port = port;
     }
@@ -38,6 +39,10 @@ public class Neighbour {
 
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
+    }
+
+    public String getPeerID() {
+        return peerID;
     }
 
 
