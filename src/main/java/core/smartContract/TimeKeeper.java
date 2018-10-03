@@ -1,11 +1,7 @@
 package core.smartContract;
 
-import core.blockchain.Block;
 import core.consensus.Consensus;
-
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 
 public class TimeKeeper extends Thread{
     String blockHash;

@@ -50,7 +50,7 @@ public class Consensus {
     }
 
     //block broadcasting and sending agreements
-    public synchronized void handleNonApprovedBlock(Block block) throws NoSuchAlgorithmException, SQLException {
+    public synchronized void handleNonApprovedBlock(Block block) throws SQLException {
 
         if(!isDuplicateBlock(block)) {
             nonApprovedBlocks.add(block);

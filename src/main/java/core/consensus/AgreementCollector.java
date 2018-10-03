@@ -29,16 +29,16 @@ public class AgreementCollector extends Thread{
     private int threshold;
 
     public AgreementCollector(Block block) throws SQLException {
-        agreementCollectorId = generateAgreementCollectorId(block);
+        this.agreementCollectorId = generateAgreementCollectorId(block);
         this.block = block;
-        agreements = new ArrayList<>();
-        mandotaryAgreements = new Agreement[2]; //get from the block
-        rating = new Rating(block);
-        blockJDBCDAO = new BlockJDBCDAO();
-        identityJDBC = new IdentityJDBC();
-        mandatoryValidators = new ArrayList<>();
-        specialValidators = new ArrayList<>();
-        threshold = 5;
+        this.agreements = new ArrayList<>();
+        this.mandotaryAgreements = new Agreement[2]; //get from the block
+        this.rating = new Rating(block);
+        this.blockJDBCDAO = new BlockJDBCDAO();
+        this.identityJDBC = new IdentityJDBC();
+        this.mandatoryValidators = new ArrayList<>();
+        this.specialValidators = new ArrayList<>();
+        this.threshold = 5;
 
         setMandatoryAgreements();
 

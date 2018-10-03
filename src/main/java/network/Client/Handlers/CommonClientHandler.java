@@ -32,14 +32,13 @@ public class CommonClientHandler extends ChannelInboundHandlerAdapter {
             Map<String, String> headers = requestMessage.readHeaders();
             String data = requestMessage.readData();
 
-            System.out.println();
-            System.out.println("=====================================");
-            System.out.println("        at the client side           ");
-            System.out.println("=====================================");
-            System.out.println("----------headers----------------");
-            System.out.println(headers.toString());
-            System.out.println("----------data----------------");
-            System.out.println(data);
+            log.info("=====================================");
+            log.info("        at the client side           ");
+            log.info("=====================================");
+            log.info("----------headers----------------");
+            log.info(headers.toString());
+            log.info("----------data----------------");
+            log.info(data);
 
             //if the msg we received had the header "keepActive" set to false
             //then close the channel

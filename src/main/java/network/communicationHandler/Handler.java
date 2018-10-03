@@ -6,6 +6,8 @@ import core.consensus.Consensus;
 import core.blockchain.Block;
 import network.Node;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -17,6 +19,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 
 public class Handler extends Thread{
+    private final Logger log = LoggerFactory.getLogger(Handler.class);
     String messageType;
     String data;
     String peerID;
@@ -88,6 +91,8 @@ public class Handler extends Thread{
             e.printStackTrace();
         } catch (InvalidKeyException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -128,7 +133,7 @@ public class Handler extends Thread{
         Consensus.getInstance().handleReceivedSignedBlockchain(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
     }
 
-    public void handleBlockChainRequest() {
+    public void handleBlockChainRequest() throws Exception {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("ListeningPort");
@@ -155,34 +160,16 @@ public class Handler extends Thread{
 
     // 0-> block comes
     public void handleBroadcastBlock() throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, ParseException, SQLException {
-        System.out.println("handleBroadcastBlock");
+        log.debug("Inside Handler/handleBroadcastBlock");
         JSONObject receivedJSONObject = new JSONObject(data);
-        String JSONBlock = (String) receivedJSONObject.get("block");
-        Block decodedBLock = JSONStringToBlock(JSONBlock);
+        //TODO: need to decode a digitally signed block. Still we handle a raw block
+        String JSONBlock = (String)receivedJSONObject.get("block");
+        Block decodedBlock = JSONStringToBlock(JSONBlock);
 
-        Consensus.getInstance().handleNonApprovedBlock(decodedBLock);
+        Consensus.getInstance().handleNonApprovedBlock(decodedBlock);
     }
 
-    public Block JSONStringToBlock(String JSONblock) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
-//        byte[] prevhash = ChainUtil.hexStringToByteArray("1234");
-//        byte[] hash = ChainUtil.hexStringToByteArray("5678");
-//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//        byte[] data = ChainUtil.hexStringToByteArray("1456");
-//        byte[] signatue1 = ChainUtil.hexStringToByteArray("3332");
-//        byte[] signatue2 = ChainUtil.hexStringToByteArray("3442");
-//        PublicKey publicKey = KeyGenerator.getInstance().getPublicKey();
-//        Validator validator1 = new Validator("val1pubkey","owner",true,3);
-//        Validator validator2 = new Validator("val2pubkey","seller",true,4);
-//        ArrayList<Validation> validations = new ArrayList<>();
-//        validations.add(new Validation(validator1,"3332"));
-//        validations.add(new Validation(validator2,"3442"));
-//        BlockHeader blockHeader = new BlockHeader("101","1234",timestamp,
-//                "senderPubkey",123,true);
-//        Transaction transaction = new Transaction("senderpubkey",validations,
-//                "tran1",new TransactionInfo());
-
-//        Block block = new Block(blockHeader,transaction);
-        JSONObject jsonObject = new JSONObject(JSONblock);
+    public Block JSONStringToBlock(String JSONblock){
         Gson gson = new GsonBuilder().serializeNulls().create();
         Block block = gson.fromJson(JSONblock,Block.class);
 

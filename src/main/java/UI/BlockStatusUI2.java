@@ -27,12 +27,12 @@ public class BlockStatusUI2 {
     private JTextField priorityText;
 
     public BlockStatusUI2(Block block) {
-        vehicleIDText.setText(block.getTransaction().getTransactionInfo().getVehicleId());
-        eventText.setText(block.getTransaction().getTransactionInfo().getEvent());
-        para1Text.setText(String.valueOf(block.getTransaction().getTransactionInfo().getParameters()[0]));
-        para2Text.setText(String.valueOf(block.getTransaction().getTransactionInfo().getParameters()[1]));
-        senderPubKeyText.setText(block.getTransaction().getSender());
-        roleText.setText(block.getTransaction().getValidations().get(0).getValidator().getRole());
+//        vehicleIDText.setText(block.getTransaction().getTransactionInfo().getVehicleId());
+//        eventText.setText(block.getTransaction().getTransactionInfo().getEvent());
+//        para1Text.setText(String.valueOf(block.getTransaction().getTransactionInfo().getParameters()[0]));
+//        para2Text.setText(String.valueOf(block.getTransaction().getTransactionInfo().getParameters()[1]));
+//        senderPubKeyText.setText(block.getTransaction().getSender());
+//        roleText.setText(block.getTransaction().getValidations().get(0).getValidator().getRole());
     }
 
     public void runBlockStatusUI2() {
