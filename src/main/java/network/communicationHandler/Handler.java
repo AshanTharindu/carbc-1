@@ -164,7 +164,7 @@ public class Handler extends Thread{
 
     public Block JSONStringToBlock(String JSONblock){
         Gson gson = new GsonBuilder().serializeNulls().create();
-        Block block = gson.fromJson(JSONblock,Block.class);
+        Block block = gson.fromJson(JSONblock, Block.class);
 
         return block;
     }

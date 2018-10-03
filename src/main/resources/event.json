@@ -1,7 +1,7 @@
 {
   "ExchangeOwnership":{
     "id": 1,
-    "params":["Vehicle ID", "Current Owner", "New Owner"],
+    "params":{ "SecondaryParty":{"NewOwner":{"name": "Sajinie", "address":"address"}}, "ThirdParty":{}},
     "mandatoryValidators": []
   },
   "ServiceRepair":{

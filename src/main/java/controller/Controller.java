@@ -25,7 +25,7 @@ public class Controller {
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
         Timestamp time = new Timestamp(System.currentTimeMillis());
         String nodeID = Node.getInstance().getNodeConfig().getNodeID();
-        Transaction transaction = new Transaction(transactionType,sender,event, data, nodeID, time);
+        Transaction transaction = new Transaction(transactionType, sender, event, data, nodeID, time);
 
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);

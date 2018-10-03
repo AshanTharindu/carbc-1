@@ -1,5 +1,9 @@
 package core.connection;
 
+import Exceptions.FileUtilityException;
+import config.DatabaseConfig;
+import org.json.JSONObject;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -14,10 +18,16 @@ public class ConnectionFactory {
 
     private ConnectionFactory() {
         try {
+//            DatabaseConfig databaseConfig = DatabaseConfig.getInstance();
+//            databaseConfig.setConfigUsingResource();
+//            JSONObject dbDetail = databaseConfig.setConfigUsingResource();
             Class.forName(driverClassName);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+//        catch (FileUtilityException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public Connection getConnection() throws SQLException {
