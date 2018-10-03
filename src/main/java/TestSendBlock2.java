@@ -9,6 +9,7 @@ import core.consensus.AgreementCollector;
 import network.Client.RequestMessage;
 import network.Node;
 import network.Protocol.BlockMessageCreator;
+import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
@@ -41,7 +42,7 @@ public class   TestSendBlock2 {
          * when initializing the network
          * */
         Node node = Node.getInstance();
-        node.init();
+        node.initTest();
 
         /*
          * when we want our node to start listening
@@ -116,8 +117,10 @@ public class   TestSendBlock2 {
 ////            MessageSender.getInstance().BroadCastBlock(block);
 //            Node.getInstance().sendMessageToNeighbour(1, blockMessage);
 
+            MessageSender.getInstance().requestIP(49222);
+            Thread.sleep(4000);
             Controller controller = new Controller();
-            controller.sendTransaction("V","ExchangeOwnership", new JSONObject());
+            controller.sendTransaction("V","ExchangeOwnership", new JSONObject("{ \"SecondaryParty\":{\"NewOwner\":{\"name\": \"Sajinie\", \"address\":\"address\"}}, \"ThirdParty\":{}}"));
         } catch (Exception e) {
             e.getMessage();
         }

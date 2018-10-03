@@ -2,6 +2,7 @@ package core.smartContract;
 
 import core.consensus.Consensus;
 import java.sql.SQLException;
+import java.text.ParseException;
 
 public class TimeKeeper extends Thread{
     String blockHash;
@@ -19,6 +20,8 @@ public class TimeKeeper extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 

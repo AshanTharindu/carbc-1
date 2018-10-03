@@ -14,6 +14,10 @@ import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Controller {
 
@@ -21,19 +25,19 @@ public class Controller {
         TransactionDataCollector.getInstance().requestTransactionData(vehicleID, date, peerID);
     }
 
-    public void sendTransaction(String transactionType, String event, JSONObject data) {
+    public void sendTransaction(String transactionType, String event, JSONObject data) throws ParseException {
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
-        Timestamp time = new Timestamp(System.currentTimeMillis());
         String nodeID = Node.getInstance().getNodeConfig().getNodeID();
-        Transaction transaction = new Transaction(transactionType,sender,event, data, nodeID, time);
+        Transaction transaction = new Transaction(transactionType,sender,event, data, nodeID);
 
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
         String previousHash = ChainUtil.getInstance().getPreviousHash();
-        BlockHeader blockHeader = new BlockHeader(blockHash, previousHash,time);
+        BlockHeader blockHeader = new BlockHeader(blockHash, previousHash);
 
         Block block = new Block(blockHeader, blockBody);
+        System.out.println(new JSONObject(block));
         MessageSender.getInstance().broadCastBlock(block);
     }
 
