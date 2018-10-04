@@ -51,33 +51,35 @@ public class Consensus {
 
     //block broadcasting and sending agreements
     public synchronized void handleNonApprovedBlock(Block block) throws SQLException {
-
         if (!isDuplicateBlock(block)) {
-            nonApprovedBlocks.add(block);
-            boolean isPresent = false;
-            for (Block b : this.nonApprovedBlocks) {
-                if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
-                    isPresent = true;
-                    break;
+            if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
+                    block.getBlockHeader().getSignature(),block.getBlockHeader().getHash())) {
+                nonApprovedBlocks.add(block);
+                boolean isPresent = false;
+                for (Block b : this.nonApprovedBlocks) {
+                    if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
+                        isPresent = true;
+                        break;
+                    }
+                }
+                if (!isPresent) {
+                    TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
+                    timeKeeper.start();
+                }
+                AgreementCollector agreementCollector = new AgreementCollector(block);
+                agreementCollectors.add(agreementCollector);
+                agreementCollector.start();
+
+                //TODO: there is a problem here. Regardless of the block validity we anyway append the agreement collector to the arraylist. so whats the point of doing block validity below??
+
+                //now need to check the relevant party is registered as with desired roles
+                //if want, we can check the validity of the block creator/transaction creator
+                BlockValidity blockValidity = new BlockValidity(block);
+                if (blockValidity.isSecondaryPartyValid()) {
+                    //pop up notification to confirm
                 }
             }
-            if (!isPresent) {
-                TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
-                timeKeeper.start();
-            }
 
-            AgreementCollector agreementCollector = new AgreementCollector(block);
-            agreementCollectors.add(agreementCollector);
-            agreementCollector.start();
-
-            //TODO: there is a problem here. Regardless of the block validity we anyway append the agreement collector to the arraylist. so whats the point of doing block validity below??
-
-            //now need to check the relevant party is registered as with desired roles
-            //if want, we can check the validity of the block creator/transaction creator
-            BlockValidity blockValidity = new BlockValidity(block);
-            if (blockValidity.isSecondaryPartyValid()) {
-                //pop up notification to confirm
-            }
         }
     }
 
@@ -147,7 +149,7 @@ public class Consensus {
 
             Identity identity = null;
             if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
-                JSONObject body = block.getBlockBody().getTransaction().getData();
+                JSONObject body = new JSONObject(block.getBlockBody().getTransaction().getData());
                 String publicKey = body.getString("publicKey");
                 String role = body.getString("role");
                 String name = body.getString("name");

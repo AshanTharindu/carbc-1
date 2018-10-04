@@ -120,7 +120,7 @@ public class   TestSendBlock2 {
             MessageSender.getInstance().requestIP(49222);
             Thread.sleep(4000);
             Controller controller = new Controller();
-            controller.sendTransaction("V","ExchangeOwnership", new JSONObject("{ \"SecondaryParty\":{\"NewOwner\":{\"name\": \"Sajinie\", \"address\":\"address\"}}, \"ThirdParty\":{}}"));
+//            controller.sendTransaction("V","ExchangeOwnership", new JSONObject("{ \"SecondaryParty\":{\"NewOwner\":{\"name\": \"Sajinie\", \"address\":\"address\"}}, \"ThirdParty\":{}}"));
         } catch (Exception e) {
             e.getMessage();
         }

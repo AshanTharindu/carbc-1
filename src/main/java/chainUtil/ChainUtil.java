@@ -30,7 +30,7 @@ public class ChainUtil {
         return chainUtil;
     }
 
-    public String digitalSignature(String data) {
+    public static String digitalSignature(String data) {
         Signature dsa = null;
         String signature = null;
         try {
@@ -52,7 +52,7 @@ public class ChainUtil {
         return signature;
     }
 
-    public boolean signatureVerification(String publicKey, String signature, String data) {
+    public static boolean signatureVerification(String publicKey, String signature, String data) {
         return verify(KeyGenerator.getInstance().getPublicKey(publicKey),hexStringToByteArray(signature),data);
     }
 

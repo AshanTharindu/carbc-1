@@ -44,7 +44,7 @@ public class MessageSender {
         RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
         requestIPMessage.addHeader("keepActive", "false");
 //        Node.getInstance().sendMessageToNeighbour(1, blockMessage);
-        Node.getInstance().sendMessageToPeer("192.168.8.101", 49154,requestIPMessage);
+        Node.getInstance().sendMessageToPeer("127.0.0.1", 49154,requestIPMessage);
     }
 
     public void sendHelloResponse(int listeningPort, String clientIP, int clientPort) {
@@ -110,9 +110,10 @@ public class MessageSender {
         RequestMessage blockMessage = BlockMessageCreator.createBlockMessage(jsonObject);
         blockMessage.addHeader("keepActive", "false");
         blockMessage.addHeader("messageType", "BlockBroadcast");
-        for(Neighbour neighbour: Node.getInstance().getNodeConfig().getNeighbours()) {
-            Node.getInstance().sendMessageToPeer(neighbour.getIp(),neighbour.getPort(),blockMessage);
-        }
+        Node.getInstance().sendMessageToPeer("192.168.8.101",49211,blockMessage);
+//        for(Neighbour neighbour: Node.getInstance().getNodeConfig().getNeighbours()) {
+//            Node.getInstance().sendMessageToPeer(neighbour.getIp(),neighbour.getPort(),blockMessage);
+//        }
     }
 
     public void sendAgreement(String signedBlock, String blockHash) {

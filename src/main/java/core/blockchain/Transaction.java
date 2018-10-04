@@ -10,15 +10,15 @@ public class Transaction {
     private String transactionId;
     private String sender;
     private String event;
-    private JSONObject data;
+    private String data;
     private String address;
     private String time;
 
-    public Transaction(String transactionType, String sender, String event, JSONObject data, String address){
+    public Transaction(String transactionType, String sender, String event, String jsonData, String address){
         this.transactionId = generateTransactionID(transactionType);
         this.sender = sender;
         this.event = event;
-        this.data = data;
+        this.data = jsonData;
         this.address = address;
         this.time = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
     }
@@ -35,7 +35,7 @@ public class Transaction {
         return event;
     }
 
-    public JSONObject getData() {
+    public String getData() {
         return data;
     }
 
