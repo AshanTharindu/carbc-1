@@ -47,11 +47,12 @@ public class CommonListenerHandler extends ChannelInboundHandlerAdapter {
             log.info(data);
 
             String messageType = (String)headers.get("messageType");
-            RequestMessage ackMessage = AckMessageCreator.createAckMessage(messageType);
+            String sender = (String)headers.get("sender");
+            RequestMessage ackMessage = AckMessageCreator.createAckMessage(messageType, sender);
             ackMessage.addHeader("keepActive", "false");
             ChannelFuture f = ctx.writeAndFlush(ackMessage);
 
-            System.out.println("Message received from: " +clientIP);
+            log.info("Message received from: {}" +clientIP);
 
             //if the msg we received had the header "keepActive" set to false
             //then close the channel

@@ -41,17 +41,19 @@ public class MessageSender {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ListeningPort",ListeningPort);
         jsonObject.put("nodeID", Node.getInstance().getNodeConfig().getNodeID());
-        RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
+//        RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
+        RequestMessage requestIPMessage = MessageCreator.createSpecificMessage(jsonObject, "Register", "0");
         requestIPMessage.addHeader("keepActive", "false");
 //        Node.getInstance().sendMessageToNeighbour(1, blockMessage);
         Node.getInstance().sendMessageToPeer("127.0.0.1", 49154,requestIPMessage);
     }
 
-    public void sendHelloResponse(int listeningPort, String clientIP, int clientPort) {
+    public void sendHelloResponse(int listeningPort, String clientIP, int clientPort, String peerID) {
         JSONObject portInfo = new JSONObject();
         portInfo.put("ListeningPort", listeningPort);
         portInfo.put("nodeID", Node.getInstance().getNodeConfig().getNodeID());
-        RequestMessage helloResponse = HelloResponseCreator.createHelloResponseMessage(portInfo);
+//        RequestMessage helloResponse = HelloResponseCreator.createHelloResponseMessage(portInfo);
+        RequestMessage helloResponse = MessageCreator.createSpecificMessage(portInfo,"HelloResponse", peerID);
         Node.getInstance().sendMessageToPeer(clientIP, clientPort, helloResponse);
     }
 
@@ -59,11 +61,11 @@ public class MessageSender {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
         RequestMessage blockChainRequest = BlockChainHashRequestCreator.createBlockChainHashRequest(jsonObject);
+//        RequestMessage blockChainRequest = MessageCreator.createSpecificMessage(jsonObject, );
         blockChainRequest.addHeader("keepActive", "false");
         BlockchainRequester.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
         Node.getInstance().broadcast(blockChainRequest);
         log.info("requestBlockchainHash");
-        System.out.println("requestBlockchainHash");
     }
 
     public void requestBlockchain() {
@@ -122,7 +124,8 @@ public class MessageSender {
         jsonObject.put("blockHash", blockHash);
         jsonObject.put("publicKey", KeyGenerator.getInstance().getPublicKeyAsString());
         RequestMessage agreementMessage = AgreementCreator.createAgreementRequest(jsonObject);
-        Node.getInstance().broadcast(agreementMessage);
+//        Node.getInstance().broadcast(agreementMessage);
+        Node.getInstance().sendMessageToPeer("192.168.8.101", 49211, agreementMessage);
     }
 
     public void requestAdditionalData(String ip, int listeningPort, String blockHash, String signedBlock) {

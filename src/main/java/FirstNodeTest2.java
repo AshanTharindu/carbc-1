@@ -1,8 +1,13 @@
 import Exceptions.FileUtilityException;
+import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
 import controller.Controller;
+import core.blockchain.Block;
+import core.blockchain.BlockBody;
+import core.blockchain.BlockHeader;
+import core.blockchain.Transaction;
 import network.communicationHandler.MessageSender;
 import network.Node;
 import org.json.JSONArray;
@@ -53,7 +58,7 @@ public class FirstNodeTest2 {
         JSONObject jsonSecondary = new JSONObject();
 
         jsonObjectNewOwner.put("name", "Ashan");
-        jsonObjectNewOwner.put("publicKey", Node.getInstance().getNodeConfig().getNodeID());
+        jsonObjectNewOwner.put("publicKey", KeyGenerator.getInstance().getPublicKeyAsString());
 
         jsonSecondary.put("NewOwner", jsonObjectNewOwner);
         jsonObject.put("SecondaryParty", jsonSecondary);
@@ -63,6 +68,24 @@ public class FirstNodeTest2 {
         Controller controller = new Controller();
 
         System.out.println(jsonObject);
-        controller.sendTransaction("V","ExchangeOwnership", jsonObject.toString());
+//        controller.sendTransaction("V","ExchangeOwnership", jsonObject.toString());
+
+
+
+
+        String sender = KeyGenerator.getInstance().getPublicKeyAsString();
+        String nodeID = Node.getInstance().getNodeConfig().getNodeID();
+        Transaction transaction = new Transaction("V",sender,"ExchangeOwnership", jsonObject.toString(), nodeID);
+
+        BlockBody blockBody = new BlockBody();
+        blockBody.setTransaction(transaction);
+        String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
+        String previousHash = ChainUtil.getInstance().getPreviousHash();
+        BlockHeader blockHeader = new BlockHeader(previousHash, blockHash);
+
+        Block block = new Block(blockHeader, blockBody);
+        MessageSender.getInstance().broadCastBlock(block);
+        Thread.sleep(4000);
+        controller.sendConfirmation(block);
     }
 }

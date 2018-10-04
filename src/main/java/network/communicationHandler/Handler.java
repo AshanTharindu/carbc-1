@@ -107,7 +107,7 @@ public class Handler extends Thread{
         String ip = clientInfo.getString("ip");
         String peerID = clientInfo.getString("nodeID");
         int listeningPort = clientInfo.getInt("ListeningPort");
-        MessageSender.getInstance().sendHelloResponse(Node.getInstance().getNodeConfig().getListenerPort(),ip, listeningPort);
+        MessageSender.getInstance().sendHelloResponse(Node.getInstance().getNodeConfig().getListenerPort(),ip, listeningPort, peerID);
         Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
 
