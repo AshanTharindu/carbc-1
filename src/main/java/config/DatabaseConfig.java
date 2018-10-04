@@ -17,7 +17,7 @@ public class DatabaseConfig {
 
     private DatabaseConfig(){}
 
-    public JSONObject getEventJson() {
+    public JSONObject getDBJson() {
         return dbConfig;
     }
 

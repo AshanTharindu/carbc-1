@@ -38,7 +38,6 @@ public class MessageSender {
 
     //messages of new protocol
     public void requestIP(int ListeningPort) throws IOException {
-
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ListeningPort",ListeningPort);
         jsonObject.put("nodeID", Node.getInstance().getNodeConfig().getNodeID());

@@ -43,7 +43,7 @@ public class Block {
 
     public static Block createGenesis() throws ParseException {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        BlockHeader blockHeader = new BlockHeader("genesis Block", "sajinie", timestamp);
+        BlockHeader blockHeader = new BlockHeader("genesis Block", "sajinie");
         Block genesisBlock = new Block(blockHeader);
         return genesisBlock;
     }

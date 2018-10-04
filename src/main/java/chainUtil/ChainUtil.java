@@ -11,6 +11,9 @@ import java.sql.Timestamp;
 import java.sql.ResultSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class ChainUtil {
@@ -214,6 +217,17 @@ public class ChainUtil {
 
     public long getRecentBlockNumber() {
         return 101;
+    }
+
+    public static Timestamp convertStringToTimestamp(String time) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+        Date parsedDate = null;
+        try {
+            parsedDate = dateFormat.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new java.sql.Timestamp(parsedDate.getTime());
     }
 
 }

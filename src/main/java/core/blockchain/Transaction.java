@@ -3,6 +3,7 @@ package core.blockchain;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Random;
 
 public class Transaction {
@@ -11,15 +12,15 @@ public class Transaction {
     private String event;
     private JSONObject data;
     private String address;
-    private Timestamp time;
+    private String time;
 
-    public Transaction(String transactionType, String sender, String event, JSONObject data, String address, Timestamp time){
+    public Transaction(String transactionType, String sender, String event, JSONObject data, String address){
         this.transactionId = generateTransactionID(transactionType);
         this.sender = sender;
         this.event = event;
         this.data = data;
         this.address = address;
-        this.time = time;
+        this.time = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
     }
 
     public String getTransactionId() {

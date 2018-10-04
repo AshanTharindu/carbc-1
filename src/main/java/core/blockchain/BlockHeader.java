@@ -3,21 +3,24 @@ package core.blockchain;
 import chainUtil.ChainUtil;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class BlockHeader {
     private String previousHash;
     private String hash;
-    private Timestamp blockTime;
+    private String signature;
+    private String blockTime;
     private long blockNumber;
     private boolean validity = false;
 
     public BlockHeader(){}
 
-    public BlockHeader(String previousHash, String hash, Timestamp blockTime){
+    public BlockHeader(String previousHash, String hash){
         this.previousHash = previousHash;
-        this.blockTime = blockTime;
+        this.blockTime = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
         this.hash = hash;
         this.blockNumber = ChainUtil.getInstance().getRecentBlockNumber() + 1;
+        signature = ChainUtil.getInstance().digitalSignature(hash);
     }
 
     public String getPreviousHash() {
@@ -36,11 +39,11 @@ public class BlockHeader {
         this.hash = hash;
     }
 
-    public Timestamp getBlockTime() {
+    public String getBlockTime() {
         return blockTime;
     }
 
-    public void setBlockTime(Timestamp blockTime) {
+    public void setBlockTime(String blockTime) {
         this.blockTime = blockTime;
     }
 
@@ -58,5 +61,9 @@ public class BlockHeader {
 
     public void setValidity(boolean validity) {
         this.validity = validity;
+    }
+
+    public String getSignature() {
+        return signature;
     }
 }

@@ -19,7 +19,9 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -79,7 +81,7 @@ public class Consensus {
         }
     }
 
-    public void checkAgreementsForBlock(String preBlockHash) throws SQLException {
+    public void checkAgreementsForBlock(String preBlockHash) throws SQLException, ParseException {
         ArrayList<Block> qualifiedBlocks = new ArrayList<>();
         for (Block b : this.nonApprovedBlocks) {
             if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)) {
@@ -101,19 +103,20 @@ public class Consensus {
         addBlockToBlockchain(qualifiedBlocks);
     }
 
-    public Block selectQualifiedBlock(ArrayList<Block> qualifiedBlocks) throws SQLException {
+    public Block selectQualifiedBlock(ArrayList<Block> qualifiedBlocks) throws SQLException, ParseException {
         Block qualifiedBlock = null;
 
         if (qualifiedBlocks.size() != 0) {
             qualifiedBlock = qualifiedBlocks.get(0);
-            Timestamp blockTimestamp = qualifiedBlock.getBlockHeader().getBlockTime();
+
+            Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(qualifiedBlock.getBlockHeader().getBlockTime());
 
             synchronized (nonApprovedBlocks) {
                 for (Block b : qualifiedBlocks) {
-                    if (blockTimestamp.after(b.getBlockHeader().getBlockTime())) {
+                    if (blockTimestamp.after(ChainUtil.convertStringToTimestamp(b.getBlockHeader().getBlockTime()))) {
                         this.nonApprovedBlocks.remove(qualifiedBlock);
                         qualifiedBlock = b;
-                        blockTimestamp = b.getBlockHeader().getBlockTime();
+                        blockTimestamp = ChainUtil.convertStringToTimestamp(b.getBlockHeader().getBlockTime());
                     } else {
                         this.nonApprovedBlocks.remove(b);
                     }
@@ -127,14 +130,14 @@ public class Consensus {
         return qualifiedBlock;
     }
 
-    public void addBlockToBlockchain(ArrayList<Block> qualifiedBlocks) throws SQLException {
+    public void addBlockToBlockchain(ArrayList<Block> qualifiedBlocks) throws SQLException, ParseException {
         Block block = selectQualifiedBlock(qualifiedBlocks);
 
         if (block != null) {
             BlockInfo blockInfo = new BlockInfo();
             blockInfo.setPreviousHash(block.getBlockHeader().getPreviousHash());
             blockInfo.setHash(block.getBlockHeader().getHash());
-            blockInfo.setBlockTime(block.getBlockHeader().getBlockTime());
+            blockInfo.setBlockTime(ChainUtil.convertStringToTimestamp(block.getBlockHeader().getBlockTime()));
             blockInfo.setBlockNumber(block.getBlockHeader().getBlockNumber());
             blockInfo.setTransactionId(block.getBlockBody().getTransaction().getTransactionId());
             blockInfo.setSender(block.getBlockBody().getTransaction().getSender());

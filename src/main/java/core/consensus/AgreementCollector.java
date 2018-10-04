@@ -51,6 +51,7 @@ public class AgreementCollector extends Thread{
         synchronized (this){
             String event = this.block.getBlockBody().getTransaction().getEvent();
             JSONObject blockData = block.getBlockBody().getTransaction().getData();
+            System.out.println(blockData);
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
 

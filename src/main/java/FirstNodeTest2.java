@@ -1,17 +1,20 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
+import controller.Controller;
 import network.communicationHandler.MessageSender;
 import network.Node;
+import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
 
 public class FirstNodeTest2 {
-    public static void main(String[] args) throws FileUtilityException, IOException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
+    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, InterruptedException, ParseException {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
@@ -38,5 +41,21 @@ public class FirstNodeTest2 {
         node.startListening();
 
         MessageSender.getInstance().requestIP(49222);
+        Thread.sleep(4000);
+
+        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObjectNewOwner = new JSONObject();
+
+        jsonObjectNewOwner.put("name", "Ashan");
+        jsonObjectNewOwner.put("address", Node.getInstance().getNodeConfig().getNodeID());
+
+        jsonObject.put("SecondaryParty", jsonObjectNewOwner);
+        jsonObject.put("ThirdParty", new JSONObject());
+
+
+        Controller controller = new Controller();
+
+        System.out.println(jsonObject);
+        controller.sendTransaction("V","ExchangeOwnership", jsonObject);
     }
 }

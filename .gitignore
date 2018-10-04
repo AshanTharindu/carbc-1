@@ -2,3 +2,7 @@
 out/
 *.iml
 target/
+src/main/resources/db.json
+src/main/resources/private.key
+src/main/resources/public.key
+
