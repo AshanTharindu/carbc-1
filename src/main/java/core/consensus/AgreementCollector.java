@@ -51,6 +51,7 @@ public class AgreementCollector extends Thread{
         synchronized (this){
             String event = this.block.getBlockBody().getTransaction().getEvent();
             JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
+            System.out.println(blockData);
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
 
@@ -106,6 +107,19 @@ public class AgreementCollector extends Thread{
 
             }
         }
+
+        if (mandatoryValidators.size()>0){
+            for (int i = 0; i<mandatoryValidators.size(); i++){
+                System.out.println(mandatoryValidators.get(i));
+            }
+        }
+
+        if (specialValidators.size()>0){
+            for (int i = 0; i<specialValidators.size(); i++){
+                System.out.println(specialValidators.get(i));
+            }
+        }
+
     }
 
     public void setMandotaryAgreementsOld(){
