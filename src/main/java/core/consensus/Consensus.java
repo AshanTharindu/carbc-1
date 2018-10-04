@@ -67,23 +67,27 @@ public class Consensus {
                     timeKeeper.start();
                 }
                 AgreementCollector agreementCollector = new AgreementCollector(block);
+                System.out.println("agreementcolletor ID: "+agreementCollector.getAgreementCollectorId());
                 agreementCollectors.add(agreementCollector);
                 agreementCollector.start();
-
+                log.info("agreement Collector added, size: {}", agreementCollectors.size());
                 //TODO: there is a problem here. Regardless of the block validity we anyway append the agreement collector to the arraylist. so whats the point of doing block validity below??
 
                 //now need to check the relevant party is registered as with desired roles
                 //if want, we can check the validity of the block creator/transaction creator
-                BlockValidity blockValidity = new BlockValidity(block);
-                if (blockValidity.isSecondaryPartyValid()) {
-                    //pop up notification to confirm
-                }
+
+//                BlockValidity blockValidity = new BlockValidity(block);
+//                if (blockValidity.isSecondaryPartyValid()) {
+//                    //pop up notification to confirm
+//                }
             }
 
         }
     }
 
     public void checkAgreementsForBlock(String preBlockHash) throws SQLException, ParseException {
+        System.out.println("Inside checkAgreementsForBlock method");
+
         ArrayList<Block> qualifiedBlocks = new ArrayList<>();
         for (Block b : this.nonApprovedBlocks) {
             if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)) {
@@ -180,12 +184,14 @@ public class Consensus {
 
     //no need of synchronizing
     public void handleAgreement(Agreement agreement) {
+        System.out.println("agreement.getBlockHash()" + agreement.getBlockHash());
         getAgreementCollector(agreement.getBlockHash()).addAgreementForBlock(agreement);
     }
 
     //no need of synchronizing
     private AgreementCollector getAgreementCollector(String id) {
         for (AgreementCollector agreementCollector : this.agreementCollectors) {
+            System.out.println(agreementCollector.getAgreementCollectorId());
             if (agreementCollector.getAgreementCollectorId().equals(id)) {
                 return agreementCollector;
             }
@@ -195,7 +201,7 @@ public class Consensus {
 
     //no need of synchronizing
     public void handleReceivedAgreement(String signature, String signedBlock, String blockHash, String publicKey) {
-        handleAgreement(new Agreement(signature, blockHash, signedBlock, publicKey));
+        handleAgreement(new Agreement(signature, signedBlock, blockHash, publicKey));
     }
 
 

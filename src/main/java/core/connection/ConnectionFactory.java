@@ -23,6 +23,8 @@ public class ConnectionFactory {
             JSONObject dbDetail = databaseConfig.getDBJson();
             dbUser = dbDetail.getString("dbUser");
             dbPwd = dbDetail.getString("dbPwd");
+            System.out.println(dbUser);
+            System.out.println(dbPwd);
 
             Class.forName(getDriverClassName());
         } catch (ClassNotFoundException e) {

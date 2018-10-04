@@ -22,6 +22,8 @@ public class IdentityJDBC {
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
+                System.out.println(resultSet);
+                identity = new JSONObject();
                 String publicKey = resultSet.getString("public_key");
                 String role = resultSet.getString("role");
                 String name = resultSet.getString("name");

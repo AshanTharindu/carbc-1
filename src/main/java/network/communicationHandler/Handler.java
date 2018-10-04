@@ -153,12 +153,14 @@ public class Handler extends Thread{
     }
 
     public void handleReceivedAgreement(){
+        log.info("inside handleReceivedAgreement method");
         JSONObject jsonObject = new JSONObject(data);
-        String signature = jsonObject.getString("digitalSignature");
+        System.out.println(jsonObject);
+//        String signature = jsonObject.getString("digitalSignature");
         String signedBlock = jsonObject.getString("signedBlock");
         String blockHash = jsonObject.getString("blockHash");
         String publicKey = jsonObject.getString("publicKey");
-        Consensus.getInstance().handleReceivedAgreement(signature, signedBlock, blockHash, publicKey);
+        Consensus.getInstance().handleReceivedAgreement("sign", signedBlock, blockHash, publicKey);
     }
 
     // 0-> block comes

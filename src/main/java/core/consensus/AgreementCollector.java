@@ -38,7 +38,7 @@ public class AgreementCollector extends Thread{
         this.identityJDBC = new IdentityJDBC();
         this.mandatoryValidators = new ArrayList<>();
         this.specialValidators = new ArrayList<>();
-        this.threshold = 5;
+        this.threshold = 1;
 
         setMandatoryAgreements();
 
@@ -58,8 +58,8 @@ public class AgreementCollector extends Thread{
             switch (event){
                 case "ExchangeOwnership":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("NewOwner").getString("publicKey"));
-                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
-                    getMandatoryValidators().add(obj.getString("publicKey"));
+//                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
+//                    getMandatoryValidators().add(obj.getString("publicKey"));
                     break;
 
                 case "ServiceRepair":
@@ -176,6 +176,7 @@ public class AgreementCollector extends Thread{
 
     //adding agreements
     public synchronized boolean addAgreementForBlock(Agreement agreement) {
+        System.out.println("Inside addAgreementForBlock method");
         if(agreementCollectorId.equals(agreement.getBlockHash())) {
             if(!isDuplicateAgreement(agreement)) {
                 PublicKey publicKey = KeyGenerator.getInstance().getInstance().getPublicKey(agreement.getPublicKey());
@@ -204,7 +205,7 @@ public class AgreementCollector extends Thread{
     }
 
     public static String generateAgreementCollectorId(Block block) {
-        return ChainUtil.getInstance().getBlockHash(block);
+        return block.getBlockHeader().getHash();
     }
 
     //no need synchronizing

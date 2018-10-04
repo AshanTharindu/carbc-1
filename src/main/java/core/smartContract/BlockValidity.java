@@ -25,29 +25,30 @@ public class BlockValidity {
 
         IdentityJDBC identityJDBC = new IdentityJDBC();
 
-        JSONObject params = eventConfig.getJSONObject(event).getJSONObject("params");
+        JSONObject params = data.getJSONObject("data");
+//        JSONObject params = eventConfig.getJSONObject(event).getJSONObject("params");
 
         JSONObject secondaryParties = params.getJSONObject("SecondaryParty");
 
-        Iterator<String> keys = secondaryParties.keys();
-        while ( keys.hasNext() ){
-            String key = (String)keys.next(); // First key in your json object
-
-            if (secondaryParties.get(key) instanceof JSONObject) {
-                JSONObject jsonObject = secondaryParties.getJSONObject(key);
-                String secondaryPartyAddress = jsonObject.getString("address");
-                String secondaryPartyRole = jsonObject.getString("role");
-
-                JSONObject identity = identityJDBC.getIdentityByAddress(secondaryPartyAddress);
-
-                //if want, can check the name also
-
-                if (!identity.getString("role").equals(secondaryPartyRole)){
-                    return false;
-                }
-            }
-
-        }
+//        Iterator<String> keys = params.keys();
+//        while ( keys.hasNext() ){
+//            String key = (String)keys.next(); // First key in your json object
+//
+//            if (params.get(key) instanceof JSONObject) {
+//                JSONObject jsonObject = secondaryParties.getJSONObject(key);
+//                String secondaryPartyAddress = jsonObject.getString("address");
+//                String secondaryPartyRole = jsonObject.getString("role");
+//
+//                JSONObject identity = identityJDBC.getIdentityByAddress(secondaryPartyAddress);
+//
+//                //if want, can check the name also
+//
+//                if (!identity.getString("role").equals(secondaryPartyRole)){
+//                    return false;
+//                }
+//            }
+//
+//        }
 
         ////old version
 //        for (int i = 0; i < secondaryParties.length(); i++){
