@@ -215,5 +215,9 @@ public final class Node {
         return null;
     }
 
+    public String getNodeId() {
+        return nodeConfig.getNodeID();
+    }
+
 
 }

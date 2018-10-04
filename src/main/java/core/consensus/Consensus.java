@@ -172,7 +172,7 @@ public class Consensus {
 
     //no need of synchronizing
     public void sendAgreementForBlock(Block block) {
-        String blockHash = ChainUtil.getInstance().getBlockHash(block);
+        String blockHash = block.getBlockHeader().getHash();
         String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
         MessageSender.getInstance().sendAgreement(signedBlock, blockHash);
         System.out.println("agreement sent");
