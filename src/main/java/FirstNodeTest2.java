@@ -22,6 +22,9 @@ import java.text.ParseException;
 
 public class FirstNodeTest2 {
     public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, InterruptedException, ParseException {
+//        System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
+
+
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
