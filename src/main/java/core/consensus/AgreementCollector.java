@@ -6,8 +6,11 @@ import config.EventConfigHolder;
 import core.blockchain.Block;
 import core.connection.BlockJDBCDAO;
 import core.connection.IdentityJDBC;
+import network.communicationHandler.MessageSender;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.*;
 import java.sql.SQLException;
@@ -27,6 +30,8 @@ public class AgreementCollector extends Thread{
     private BlockJDBCDAO blockJDBCDAO;
     private IdentityJDBC identityJDBC;
     private int threshold;
+    private final Logger log = LoggerFactory.getLogger(AgreementCollector.class);
+
 
     public AgreementCollector(Block block) throws SQLException {
         this.agreementCollectorId = generateAgreementCollectorId(block);
@@ -180,12 +185,8 @@ public class AgreementCollector extends Thread{
         if(agreementCollectorId.equals(agreement.getBlockHash())) {
             if(!isDuplicateAgreement(agreement)) {
                 PublicKey publicKey = KeyGenerator.getInstance().getInstance().getPublicKey(agreement.getPublicKey());
-                if(ChainUtil.getInstance()
-                        .signatureVerification(agreement.getPublicKey(),
-                                agreement.getDigitalSignature(),
-                                agreement.getBlockHash()))
-                {
-
+                if(ChainUtil.getInstance().signatureVerification(agreement.getPublicKey(), agreement.getSignedBlock(),
+                                agreement.getBlockHash())) {
                     getAgreements().add(agreement);
                     //check for mandatory
                     if (getMandatoryValidators().contains(agreement.getPublicKey())){
@@ -196,7 +197,7 @@ public class AgreementCollector extends Thread{
                         // add rating
                     }
 
-                    System.out.println("agreement added successfully");
+                    log.info("agreement added for block: {}", agreement.getBlockHash());
                     return true;
                 }
             }
