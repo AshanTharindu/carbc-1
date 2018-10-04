@@ -7,11 +7,12 @@ import org.json.JSONObject;
 import java.sql.*;
 
 public class BlockJDBCDAO {
-    Connection connection = null;
-    PreparedStatement ptmt = null;
-    ResultSet resultSet = null;
 
     public boolean addBlockToBlockchain(BlockInfo blockInfo, Identity identity) throws SQLException {
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+
         String transactionId = blockInfo.getTransactionId();
         String transactionType = transactionId.substring(0, 1);
         String query = "";
@@ -66,6 +67,9 @@ public class BlockJDBCDAO {
 
 
     public ResultSet getBlockchain(long blockNumber) throws SQLException {
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
 
         String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
                 "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
@@ -102,6 +106,10 @@ public class BlockJDBCDAO {
 
     //get an identity related transactions
     public void updateIdentityTableAtBlockchainReceipt() throws SQLException {
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+
         String query = "SELECT `data` FROM `Blockchain` WHERE `address` LIKE 'I%'";
         String queryForIdentity = "INSERT INTO `Identity`(`block_hash`, `role`, `name`) VALUES (?,?,?)";
         JSONObject identity = null;
@@ -142,5 +150,40 @@ public class BlockJDBCDAO {
         }
     }
 
+    public ResultSet getCompleteVehicleInfo(String vehicleId) throws SQLException {
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
 
+        String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
+                "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
+                "FROM `Blockchain` WHERE `transaction_id` LIKE ? AND `event` = ? AND " +
+                "`address` >=  AND `validity` = `T`";
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, "V");
+            ptmt.setString(2, vehicleId);
+            ptmt.setString(2, "T");
+            resultSet = ptmt.executeQuery();
+
+            if (resultSet.next()){
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return resultSet;
+        }
+    }
 }
