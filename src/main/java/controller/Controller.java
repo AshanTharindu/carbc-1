@@ -9,7 +9,9 @@ import core.blockchain.Transaction;
 import core.consensus.Consensus;
 import core.consensus.DataRequester;
 import core.consensus.TransactionDataCollector;
+import network.Client.RequestMessage;
 import network.Node;
+import network.Protocol.BlockMessageCreator;
 import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
 
@@ -25,7 +27,7 @@ public class Controller {
         TransactionDataCollector.getInstance().requestTransactionData(vehicleID, date, peerID);
     }
 
-    public void sendTransaction(String transactionType, String event, JSONObject data) throws ParseException {
+    public void sendTransaction(String transactionType, String event, String data) throws ParseException {
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
         String nodeID = Node.getInstance().getNodeConfig().getNodeID();
         Transaction transaction = new Transaction(transactionType,sender,event, data, nodeID);

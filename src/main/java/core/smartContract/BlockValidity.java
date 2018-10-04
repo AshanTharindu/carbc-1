@@ -20,7 +20,7 @@ public class BlockValidity {
     public boolean isSecondaryPartyValid() throws SQLException {
 
         String event = block.getBlockBody().getTransaction().getEvent();
-        JSONObject data = block.getBlockBody().getTransaction().getData();
+        JSONObject data = new JSONObject(block.getBlockBody().getTransaction().getData());
         JSONObject eventConfig = EventConfigHolder.getInstance().getEventJson();
 
         IdentityJDBC identityJDBC = new IdentityJDBC();

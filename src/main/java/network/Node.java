@@ -5,6 +5,7 @@ import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import config.NodeConfig;
 import constants.Constants;
+import core.connection.NeighbourJDBC;
 import network.Client.Client;
 import network.Client.RequestMessage;
 import network.Listener.Listener;
@@ -191,10 +192,13 @@ public final class Node {
     }
 
     public void addActiveNeighbour(String peerID, String ip, int port) {
-        nodeConfig.addNeighbour(new Neighbour(peerID, ip, port));
+        Neighbour neighbour = new Neighbour(peerID, ip, port);
+        nodeConfig.addNeighbour(neighbour);
+        NeighbourJDBC neighbourJDBC = new NeighbourJDBC();
+        neighbourJDBC.saveNeighbours(neighbour);
         log.info("Active Peer Added: {}" , peerID);
-        for(Neighbour neighbour: nodeConfig.getNeighbours()) {
-            System.out.println("IP: "+ neighbour.getIp() + " port: " + neighbour.getPort());
+        for(Neighbour peer: nodeConfig.getNeighbours()) {
+            System.out.println("IP: "+ peer.getIp() + " port: " + peer.getPort());
         }
     }
 

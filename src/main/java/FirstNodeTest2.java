@@ -4,6 +4,7 @@ import constants.Constants;
 import controller.Controller;
 import network.communicationHandler.MessageSender;
 import network.Node;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
@@ -40,22 +41,24 @@ public class FirstNodeTest2 {
          * */
         node.startListening();
 
-        MessageSender.getInstance().requestIP(49222);
-        Thread.sleep(4000);
+//        MessageSender.getInstance().requestIP(49222);
+//        Thread.sleep(4000);
 
         JSONObject jsonObject = new JSONObject();
         JSONObject jsonObjectNewOwner = new JSONObject();
+        JSONObject jsonSecondary = new JSONObject();
 
         jsonObjectNewOwner.put("name", "Ashan");
-        jsonObjectNewOwner.put("address", Node.getInstance().getNodeConfig().getNodeID());
+        jsonObjectNewOwner.put("publicKey", Node.getInstance().getNodeConfig().getNodeID());
 
-        jsonObject.put("SecondaryParty", jsonObjectNewOwner);
-        jsonObject.put("ThirdParty", new JSONObject());
+        jsonSecondary.put("NewOwner", jsonObjectNewOwner);
+        jsonObject.put("SecondaryParty", jsonSecondary);
+        jsonObject.put("ThirdParty", new JSONArray());
 
 
         Controller controller = new Controller();
 
         System.out.println(jsonObject);
-        controller.sendTransaction("V","ExchangeOwnership", jsonObject);
+        controller.sendTransaction("V","ExchangeOwnership", jsonObject.toString());
     }
 }

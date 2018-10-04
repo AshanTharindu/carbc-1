@@ -50,15 +50,13 @@ public class AgreementCollector extends Thread{
 
         synchronized (this){
             String event = this.block.getBlockBody().getTransaction().getEvent();
-            JSONObject blockData = block.getBlockBody().getTransaction().getData();
+            JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
 
             switch (event){
                 case "ExchangeOwnership":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("NewOwner")
-                            .getString("address"));
-
+                    getMandatoryValidators().add(secondaryParties.getJSONObject("NewOwner").getString("publicKey"));
                     JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
                     getMandatoryValidators().add(obj.getString("publicKey"));
                     break;
