@@ -1,11 +1,13 @@
 package network.communicationHandler;
 
+import DataOwners.ServiceStation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import core.consensus.BlockchainRequester;
 import core.consensus.Consensus;
 import core.blockchain.Block;
 import core.consensus.TransactionDataCollector;
+import core.serviceStation.Service;
 import network.Node;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -87,6 +89,15 @@ public class Handler extends Thread{
                     handleRequestedPeerDetails(data);
                     break;
 
+                case "RequestTransactionData":
+                    log.info("RequestedPeerDetails");
+                    handleRequestTransactionData(data);
+                    break;
+
+                case "TransactionDetails":
+                    log.info("TransactionDetails");
+//                    handleRequestTransactionData(data);
+                    break;
 
                 default:
                     System.out.println("default");
@@ -119,14 +130,14 @@ public class Handler extends Thread{
         Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
 
-    public void handleBlockChainHashRequest() throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
+    public void handleBlockChainHashRequest() {
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
         int listeningPort = clientInfo.getInt("ListeningPort");
         BlockchainRequester.getInstance().handleBlockchainHashRequest(ip,listeningPort);
     }
 
-    public void handleBlockChainSignRequest() throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException {
+    public void handleBlockChainSignRequest() {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("ListeningPort");
@@ -192,6 +203,20 @@ public class Handler extends Thread{
             TransactionDataCollector.getInstance().handleRequestedPeerDetails(peerDetails,signature,signedData,publicKey);
         }
 
+    }
+
+    public void handleRequestTransactionData(String data) {
+        JSONObject jsonObject = new JSONObject(data);
+        String dataOwner = jsonObject.getString("dataOwner");
+        String dataRequester = jsonObject.getString("nodeID");
+        String vehicleID = jsonObject.getString("vehicleID");
+        String date = jsonObject.getString("date");
+        String signature = jsonObject.getString("signature");
+        String signedData = jsonObject.getString("signedData");
+        String ip = jsonObject.getString("ip");
+        int listeningPort = jsonObject.getInt("listeningPort");
+        ServiceStation serviceStation = new ServiceStation();
+        serviceStation.getServiceRecord(vehicleID, signature, signedData, dataRequester, ip, listeningPort);
     }
 
 }

@@ -212,11 +212,11 @@ public class ChainUtil {
     }
 
     public String getPreviousHash() {
-        return "previousHash";
+        return "b9a9c304e9313a6c9d1c5a3a2f3fcd41ae3aa56964f9a3186379d6477500583e";
     }
 
     public long getRecentBlockNumber() {
-        return 101;
+        return 104;
     }
 
     public static Timestamp convertStringToTimestamp(String time) {

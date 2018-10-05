@@ -49,7 +49,7 @@ public class FirstNodeTest {
          * when we want our node to start listening
          * */
         node.startListening();
-//        MessageSender.getInstance().requestIP(49211);
+        MessageSender.getInstance().requestIP(49211);
 
     }
 }

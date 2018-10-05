@@ -31,7 +31,7 @@ public class TransactionDataCollector {
         return transactionDataCollector;
     }
 
-    public void requestTransactionData(String vehicleID, Timestamp date, String peerID) {
+    public void requestTransactionData(String vehicleID, String date, String peerID) {
         Neighbour dataOwner = Node.getInstance().getPeerDetails(peerID);
         if (dataOwner != null) {
             DataRequester dataRequester = new DataRequester(peerID, vehicleID, dataOwner, date);
@@ -45,7 +45,7 @@ public class TransactionDataCollector {
         }
     }
 
-    public void requestTransactionDataFromDataOwner(String vehicleID, Timestamp date, Neighbour dataOwner) {
+    public void requestTransactionDataFromDataOwner(String vehicleID, String date, Neighbour dataOwner) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("vehicleID", vehicleID);
         jsonObject.put("dataOwner", dataOwner.getPeerID());

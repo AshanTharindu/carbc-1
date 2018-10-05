@@ -11,15 +11,15 @@ public class DataRequester {
     private String vehicleID;
     private Neighbour dataOwner;
     private JSONObject receivedData;
-    private Timestamp date;
+    private String date;
 
-    public DataRequester(String peerID, String vehicleID, Timestamp date) {
+    public DataRequester(String peerID, String vehicleID, String date) {
         this.peerID = peerID;
         this.vehicleID = vehicleID;
         this.date = date;
     }
 
-    public DataRequester(String peerID, String vehicleID, Neighbour dataOwner,Timestamp date ) {
+    public DataRequester(String peerID, String vehicleID, Neighbour dataOwner,String date ) {
         this.peerID = peerID;
         this.vehicleID = vehicleID;
         this.dataOwner = dataOwner;
@@ -46,7 +46,7 @@ public class DataRequester {
         return receivedData;
     }
 
-    public Timestamp getDate() {
+    public String getDate() {
         return date;
     }
 

@@ -8,6 +8,7 @@ import core.blockchain.Block;
 import core.blockchain.BlockBody;
 import core.blockchain.BlockHeader;
 import core.blockchain.Transaction;
+import core.consensus.Consensus;
 import network.communicationHandler.MessageSender;
 import network.Node;
 import org.json.JSONArray;
@@ -68,11 +69,7 @@ public class FirstNodeTest2 {
         Controller controller = new Controller();
 
         System.out.println(jsonObject);
-//        controller.sendTransaction("V","ExchangeOwnership", jsonObject.toString());
-
-
-
-
+//
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
         String nodeID = Node.getInstance().getNodeConfig().getNodeID();
         Transaction transaction = new Transaction("V",sender,"ExchangeOwnership", jsonObject.toString(), nodeID);
@@ -84,8 +81,8 @@ public class FirstNodeTest2 {
         BlockHeader blockHeader = new BlockHeader(previousHash, blockHash);
 
         Block block = new Block(blockHeader, blockBody);
-        MessageSender.getInstance().broadCastBlock(block);
+        MessageSender.getInstance().broadCastBlockTest(block);
         Thread.sleep(4000);
-        controller.sendConfirmation(block);
+        Consensus.getInstance().sendAgreementForBlockTest(block);
     }
 }

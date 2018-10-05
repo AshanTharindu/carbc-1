@@ -20,7 +20,7 @@ public class Transaction {
         this.event = event;
         this.data = jsonData;
         this.address = address;
-        this.time = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
+        this.time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new java.util.Date());
     }
 
     public String getTransactionId() {

@@ -23,7 +23,7 @@ import java.util.Date;
 
 public class Controller {
 
-    public void requestTransactionData(String vehicleID, Timestamp date, String peerID) {
+    public void requestTransactionData(String vehicleID, String date, String peerID) {
         TransactionDataCollector.getInstance().requestTransactionData(vehicleID, date, peerID);
     }
 

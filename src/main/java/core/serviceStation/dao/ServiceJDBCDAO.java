@@ -64,11 +64,11 @@ public class ServiceJDBCDAO {
 
             ResultSet rs = ptmt.getGeneratedKeys();
 
-            String query = "INSERT INTO `Service`(`record_id`, `service_id`, `spare_part`) " +
+            String query = "INSERT INTO `Service`(`record_id`, `service_id`, `spare_part_serial_number`) " +
                     "VALUES (?,?,?)";
 
             if (rs.next()){
-                int record_id = rs.getInt("record_id");
+                int record_id = rs.getInt(1);
 
                 pstm = connection.prepareStatement(query);
                 pstm.setInt(1, record_id);
@@ -128,13 +128,12 @@ public class ServiceJDBCDAO {
 
     //return service details by vehicle number
     public JSONObject getServiceRecords(String vehicle_id) throws SQLException {
-        String queryString = "SELECT `record_id`, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
+        String queryString = "SELECT s.record_id, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
                 " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
                 "ON s.service_id = st.service_id LEFT JOIN `SparePart` sp " +
                 "ON s.spare_part_serial_number = sp.serial_number " +
-                "WHERE `vehicle_id` = ? AND serviced_date = DATE(NOW()) " +
-                "AND serviced_date > DATEADD(HOUR, -4, GETDATE())";
+                "WHERE `vehicle_id` = ?";
 
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
@@ -151,7 +150,7 @@ public class ServiceJDBCDAO {
 
             if (resultSet.next()){
                 if (count == 0){
-                    int recordId = resultSet.getInt("record_id");
+                    int recordId = resultSet.getInt(1);
                     serviceRecord.put("vehicle_id", resultSet.getString("vehicle_id"));
                     serviceRecord.put("serviced_date", resultSet.getTimestamp("serviced_date"));
                     count = 1;
@@ -177,5 +176,34 @@ public class ServiceJDBCDAO {
                 connection.close();
             return serviceRecord;
         }
+    }
+
+    public String getCustomerPublicKey(String nodeID) throws SQLException {
+        String queryString = "SELECT `public_key` FROM `Customer_details` WHERE `node_id` = ?";
+
+        PreparedStatement ptmt = null;
+        ResultSet result = null;
+        String publicKey = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, nodeID);
+            result = ptmt.executeQuery();
+            result.next();
+            publicKey = result.getString("public_key");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (result != null)
+                result.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return publicKey;
+        }
+
     }
 }

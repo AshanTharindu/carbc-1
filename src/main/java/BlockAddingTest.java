@@ -1,5 +1,4 @@
 import Exceptions.FileUtilityException;
-import UI.BlockStatusUI;
 import config.CommonConfigHolder;
 import constants.Constants;
 import network.Node;
@@ -32,7 +31,7 @@ public class BlockAddingTest {
          * when initializing the network
          * */
         Node node = Node.getInstance();
-        node.init();
+        node.initTest();
 
         /*
          * when we want our node to start listening
