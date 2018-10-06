@@ -1,21 +1,17 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
-import core.consensus.Consensus;
-import core.consensus.TransactionDataCollector;
-import core.serviceStation.Service;
-import core.serviceStation.ServiceRecord;
-import core.serviceStation.dao.ServiceJDBCDAO;
 import network.Node;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+
 
 public class TransactionDataTest {
     public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, SQLException {
@@ -43,6 +39,12 @@ public class TransactionDataTest {
          * */
         node.startListening();
 
+        try(final DatagramSocket socket = new DatagramSocket()){
+            socket.connect(InetAddress.getByName("8.8.8.8"), 49211);
+            String ip = socket.getLocalAddress().getHostAddress();
+            System.out.println(ip);
+        }
+
 //        String time = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
 //        ServiceJDBCDAO serviceJDBCDAO = new ServiceJDBCDAO();
 //
@@ -58,6 +60,6 @@ public class TransactionDataTest {
 //
 //        serviceJDBCDAO.addServiceRecord(serviceRecord);
 
-//        TransactionDataCollector.getInstance().requestTransactionData("ca83838", time,"abcd1234");
+//        DataCollector.getInstance().requestTransactionData("ca83838", time,"abcd1234");
     }
 }

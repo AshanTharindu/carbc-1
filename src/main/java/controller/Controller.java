@@ -7,24 +7,18 @@ import core.blockchain.BlockBody;
 import core.blockchain.BlockHeader;
 import core.blockchain.Transaction;
 import core.consensus.Consensus;
-import core.consensus.DataRequester;
-import core.consensus.TransactionDataCollector;
+import core.consensus.DataCollector;
 import network.Client.RequestMessage;
 import network.Node;
-import network.Protocol.BlockMessageCreator;
-import network.communicationHandler.MessageSender;
+import network.Protocol.MessageCreator;
 import org.json.JSONObject;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Controller {
 
     public void requestTransactionData(String vehicleID, String date, String peerID) {
-        TransactionDataCollector.getInstance().requestTransactionData(vehicleID, date, peerID);
+        DataCollector.getInstance().requestTransactionData(vehicleID, date, peerID);
     }
 
     public void sendTransaction(String transactionType, String event, String data) throws ParseException {
@@ -40,7 +34,7 @@ public class Controller {
 
         Block block = new Block(blockHeader, blockBody);
         System.out.println(new JSONObject(block));
-        MessageSender.getInstance().broadCastBlock(block);
+        Consensus.getInstance().broadcastBlock(block);
     }
 
     public void sendConfirmation(Block block) {
@@ -48,11 +42,18 @@ public class Controller {
     }
 
     public void requestAdditionalData(Block block) {
-
+        DataCollector.getInstance().requestAdditionalData(block);
     }
 
     public String getCarBCno(String vehicleID) {
         return vehicleID;
+    }
+
+    public void testNetwork(String ip, int listeningPort, String message) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("message", message);
+        RequestMessage testMessage = MessageCreator.createMessage(jsonObject, "Test");
+        Node.getInstance().sendMessageToPeer(ip, listeningPort, testMessage);
     }
 
 }

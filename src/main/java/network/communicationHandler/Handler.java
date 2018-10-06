@@ -6,18 +6,16 @@ import com.google.gson.GsonBuilder;
 import core.consensus.BlockchainRequester;
 import core.consensus.Consensus;
 import core.blockchain.Block;
-import core.consensus.TransactionDataCollector;
-import core.serviceStation.Service;
+import core.consensus.PeerDetailsCollector;
+import core.consensus.DataCollector;
 import network.Node;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -96,7 +94,11 @@ public class Handler extends Thread{
 
                 case "TransactionDetails":
                     log.info("TransactionDetails");
-//                    handleRequestTransactionData(data);
+                    handleReceivedTransactionData(data);
+                    break;
+
+                case "Test":
+                    log.info("Test Message Received");
                     break;
 
                 default:
@@ -118,7 +120,7 @@ public class Handler extends Thread{
         String ip = clientInfo.getString("ip");
         String peerID = clientInfo.getString("nodeID");
         int listeningPort = clientInfo.getInt("ListeningPort");
-        MessageSender.getInstance().sendHelloResponse(Node.getInstance().getNodeConfig().getListenerPort(),ip, listeningPort, peerID);
+        MessageSender.sendHelloResponse(Node.getInstance().getNodeConfig().getListenerPort(),ip, listeningPort, peerID);
         Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
 
@@ -178,17 +180,14 @@ public class Handler extends Thread{
     public void handleBroadcastBlock() throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, ParseException, SQLException {
         log.debug("Inside Handler/handleBroadcastBlock");
         JSONObject receivedJSONObject = new JSONObject(data);
-        //TODO: need to decode a digitally signed block. Still we handle a raw block
         String JSONBlock = (String)receivedJSONObject.get("block");
         Block decodedBlock = JSONStringToBlock(JSONBlock);
-
         Consensus.getInstance().handleNonApprovedBlock(decodedBlock);
     }
 
     public Block JSONStringToBlock(String JSONblock){
         Gson gson = new GsonBuilder().serializeNulls().create();
         Block block = gson.fromJson(JSONblock, Block.class);
-
         return block;
     }
 
@@ -196,13 +195,13 @@ public class Handler extends Thread{
         if(peerID.equals("Bootstrap Node")) {
             JSONObject jsonObject = new JSONObject(data);
             JSONObject peerDetails = jsonObject.getJSONObject("peerDetails");
+            String peerID = peerDetails.getString("nodeID");
             String signature = jsonObject.getString("signature");
             String signedData = jsonObject.getString("signedData");
             String publicKey = jsonObject.getString("publicKey");
             log.info("Peer Details Received");
-            TransactionDataCollector.getInstance().handleRequestedPeerDetails(peerDetails,signature,signedData,publicKey);
+            DataCollector.getInstance().handleRequestedPeerDetails(peerDetails,signature,signedData);
         }
-
     }
 
     public void handleRequestTransactionData(String data) {
@@ -217,6 +216,14 @@ public class Handler extends Thread{
         int listeningPort = jsonObject.getInt("listeningPort");
         ServiceStation serviceStation = new ServiceStation();
         serviceStation.getServiceRecord(vehicleID, signature, signedData, dataRequester, ip, listeningPort);
+    }
+
+    public void handleReceivedTransactionData(String data) {
+        JSONObject jsonObject = new JSONObject(data);
+        JSONObject transactionData = jsonObject.getJSONObject("transactionDetails");
+        String signature = jsonObject.getString("digitalSignature");
+        String signedData = jsonObject.getString("signedData");
+        DataCollector.getInstance().handleReceivedTransactionData(transactionData, signature, signedData, peerID);
     }
 
 }

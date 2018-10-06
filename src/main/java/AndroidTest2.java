@@ -1,9 +1,12 @@
 import Exceptions.FileUtilityException;
+import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
-import core.consensus.DataCollector;
-import network.Neighbour;
+import controller.Controller;
+import core.blockchain.*;
+import network.communicationHandler.MessageSender;
 import network.Node;
+import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
@@ -11,8 +14,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 
-public class TransactionDataTest2 {
+public class AndroidTest2 {
     public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
         try {
             System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
@@ -40,13 +45,10 @@ public class TransactionDataTest2 {
              * */
             node.startListening();
 
-//            ServiceJDBCDAO serviceJDBCDAO = new ServiceJDBCDAO();
-//            System.out.println(serviceJDBCDAO.getServiceRecords("12345"));
-//            System.out.println(Node.getInstance().getNodeId());
-////            System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
-//            System.out.println(serviceJDBCDAO.getCustomerPublicKey("3081f13081a806072a8648ce38040130819c0241"));
-            String time = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
-            DataCollector.getInstance().requestTransactionDataFromDataOwner("12345",time, new Neighbour("3081f13081a806072a8648ce38040130819c0241","127.0.0.1", 49211));
+            Controller controller = new Controller();
+            controller.testNetwork("127.0.0.1", 49211, "TestMessage");
+
+
         } catch (Exception e) {
             e.getMessage();
         }

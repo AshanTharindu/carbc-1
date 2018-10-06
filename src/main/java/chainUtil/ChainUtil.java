@@ -132,7 +132,7 @@ public class ChainUtil {
         return data;
     }
 
-    public String getHash(String data) {
+    public static String getHash(String data) {
         return bytesToHex(getHashByteArray(data));
     }
 
@@ -141,7 +141,7 @@ public class ChainUtil {
         return getHash((jsonBlock.toString()));
     }
 
-    public String getBlockHash(BlockBody blockBody) {
+    public static String getBlockHash(BlockBody blockBody) {
         JSONObject jsonBlock = new JSONObject(blockBody);
         return getHash((jsonBlock.toString()));
     }

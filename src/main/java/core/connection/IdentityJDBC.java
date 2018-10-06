@@ -1,5 +1,6 @@
 package core.connection;
 
+import chainUtil.KeyGenerator;
 import org.json.JSONObject;
 
 import java.sql.Connection;
@@ -64,5 +65,9 @@ public class IdentityJDBC {
     public JSONObject getIdentityByRole(String role) throws SQLException {
         String query = "SELECT public_key, role, name FROM `Identity` WHERE `role` = ?";
         return getIdentity(query, role);
+    }
+
+    public String getPeerPublicKey(String peerID) {
+        return KeyGenerator.getInstance().getPublicKeyAsString();
     }
 }

@@ -18,7 +18,7 @@ public class NeighbourJDBC {
     }
 
     public void saveNeighboursToDB(String nodeID, String ip, int port) {
-        String queryString = "INSERT INTO `PeerDetails`(`node_id`,`ip`,`port`) VALUES(?,?,?)";
+        String queryString = "INSERT INTO `PeerDetailsCollector`(`node_id`,`ip`,`port`) VALUES(?,?,?)";
         try {
             Connection connection = ConnectionFactory.getInstance().getConnection();
             PreparedStatement ptmt = connection.prepareStatement(queryString);

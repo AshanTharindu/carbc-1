@@ -117,7 +117,7 @@ public class   TestSendBlock2 {
 ////            MessageSender.getInstance().BroadCastBlock(block);
 //            Node.getInstance().sendMessageToNeighbour(1, blockMessage);
 
-            MessageSender.getInstance().requestIP(49222);
+            MessageSender.getInstance().requestIP();
             Thread.sleep(4000);
             Controller controller = new Controller();
 //            controller.sendTransaction("V","ExchangeOwnership", new JSONObject("{ \"SecondaryParty\":{\"NewOwner\":{\"name\": \"Sajinie\", \"address\":\"address\"}}, \"ThirdParty\":{}}"));

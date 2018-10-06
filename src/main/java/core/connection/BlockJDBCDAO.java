@@ -186,4 +186,32 @@ public class BlockJDBCDAO {
             return resultSet;
         }
     }
+
+    public long getRecentBlockNumber() throws SQLException {
+        String queryString = "SELECT `block_number` FROM Blockchain ORDER BY id DESC LIMIT 1";
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet result = null;
+        long blockNumber = 0;
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            result = ptmt.executeQuery();
+            result.next();
+            blockNumber = result.getLong("block_number");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (result != null)
+                result.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return blockNumber;
+        }
+    }
 }

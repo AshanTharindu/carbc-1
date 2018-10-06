@@ -44,14 +44,14 @@ public class BlockchainRequester {
         String blockchainHash = ChainUtil.getInstance().getBlockChainHash(blockchainShare.getBlockChainInstance());
         blockchainShareDetails.add(blockchainShare);
         String signedBlockchainHash = ChainUtil.getInstance().digitalSignature(blockchainHash);
-        MessageSender.getInstance().sendSignedBlockChain(ip, listeningPort, signedBlockchainHash, blockchainHash);
+        MessageSender.sendSignedBlockChain(ip, listeningPort, signedBlockchainHash, blockchainHash);
 
     }
 
     //no need of synchronizing
     public void sendBlockchain(String ip, int listeningPort) throws Exception {
         JSONObject blockchainInfo = ChainUtil.getInstance().getBlockchain(0);
-        MessageSender.getInstance().sendBlockchainToPeer(
+        MessageSender.sendBlockchainToPeer(
                 ip,
                 listeningPort,
                 blockchainInfo.getString("blockchain"),
@@ -135,7 +135,7 @@ public class BlockchainRequester {
     public void requestBlockchain() {
         BlockchainReceiver blockchainReceiver = getBlockchainReceiverfromPK(findCorrectBlockchain());
         requestedBlockchainHash = blockchainReceiver.getBlockchainHash();
-        MessageSender.getInstance().requestBlockchainFromPeer(blockchainReceiver.getIp(), blockchainReceiver.getListeningPort());
+        MessageSender.requestBlockchainFromPeer(blockchainReceiver.getIp(), blockchainReceiver.getListeningPort());
     }
 
     //no need of synchronizing

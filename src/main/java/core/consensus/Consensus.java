@@ -39,7 +39,6 @@ public class Consensus {
         nonApprovedBlocks = new ArrayList<>();
         agreementCollectors = new ArrayList<>();
         approvedBlocks = new ArrayList<>();
-
     }
 
     public static Consensus getInstance() {
@@ -50,7 +49,13 @@ public class Consensus {
     }
 
     //block broadcasting and sending agreements
-    public synchronized void handleNonApprovedBlock(Block block) throws SQLException {
+
+    public void broadcastBlock(Block block) {
+        handleNonApprovedBlock(block);
+        MessageSender.broadCastBlock(block);
+    }
+
+    public synchronized void handleNonApprovedBlock(Block block) {
         if (!isDuplicateBlock(block)) {
             if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
                     block.getBlockHeader().getSignature(),block.getBlockHeader().getHash())) {
@@ -178,14 +183,14 @@ public class Consensus {
     public void sendAgreementForBlock(Block block) {
         String blockHash = block.getBlockHeader().getHash();
         String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
-        MessageSender.getInstance().sendAgreement(signedBlock, blockHash);
+        MessageSender.sendAgreement(signedBlock, blockHash);
         log.info("Agreement Sent for: {}", block.getBlockHeader().getHash());
     }
 
     public void sendAgreementForBlockTest(Block block) {
         String blockHash = block.getBlockHeader().getHash();
         String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
-        MessageSender.getInstance().sendAgreementTest(signedBlock, blockHash);
+        MessageSender.sendAgreementTest(signedBlock, blockHash);
         log.info("Agreement Sent for: {}", block.getBlockHeader().getHash());
     }
 
@@ -212,14 +217,7 @@ public class Consensus {
     }
 
 
-    public void requestAdditionalData(Block block) {
-        String blockHash = ChainUtil.getInstance().getBlockHash(block.getBlockBody());
 
-    }
-
-    public void handleAdditionalDataRequest(String ip, int listeningPort, String signedBlock, String blockHash, String peerID) {
-        String data = getAdditionalDataForBlock(blockHash).toString();
-    }
 
     public JSONObject getAdditionalDataForBlock(String blockHash) {
         return new JSONObject();

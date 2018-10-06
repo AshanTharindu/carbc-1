@@ -1,6 +1,7 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
+import controller.Controller;
 import network.Node;
 import org.slf4j.impl.SimpleLogger;
 
@@ -9,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 
-public class AgreementRequestTest {
+public class AndroidTest {
     public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
 
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
@@ -37,7 +38,6 @@ public class AgreementRequestTest {
          * */
         node.startListening();
 
-        String status = "Block Received";
 
     }
 }

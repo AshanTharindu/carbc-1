@@ -8,30 +8,16 @@ import java.sql.Timestamp;
 public class DataRequester {
 
     private String peerID;
-    private String vehicleID;
     private Neighbour dataOwner;
     private JSONObject receivedData;
-    private String date;
 
-    public DataRequester(String peerID, String vehicleID, String date) {
+    //for additional data request
+    public DataRequester(String peerID) {
         this.peerID = peerID;
-        this.vehicleID = vehicleID;
-        this.date = date;
-    }
-
-    public DataRequester(String peerID, String vehicleID, Neighbour dataOwner,String date ) {
-        this.peerID = peerID;
-        this.vehicleID = vehicleID;
-        this.dataOwner = dataOwner;
-        this.date = date;
     }
 
     public String getPeerID() {
         return peerID;
-    }
-
-    public String getVehicleID() {
-        return vehicleID;
     }
 
     public Neighbour getDataOwner() {
@@ -44,10 +30,6 @@ public class DataRequester {
 
     public JSONObject getReceivedData() {
         return receivedData;
-    }
-
-    public String getDate() {
-        return date;
     }
 
     public void setReceivedData(JSONObject receivedData) {

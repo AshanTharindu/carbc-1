@@ -51,7 +51,7 @@ public class Peer3Test {
          * when we want our node to start listening
          * */
         node.startListening();
-        MessageSender.getInstance().requestIP(49233);
+        MessageSender.getInstance().requestIP();
 
     }
 }

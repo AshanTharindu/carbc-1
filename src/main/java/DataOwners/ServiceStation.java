@@ -26,7 +26,7 @@ public class ServiceStation {
             try {
                 serviceRecord = serviceJDBCDAO.getServiceRecords(vehicleId);
                 log.info("service records found for: {}", vehicleId);
-                MessageSender.getInstance().sendTransactionData(serviceRecord,ip, listeningPort,dataRequester);
+                MessageSender.sendTransactionData(serviceRecord,ip, listeningPort,dataRequester);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
