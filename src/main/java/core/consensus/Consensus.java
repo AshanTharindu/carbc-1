@@ -1,6 +1,7 @@
 package core.consensus;
 
 import chainUtil.ChainUtil;
+import controller.Controller;
 import core.blockchain.Block;
 import core.blockchain.BlockInfo;
 import core.blockchain.Transaction;
@@ -216,7 +217,33 @@ public class Consensus {
         handleAgreement(new Agreement(signature, signedBlock, blockHash, publicKey));
     }
 
+    public void handleReceivedAdditionalData(String blockHash, String additionalData) {
+        Block block = getBlockByBlockHash(blockHash);
+        if(block != null) {
+            String data = block.getBlockBody().getTransaction().getData();
+            JSONObject jsonData = new JSONObject(data);
+            String additionalDataField = jsonData.getString("additionalData");
+            if(additionalDataField.equals(ChainUtil.getHash(additionalData))) {
+                jsonData.put("additionalData", additionalData);
+                block.getBlockBody().getTransaction().setData(jsonData.toString());
+                Controller controller = new Controller();
+                controller.notifyReceivedAdditionalData();
+                log.info("Additional Data added to the block");
+            }
+        } else {
+            log.info("No block found for blockHash: {} ", blockHash);
+        }
 
+    }
+
+    public Block getBlockByBlockHash(String blockHash) {
+        for(Block block: nonApprovedBlocks) {
+            if(blockHash.equals(block.getBlockHeader().getHash())) {
+                return block;
+            }
+        }
+        return null;
+    }
 
 
     public JSONObject getAdditionalDataForBlock(String blockHash) {

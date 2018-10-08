@@ -47,4 +47,7 @@ public class Transaction {
         return transactionType+"-"+ number;
     }
 
+    public void setData(String data) {
+        this.data = data;
+    }
 }

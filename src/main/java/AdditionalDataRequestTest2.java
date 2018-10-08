@@ -43,7 +43,7 @@ public class AdditionalDataRequestTest2 {
          * when initializing the network
          * */
         Node node = Node.getInstance();
-        node.init();
+        node.initTest();
 
         /*
          * when we want our node to start listening
@@ -63,7 +63,7 @@ public class AdditionalDataRequestTest2 {
         Controller controller = new Controller();
         //
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
-        String nodeID = Node.getInstance().getNodeConfig().getNodeID();
+        String nodeID = "5678";
         Transaction transaction = new Transaction("V",sender,"ExchangeOwnership", jsonObject.toString(), nodeID);
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);

@@ -8,6 +8,7 @@ import core.consensus.Consensus;
 import core.blockchain.Block;
 import core.consensus.PeerDetailsCollector;
 import core.consensus.DataCollector;
+import network.Neighbour;
 import network.Node;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -97,6 +98,16 @@ public class Handler extends Thread{
                     handleReceivedTransactionData(data);
                     break;
 
+                case "RequestAdditionalData":
+                    log.info("RequestAdditionalData");
+                    handleAdditionalDataRequest(data);
+                    break;
+
+                case "AdditionalData":
+                    log.info("AdditionalData");
+                    System.out.println(data);
+                    handleReceivedAdditionalData(data);
+                    break;
                 case "Test":
                     log.info("Test Message Received");
                     break;
@@ -224,6 +235,31 @@ public class Handler extends Thread{
         String signature = jsonObject.getString("digitalSignature");
         String signedData = jsonObject.getString("signedData");
         DataCollector.getInstance().handleReceivedTransactionData(transactionData, signature, signedData, peerID);
+    }
+
+    public void handleAdditionalDataRequest(String data) {
+        JSONObject jsonObject = new JSONObject(data);
+        String dataOwner = jsonObject.getString("dataOwner");
+        String ip = jsonObject.getString("ip");
+        int listeningPort = jsonObject.getInt("listeningPort");
+
+        if(dataOwner.equals(Node.getInstance().getNodeId())) {
+            Neighbour dataRequester = new Neighbour(peerID, ip, listeningPort);
+            String blockHash = jsonObject.getString("blockHash");
+            String signature = jsonObject.getString("signature");
+            String publicKey = jsonObject.getString("publicKey");
+            dataRequester.setPublicKey(publicKey);
+            DataCollector.getInstance().handleReceivedAdditionalData(blockHash, signature, dataRequester);
+        } else {
+            log.info("Invalid Additional Data Request");
+        }
+    }
+
+    public void handleReceivedAdditionalData(String data) {
+        JSONObject jsonObject = new JSONObject(data);
+        String blockHash = jsonObject.getString("blockHash");
+        String additionalData = jsonObject.getString("additionalData");
+        Consensus.getInstance().handleReceivedAdditionalData(blockHash, additionalData);
     }
 
 }

@@ -5,7 +5,7 @@ import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import config.NodeConfig;
 import constants.Constants;
-import core.connection.NeighbourJDBC;
+import core.connection.NeighbourDAO;
 import network.Client.Client;
 import network.Client.RequestMessage;
 import network.Listener.Listener;
@@ -85,7 +85,7 @@ public final class Node {
 
     //revert later
 
-    public void initTest() throws FileUtilityException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    public void initTest() {
 
         /* Set config and its parameters */
 //        Random random = new Random();
@@ -194,8 +194,8 @@ public final class Node {
     public void addActiveNeighbour(String peerID, String ip, int port) {
         Neighbour neighbour = new Neighbour(peerID, ip, port);
         nodeConfig.addNeighbour(neighbour);
-        NeighbourJDBC neighbourJDBC = new NeighbourJDBC();
-        neighbourJDBC.saveNeighbours(neighbour);
+        NeighbourDAO neighbourDAO = new NeighbourDAO();
+        neighbourDAO.saveNeighbours(neighbour);
         log.info("Active Peer Added: {}" , peerID);
         for(Neighbour peer: nodeConfig.getNeighbours()) {
             System.out.println("IP: "+ peer.getIp() + " port: " + peer.getPort());

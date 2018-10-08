@@ -3,7 +3,11 @@ import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
 import core.blockchain.*;
+import core.consensus.DataCollector;
 import network.Node;
+import network.communicationHandler.MessageSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
@@ -15,6 +19,8 @@ import java.util.ArrayList;
 
 public class AdditionalDataRequestTest {
     public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
+        Logger log = LoggerFactory.getLogger(DataCollector.class);
+
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
@@ -33,11 +39,14 @@ public class AdditionalDataRequestTest {
         * when initializing the network
         * */
         Node node = Node.getInstance();
-        node.init();
-
+        node.initTest();
+        node.getNodeConfig().setNodeID("5678");
         /*
         * when we want our node to start listening
         * */
         node.startListening();
+
+//        MessageSender.getInstance().requestIP();
+
     }
 }

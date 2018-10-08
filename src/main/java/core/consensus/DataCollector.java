@@ -2,7 +2,9 @@ package core.consensus;
 
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
+import controller.Controller;
 import core.blockchain.Block;
+import core.connection.HistoryDAO;
 import core.connection.IdentityJDBC;
 import network.Neighbour;
 import network.Node;
@@ -11,6 +13,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DataCollector {
@@ -137,11 +140,29 @@ public class DataCollector {
         jsonObject.put("blockHash", blockHash);
         jsonObject.put("dataOwner", dataOwner.getPeerID());
         jsonObject.put("signature", ChainUtil.digitalSignature(blockHash));
-        MessageSender.requestAdditionalData(jsonObject, dataOwner);
+        jsonObject.put("publicKey", KeyGenerator.getInstance().getPublicKeyAsString());
+        MessageSender.  requestAdditionalData(jsonObject, dataOwner);
     }
 
-//    public void handleReceivedAdditionalData(String ip, int listeningPort, String signedBlock, String blockHash, String peerID) {
-//        String data = getAdditionalDataForBlock(blockHash).toString();
-//    }
+    public void handleReceivedAdditionalData(String blockHash, String signedBlock, Neighbour dataRequester) {
+        if(ChainUtil.signatureVerification(dataRequester.getPublicKey(), signedBlock, blockHash)) {
+            Controller controller = new Controller();
+            controller.handleAdditionalDataRequest(blockHash, dataRequester);
+        }
+    }
+
+    public void sendAdditionalData(String blockHash, Neighbour dataRequester) {
+        HistoryDAO historyDAO = new HistoryDAO();
+        try {
+            String additionalData = historyDAO.getAdditionalData(blockHash);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("blockHash", blockHash);
+            jsonObject.put("additionalData", additionalData);
+            MessageSender.sendAdditionalData(jsonObject, dataRequester);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

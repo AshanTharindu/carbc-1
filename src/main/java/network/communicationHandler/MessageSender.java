@@ -123,7 +123,7 @@ public class MessageSender {
         RequestMessage blockMessage = MessageCreator.createMessage(jsonObject,"BlockBroadcast");
         blockMessage.addHeader("keepActive", "false");
         blockMessage.addHeader("messageType", "BlockBroadcast");
-        Node.getInstance().sendMessageToPeer("192.168.8.100",49211,blockMessage);
+        Node.getInstance().sendMessageToPeer("192.168.8.105",42761, blockMessage);
     }
 
     public static void sendAgreement(String signedBlock, String blockHash) {
@@ -149,8 +149,7 @@ public class MessageSender {
     }
 
     public static void requestAdditionalData(JSONObject details, Neighbour dataOwner) {
-        details.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
-        details.put("publicKey", KeyGenerator.getInstance().getPublicKeyAsString());
+        details.put("listeningPort",Node.getInstance().getNodeConfig().getListenerPort());
         RequestMessage dataRequestMessage = MessageCreator.createSpecificMessage(details,"RequestAdditionalData", dataOwner.getPeerID());
         dataRequestMessage.addHeader("keepActive", "false");
         Node.getInstance().sendMessageToPeer(dataOwner.getIp(),dataOwner.getPort(), dataRequestMessage);
@@ -188,6 +187,13 @@ public class MessageSender {
                 "TransactionDetails", dataRequester);
         Node.getInstance().sendMessageToPeer(ip, listeningPort, transactionDetailsMessage);
         log.info("Transaction Details Sent to:  {}", dataRequester);
+    }
+
+    public static void sendAdditionalData(JSONObject additionalData, Neighbour dataRequester) {
+        RequestMessage additonalDataMessage = MessageCreator.createSpecificMessage(additionalData,
+                "AdditionalData", dataRequester.getPeerID());
+        Node.getInstance().sendMessageToPeer(dataRequester.getIp(), dataRequester.getPort(), additonalDataMessage);
+        log.info("Additional Data Sent for: {} ", dataRequester.getPeerID());
     }
 
     public static String blockToJSON(Block block) {

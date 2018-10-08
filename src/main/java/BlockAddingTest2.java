@@ -77,8 +77,8 @@ public class BlockAddingTest2 {
 
         Block block = new Block(blockHeader, blockBody);
         MessageSender.getInstance().broadCastBlockTest(block);
-        Thread.sleep(4000);
-        Consensus.getInstance().sendAgreementForBlockTest(block);
+//        Thread.sleep(4000);
+//        Consensus.getInstance().sendAgreementForBlockTest(block);
 
         } catch(Exception e){
             e.getMessage();

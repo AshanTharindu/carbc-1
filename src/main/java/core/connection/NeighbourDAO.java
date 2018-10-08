@@ -8,9 +8,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class NeighbourJDBC {
+public class NeighbourDAO {
 
-    private final Logger log = LoggerFactory.getLogger(NeighbourJDBC.class);
+    private final Logger log = LoggerFactory.getLogger(NeighbourDAO.class);
 
     public void saveNeighbours(String nodeID, String ip, int port, String publicKey) {
 
