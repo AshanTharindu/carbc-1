@@ -1,17 +1,18 @@
 package core.consensus;
 
 import core.blockchain.Block;
+import network.Neighbour;
 
 import java.util.LinkedList;
 
 public class BlockchainShare {
 
-    private String id;
-    private String ip;
+    private Neighbour blockchainRequester;
     private int listeningPort;
     private LinkedList<Block> blockChainInstance;
 
-    public BlockchainShare(String ip, int listeningPort) {
+
+    public BlockchainShare(Neighbour blockchainRequester) {
 //        this.ip = ip;
 //        this.listeningPort = listeningPort;
 //        id = ip + String.valueOf(listeningPort);
@@ -19,11 +20,11 @@ public class BlockchainShare {
     }
 
     public String getId() {
-        return id;
+        return blockchainRequester.getPeerID();
     }
 
-    public String getIp() {
-        return ip;
+    public Neighbour getBlockchainRequester() {
+        return blockchainRequester;
     }
 
     public int getListeningPort() {

@@ -72,11 +72,11 @@ public class BlockAddingTest2 {
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
-        String previousHash = ChainUtil.getInstance().getPreviousHash();
-        BlockHeader blockHeader = new BlockHeader(previousHash, blockHash);
+        BlockHeader blockHeader = new BlockHeader(blockHash);
 
+            System.out.println(blockHeader.getBlockTime());
         Block block = new Block(blockHeader, blockBody);
-        MessageSender.getInstance().broadCastBlockTest(block);
+//        MessageSender.getInstance().broadCastBlockTest(block);
 //        Thread.sleep(4000);
 //        Consensus.getInstance().sendAgreementForBlockTest(block);
 

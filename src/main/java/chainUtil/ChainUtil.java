@@ -146,14 +146,17 @@ public class ChainUtil {
         return getHash((jsonBlock.toString()));
     }
 
+
+    //functionaly changed
     public String getBlockChainHash(LinkedList<Block> blockchain) {
         String blockChainString = "";
         for(Block block: blockchain) {
-            blockChainString+=new JSONObject(block).toString();
+            blockChainString += new JSONObject(block).toString();
         }
         return getHash(blockChainString);
     }
 
+    //functionaly changed
     public String getBlockchainAsJsonString(LinkedList<Block> blockchain) {
         JSONObject jsonBlockchain = new JSONObject();
         for(int i = 0; i < blockchain.size(); i++) {
@@ -163,47 +166,6 @@ public class ChainUtil {
         return jsonBlockchain.toString();
     }
 
-    public JSONObject getBlockchain(int from) throws Exception {
-        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
-        ResultSet rs = blockJDBCDAO.getBlockchain(from);
-        return convertResultSetIntoJSON(rs);
-
-    }
-
-    public JSONObject convertResultSetIntoJSON(ResultSet resultSet) throws Exception {
-        JSONObject result = new JSONObject();
-        int count = 0;
-
-        JSONArray jsonArray = new JSONArray();
-        while (resultSet.next()) {
-            count++;
-            int total_rows = resultSet.getMetaData().getColumnCount();
-            JSONObject obj = new JSONObject();
-
-            for (int i = 0; i < total_rows; i++) {
-                String columnName = resultSet.getMetaData().getColumnLabel(i + 1).toLowerCase();
-                Object columnValue = resultSet.getObject(i + 1);
-                // if value in DB is null, then we set it to default value
-                if (columnValue == null){
-                    columnValue = "null";
-                }
-                /*
-                Next if block is a hack. In case when in db we have values like price and price1 there's a bug in jdbc -
-                both this names are getting stored as price in ResulSet. Therefore when we store second column value,
-                we overwrite original value of price. To avoid that, i simply add 1 to be consistent with DB.
-                 */
-                if (obj.has(columnName)){
-                    columnName += "1";
-                }
-                obj.put(columnName, columnValue);
-            }
-            jsonArray.put(obj);
-        }
-        result.put("blockchainSize", count);
-        result.put("blockchain", jsonArray.toString());
-        return result;
-    }
-
     public boolean verifyUser(String peerID, String publicKey) {
         if(peerID.equals(publicKey.substring(0,40))) {
             return true;
@@ -211,13 +173,7 @@ public class ChainUtil {
         return false;
     }
 
-    public String getPreviousHash() {
-        return "b9a9c304e9313a6c9d1c5a3a2f3fcd41ae3aa56964f9a3186379d6477500583e";
-    }
 
-    public long getRecentBlockNumber() {
-        return 104;
-    }
 
     public static Timestamp convertStringToTimestamp(String time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.hh.mm.ss");

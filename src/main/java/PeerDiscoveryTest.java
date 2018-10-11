@@ -1,23 +1,13 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
-import core.blockchain.Block;
-import core.blockchain.Blockchain;
-import core.connection.BlockJDBCDAO;
 import network.Node;
+import network.communicationHandler.MessageSender;
 import org.slf4j.impl.SimpleLogger;
 
-import javax.swing.*;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+public class PeerDiscoveryTest {
 
-public class BlockAddingTest {
-    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, InterruptedException {
-
+    public static void main(String[] args) throws FileUtilityException {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
@@ -37,16 +27,12 @@ public class BlockAddingTest {
          * */
         Node node = Node.getInstance();
         node.initTest();
-
+        node.getNodeConfig().setNodeID("5678");
         /*
          * when we want our node to start listening
          * */
         node.startListening();
 
-        Block block = Blockchain.createGenesis();
-        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
-        System.out.println(block.getBlockHeader().getBlockTime());
-        Blockchain.addBlocktoBlockchain(block);
-
+        MessageSender.getInstance().requestIP();
     }
 }

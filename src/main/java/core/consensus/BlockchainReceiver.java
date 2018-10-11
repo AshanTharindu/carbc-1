@@ -1,19 +1,17 @@
 package core.consensus;
 
+import network.Neighbour;
+
 public class BlockchainReceiver {
 
-    private String id;
-    private String ip;
-    private int listeningPort;
+    private Neighbour peer;
     private String signedBlockchain;
-    private String blockchainHash;
+    private String id;
 
-    public BlockchainReceiver(String publicKey, String ip,int listeningPort,String signedBlockchain,String blockchainHash) {
-        this.id = publicKey;
-        this.ip = ip;
-        this.listeningPort =  listeningPort;
+    public BlockchainReceiver(Neighbour peer, String signedBlockchain, String blockchainHash) {
+        this.peer = peer;
         this.signedBlockchain = signedBlockchain;
-        this.blockchainHash = blockchainHash;
+        this.id = blockchainHash;
     }
 
     public String getId() {
@@ -21,11 +19,11 @@ public class BlockchainReceiver {
     }
 
     public String getIp() {
-        return ip;
+        return peer.getIp();
     }
 
     public int getListeningPort() {
-        return listeningPort;
+        return peer.getPort();
     }
 
     public String getSignedBlockchain() {
@@ -33,7 +31,7 @@ public class BlockchainReceiver {
     }
 
     public String getBlockchainHash() {
-        return blockchainHash;
+        return id;
     }
 
 }

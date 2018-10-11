@@ -67,10 +67,24 @@ public class MessageSender {
         log.info("requestBlockchainHash");
     }
 
+    public static void requestBlockchainHashTest() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
+//        RequestMessage blockChainRequest = BlockChainHashRequestCreator.createBlockChainHashRequest(jsonObject);
+        RequestMessage blockChainRequest = MessageCreator.createMessage(jsonObject,"BlockChainHashRequest");
+        blockChainRequest.addHeader("keepActive", "false");
+//        BlockchainRequester.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
+        BlockchainRequester.getInstance().setBlockchainRequest(1);
+//        Node.getInstance().broadcast(blockChainRequest);
+        Node.getInstance().sendMessageToPeer("127.0.0.1", 48653, blockChainRequest);
+        log.info("requestBlockchainHashTest");
+    }
+
     public void requestBlockchain() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
-        RequestMessage blockChainRequest = BlockChainRequestCreator.createBlockChainRequest(jsonObject);
+//        RequestMessage blockChainRequest = BlockChainRequestCreator.createBlockChainRequest(jsonObject);
+        RequestMessage blockChainRequest = MessageCreator.createMessage(jsonObject, "BlockChainRequest");
         blockChainRequest.addHeader("keepActive", "false");
         Node.getInstance().broadcast(blockChainRequest);
     }
@@ -84,13 +98,16 @@ public class MessageSender {
         Node.getInstance().sendMessageToPeer(ip,listeningPort,blockChainRequest);
     }
 
-    public static void sendSignedBlockChain(String ip, int listeningPort, String signedBlockchain, String blockchainHash) {
+    public static void sendSignedBlockChain(Neighbour blockchainRequeseter, String signedBlockchain, String blockchainHash) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("signedBlockchain", signedBlockchain);
         jsonObject.put("blockchainHash", blockchainHash);
         jsonObject.put("publicKey",KeyGenerator.getInstance().getPublicKeyAsString());
-        RequestMessage blockSignMessage = BlockChainSignCreator.createBlockChainSignRequest(jsonObject);
-        Node.getInstance().sendMessageToPeer(ip, listeningPort, blockSignMessage);
+        jsonObject.put("listeningPort", Node.getInstance().getNodeConfig().getListenerPort());
+//        RequestMessage blockSignMessage = BlockChainSignCreator.createBlockChainSignRequest(jsonObject);
+        RequestMessage blockSignMessage = MessageCreator.createSpecificMessage(jsonObject, "BlockChainSign",
+                blockchainRequeseter.getPeerID());
+        Node.getInstance().sendMessageToPeer(blockchainRequeseter.getIp(), blockchainRequeseter.getPort(), blockSignMessage);
         log.info("sendSignedBlockChain");
         System.out.println("sendSignedBlockChain");
     }

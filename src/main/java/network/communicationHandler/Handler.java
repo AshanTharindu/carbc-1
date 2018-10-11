@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import core.consensus.BlockchainRequester;
 import core.consensus.Consensus;
 import core.blockchain.Block;
-import core.consensus.PeerDetailsCollector;
 import core.consensus.DataCollector;
 import network.Neighbour;
 import network.Node;
@@ -62,7 +61,7 @@ public class Handler extends Thread{
 
                 case "BlockChainSign":
                     System.out.println("BlockChainSign");
-                    handleBlockChainSignRequest();
+                    handleReceivedSignedBlockchain();
                     break;
 
                 case "BlockChainRequest":
@@ -147,17 +146,19 @@ public class Handler extends Thread{
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
         int listeningPort = clientInfo.getInt("ListeningPort");
-        BlockchainRequester.getInstance().handleBlockchainHashRequest(ip,listeningPort);
+        Neighbour blockchainRequester = new Neighbour(peerID, ip, listeningPort);
+        BlockchainRequester.getInstance().handleBlockchainHashRequest(blockchainRequester);
     }
 
-    public void handleBlockChainSignRequest() {
+    public void handleReceivedSignedBlockchain() {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
-        int listeningPort = jsonObject.getInt("ListeningPort");
+        int listeningPort = jsonObject.getInt("listeningPort");
         String signedBlockchain = jsonObject.getString("signedBlockchain");
         String blockchainHash = jsonObject.getString("blockchainHash");
-        String publicKey = jsonObject.getString("publicKey"); //get from header
-        BlockchainRequester.getInstance().handleReceivedSignedBlockchain(publicKey,ip,listeningPort,signedBlockchain,blockchainHash);
+        String publicKey = jsonObject.getString("publicKey");
+        Neighbour sender = new Neighbour(peerID, ip, listeningPort, publicKey);
+        BlockchainRequester.getInstance().handleReceivedSignedBlockchain(sender, signedBlockchain, blockchainHash);
     }
 
     public void handleBlockChainRequest() throws Exception {

@@ -46,7 +46,7 @@ public class AdditionalDataRequestTest {
         * */
         node.startListening();
 
-//        MessageSender.getInstance().requestIP();
+        MessageSender.getInstance().requestIP();
 
     }
 }

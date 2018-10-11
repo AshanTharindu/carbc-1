@@ -39,7 +39,7 @@ public class DataCollector {
     }
 
     public void requestTransactionData(String vehicleID, String date, String peerID) {
-        Neighbour dataOwner = Node.getInstance().getPeerDetails(peerID);
+        Neighbour dataOwner = Node.getInstance().getPeer(peerID);
         if (dataOwner != null) {
             TransactionDataRequester dataRequester = new TransactionDataRequester(peerID, vehicleID, date);
             dataRequester.setDataOwner(dataOwner);
@@ -124,7 +124,7 @@ public class DataCollector {
         String peerID = block.getBlockBody().getTransaction().getAddress();
         AddtionalDataRequester addtionalDataRequester = new AddtionalDataRequester(peerID, blockHash);
         requestedAdditionalDataDetails.add(addtionalDataRequester);
-        Neighbour dataOwner = Node.getInstance().getPeerDetails(peerID);
+        Neighbour dataOwner = Node.getInstance().getPeer(peerID);
 
         if (dataOwner != null) {
             requestAdditionalDataFromDataOwner(blockHash, dataOwner);

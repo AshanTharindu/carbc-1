@@ -51,4 +51,13 @@ public class NodeConfig {
     public void setNodeID(String nodeID) {
         this.nodeID = nodeID;
     }
+
+    public void updateNeighbourDetails(String peerID, String ip, int port) {
+        for(Neighbour neighbour: neighbours) {
+            if(peerID.equals(neighbour.getPeerID())) {
+                neighbour.setIp(ip);
+                neighbour.setPort(port);
+            }
+        }
+    }
 }

@@ -22,7 +22,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 
 public class FirstNodeTest2 {
-    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, InterruptedException, ParseException {
+    public static void main(String[] args) throws InterruptedException {
 //        System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
 
 
@@ -77,8 +77,7 @@ public class FirstNodeTest2 {
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
-        String previousHash = ChainUtil.getInstance().getPreviousHash();
-        BlockHeader blockHeader = new BlockHeader(previousHash, blockHash);
+        BlockHeader blockHeader = new BlockHeader(blockHash);
 
         Block block = new Block(blockHeader, blockBody);
         MessageSender.getInstance().broadCastBlockTest(block);

@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 public class Transaction {
@@ -21,6 +22,15 @@ public class Transaction {
         this.data = jsonData;
         this.address = address;
         this.time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new java.util.Date());
+    }
+
+    public Transaction() {
+        this.transactionId = "0-0000";
+        this.sender = "CAR.BC";
+        this.event = "genesisBlock";
+        this.data = "Initial Data";
+        this.address = "0000";
+        this.time = new SimpleDateFormat("YYYY.MM.dd.HH.mm.ss").format(new Date(0));
     }
 
     public String getTransactionId() {

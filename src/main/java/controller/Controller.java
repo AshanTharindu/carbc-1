@@ -43,8 +43,7 @@ public class Controller {
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
-        String previousHash = ChainUtil.getInstance().getPreviousHash();
-        BlockHeader blockHeader = new BlockHeader(blockHash, previousHash);
+        BlockHeader blockHeader = new BlockHeader(blockHash);
 
         Block block = new Block(blockHeader, blockBody);
         System.out.println(new JSONObject(block));

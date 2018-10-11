@@ -35,9 +35,13 @@ public class ConnectionFactory {
 
     }
 
-    public Connection getConnection() throws SQLException {
+    public Connection getConnection() {
         Connection conn = null;
-        conn = DriverManager.getConnection(getConnectionUrl(), getDbUser(), getDbPwd());
+        try {
+            conn = DriverManager.getConnection(getConnectionUrl(), getDbUser(), getDbPwd());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return conn;
     }
 
