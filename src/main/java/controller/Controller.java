@@ -1,14 +1,10 @@
 package controller;
 
-import Exceptions.FileUtilityException;
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
-import core.blockchain.Block;
-import core.blockchain.BlockBody;
-import core.blockchain.BlockHeader;
-import core.blockchain.Transaction;
+import core.blockchain.*;
 import core.consensus.Consensus;
 import core.consensus.DataCollector;
 import network.Client.RequestMessage;
@@ -19,11 +15,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.SimpleLogger;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 
 public class Controller {
@@ -47,7 +38,7 @@ public class Controller {
 
         Block block = new Block(blockHeader, blockBody);
         System.out.println(new JSONObject(block));
-        Consensus.getInstance().broadcastBlock(block);
+        Consensus.getInstance().broadcastBlock(block, data);
     }
 
     public void sendConfirmation(Block block) {
@@ -62,10 +53,32 @@ public class Controller {
         return vehicleID;
     }
 
-    public void sendAdditonalData() {
 
+    public void resendBlock(Block block, String data) {
+        block.getBlockBody().getTransaction().setTime();
+        block.getBlockHeader().setPreviousHash(Blockchain.getPreviousHash());
+        block.getBlockHeader().setBlockNumber(Blockchain.getRecentBlockNumber()+1);
+        block.getBlockHeader().setHash(ChainUtil.getBlockHash(block.getBlockBody()));
+        block.getBlockHeader().setSignature(ChainUtil.digitalSignature(block.getBlockHeader().getHash()));
+        Consensus.getInstance().broadcastBlock(block, data);
     }
 
+
+    public void handleAdditionalDataRequest(String blockHash, Neighbour dataRequester) {
+        log.info("Additional Data Request for block: {} From: {} ",blockHash, dataRequester.getPeerID());
+    }
+
+    public void sendAddtionalDataForRequester(String blockHash, Neighbour dataRequester) {
+        DataCollector.getInstance().sendAdditionalData(blockHash, dataRequester);
+    }
+
+    public void notifyReceivedAdditionalData() {
+        log.info("Additional Data Received");
+    }
+
+    public void searchVehicle(String vehicleID) {
+
+    }
 
     //test methods
     public void testNetwork(String ip, int listeningPort, String message) {
@@ -75,7 +88,7 @@ public class Controller {
         Node.getInstance().sendMessageToPeer(ip, listeningPort, testMessage);
     }
 
-    public void startNode() throws InvalidKeySpecException, FileUtilityException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+    public void startNode() {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
@@ -100,18 +113,6 @@ public class Controller {
          * when we want our node to start listening
          * */
         node.startListening();
-    }
-
-    public void handleAdditionalDataRequest(String blockHash, Neighbour dataRequester) {
-        log.info("Additional Data Request for block: {} From: {} ",blockHash, dataRequester.getPeerID());
-    }
-
-    public void sendAddtionalDataForRequester(String blockHash, Neighbour dataRequester) {
-        DataCollector.getInstance().sendAdditionalData(blockHash, dataRequester);
-    }
-
-    public void notifyReceivedAdditionalData() {
-        log.info("Additional Data Received");
     }
 
 }

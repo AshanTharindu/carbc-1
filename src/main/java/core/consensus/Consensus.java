@@ -6,6 +6,7 @@ import core.blockchain.Block;
 import core.blockchain.BlockInfo;
 import core.blockchain.Transaction;
 import core.connection.BlockJDBCDAO;
+import core.connection.HistoryDAO;
 import core.connection.Identity;
 import core.smartContract.BlockValidity;
 import network.Neighbour;
@@ -51,9 +52,15 @@ public class Consensus {
 
     //block broadcasting and sending agreements
 
-    public void broadcastBlock(Block block) {
-        handleNonApprovedBlock(block);
-        MessageSender.broadCastBlock(block);
+    public void broadcastBlock(Block block, String data) {
+        HistoryDAO historyDAO = new HistoryDAO();
+        try {
+            historyDAO.saveBlockWithAdditionalData(block, data);
+            handleNonApprovedBlock(block);
+            MessageSender.broadCastBlock(block);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public synchronized void handleNonApprovedBlock(Block block) {

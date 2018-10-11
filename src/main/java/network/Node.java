@@ -11,6 +11,7 @@ import network.Client.Client;
 import network.Client.RequestMessage;
 import network.Listener.Listener;
 import network.Protocol.HelloMessageCreator;
+import network.communicationHandler.MessageSender;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -79,10 +80,7 @@ public final class Node {
                 nodeConfig.addNeighbour(neighbour);
             }
         }
-
-
         log.info("Initializing Node:{}", peerID);
-
     }
 
     //revert later
@@ -271,7 +269,12 @@ public final class Node {
         node.startListening();
 
         /**
-         * Blockchain
+         * collecting peer details
+         */
+        MessageSender.requestIP();
+
+        /**
+         * Getting blockchain
          */
         Blockchain.runBlockChain();
     }

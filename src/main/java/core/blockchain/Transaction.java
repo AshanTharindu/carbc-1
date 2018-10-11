@@ -60,4 +60,12 @@ public class Transaction {
     public void setData(String data) {
         this.data = data;
     }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime() {
+        this.time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new java.util.Date());
+    }
 }

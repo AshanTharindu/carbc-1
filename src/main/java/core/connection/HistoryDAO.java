@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class HistoryDAO {
     private final Logger log = LoggerFactory.getLogger(HistoryDAO.class);
 
-    public boolean saveBlockWithAdditionalData(Block block, JSONObject data) throws SQLException {
+    public boolean saveBlockWithAdditionalData(Block block, String data) throws SQLException {
 
         if (block != null) {
             BlockInfo blockInfo = new BlockInfo();

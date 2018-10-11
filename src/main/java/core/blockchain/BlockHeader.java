@@ -69,4 +69,7 @@ public class BlockHeader {
         return signature;
     }
 
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
 }
