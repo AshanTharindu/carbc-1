@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NodeConfig {
-    private final String nodeID;
+    private  String nodeID; //change to final
     private int ListenerPort;
     private List<Neighbour> neighbours;
     private Neighbour registry;
@@ -46,5 +46,18 @@ public class NodeConfig {
             }
         }
         return neighbour;
+    }
+
+    public void setNodeID(String nodeID) {
+        this.nodeID = nodeID;
+    }
+
+    public void updateNeighbourDetails(String peerID, String ip, int port) {
+        for(Neighbour neighbour: neighbours) {
+            if(peerID.equals(neighbour.getPeerID())) {
+                neighbour.setIp(ip);
+                neighbour.setPort(port);
+            }
+        }
     }
 }

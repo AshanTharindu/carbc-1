@@ -1,30 +1,29 @@
 import Exceptions.FileUtilityException;
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
+import com.google.gson.Gson;
 import config.CommonConfigHolder;
 import constants.Constants;
 import controller.Controller;
-import core.blockchain.Block;
-import core.blockchain.BlockBody;
-import core.blockchain.BlockHeader;
-import core.blockchain.Transaction;
-import core.consensus.Consensus;
-import network.communicationHandler.MessageSender;
+import core.blockchain.*;
+//import org.codehaus.jackson.map.ObjectMapper;
+import core.consensus.DataCollector;
 import network.Node;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
 
-public class FirstNodeTest2 {
-    public static void main(String[] args) throws InterruptedException {
-//        System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
-
+public class AdditionalDataRequestTest2 {
+    public static void main(String[] args) throws NoSuchAlgorithmException, IOException, SignatureException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, FileUtilityException {
 
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
@@ -51,37 +50,27 @@ public class FirstNodeTest2 {
          * */
         node.startListening();
 
-//        MessageSender.getInstance().requestIP(49222);
-//        Thread.sleep(4000);
 
         JSONObject jsonObject = new JSONObject();
         JSONObject jsonObjectNewOwner = new JSONObject();
         JSONObject jsonSecondary = new JSONObject();
-
         jsonObjectNewOwner.put("name", "Ashan");
         jsonObjectNewOwner.put("publicKey", KeyGenerator.getInstance().getPublicKeyAsString());
-
         jsonSecondary.put("NewOwner", jsonObjectNewOwner);
         jsonObject.put("SecondaryParty", jsonSecondary);
         jsonObject.put("ThirdParty", new JSONArray());
 
-
         Controller controller = new Controller();
-
-        System.out.println(jsonObject);
-//
+        //
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
-        String nodeID = Node.getInstance().getNodeConfig().getNodeID();
+        String nodeID = "5678";
         Transaction transaction = new Transaction("V",sender,"ExchangeOwnership", jsonObject.toString(), nodeID);
-
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
         BlockHeader blockHeader = new BlockHeader(blockHash);
-
         Block block = new Block(blockHeader, blockBody);
-        MessageSender.getInstance().broadCastBlockTest(block);
-        Thread.sleep(4000);
-        Consensus.getInstance().sendAgreementForBlockTest(block);
+
+        DataCollector.getInstance().requestAdditionalData(block);
     }
 }

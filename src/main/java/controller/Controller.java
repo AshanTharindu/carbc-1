@@ -2,29 +2,28 @@ package controller;
 
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;
-import core.blockchain.Block;
-import core.blockchain.BlockBody;
-import core.blockchain.BlockHeader;
-import core.blockchain.Transaction;
+import config.CommonConfigHolder;
+import constants.Constants;
+import core.blockchain.*;
 import core.consensus.Consensus;
-import core.consensus.DataRequester;
-import core.consensus.TransactionDataCollector;
+import core.consensus.DataCollector;
 import network.Client.RequestMessage;
+import network.Neighbour;
 import network.Node;
-import network.Protocol.BlockMessageCreator;
-import network.communicationHandler.MessageSender;
+import network.Protocol.MessageCreator;
 import org.json.JSONObject;
-
-import java.sql.Timestamp;
-import java.text.DateFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.SimpleLogger;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Controller {
 
-    public void requestTransactionData(String vehicleID, Timestamp date, String peerID) {
-        TransactionDataCollector.getInstance().requestTransactionData(vehicleID, date, peerID);
+    private final Logger log = LoggerFactory.getLogger(Controller.class);
+
+
+    public void requestTransactionData(String vehicleID, String date, String peerID) {
+        DataCollector.getInstance().requestTransactionData(vehicleID, date, peerID);
     }
 
     public void sendTransaction(String transactionType, String event, String data) throws ParseException {
@@ -35,12 +34,11 @@ public class Controller {
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
-        String previousHash = ChainUtil.getInstance().getPreviousHash();
-        BlockHeader blockHeader = new BlockHeader(blockHash, previousHash);
+        BlockHeader blockHeader = new BlockHeader(blockHash);
 
         Block block = new Block(blockHeader, blockBody);
         System.out.println(new JSONObject(block));
-        MessageSender.getInstance().broadCastBlock(block);
+        Consensus.getInstance().broadcastBlock(block, data);
     }
 
     public void sendConfirmation(Block block) {
@@ -48,11 +46,73 @@ public class Controller {
     }
 
     public void requestAdditionalData(Block block) {
-
+        DataCollector.getInstance().requestAdditionalData(block);
     }
 
     public String getCarBCno(String vehicleID) {
         return vehicleID;
+    }
+
+
+    public void resendBlock(Block block, String data) {
+        block.getBlockBody().getTransaction().setTime();
+        block.getBlockHeader().setPreviousHash(Blockchain.getPreviousHash());
+        block.getBlockHeader().setBlockNumber(Blockchain.getRecentBlockNumber()+1);
+        block.getBlockHeader().setHash(ChainUtil.getBlockHash(block.getBlockBody()));
+        block.getBlockHeader().setSignature(ChainUtil.digitalSignature(block.getBlockHeader().getHash()));
+        Consensus.getInstance().broadcastBlock(block, data);
+    }
+
+
+    public void handleAdditionalDataRequest(String blockHash, Neighbour dataRequester) {
+        log.info("Additional Data Request for block: {} From: {} ",blockHash, dataRequester.getPeerID());
+    }
+
+    public void sendAddtionalDataForRequester(String blockHash, Neighbour dataRequester) {
+        DataCollector.getInstance().sendAdditionalData(blockHash, dataRequester);
+    }
+
+    public void notifyReceivedAdditionalData() {
+        log.info("Additional Data Received");
+    }
+
+    public void searchVehicle(String vehicleID) {
+
+    }
+
+    //test methods
+    public void testNetwork(String ip, int listeningPort, String message) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("message", message);
+        RequestMessage testMessage = MessageCreator.createMessage(jsonObject, "Test");
+        Node.getInstance().sendMessageToPeer(ip, listeningPort, testMessage);
+    }
+
+    public void startNode() {
+        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
+
+        /*
+         * Set the main directory as home
+         * */
+        System.setProperty(Constants.CARBC_HOME, System.getProperty("user.dir"));
+
+        /*
+         * At the very beginning
+         * A Config common to all: network, blockchain, etc.
+         * */
+        CommonConfigHolder commonConfigHolder = CommonConfigHolder.getInstance();
+        commonConfigHolder.setConfigUsingResource("peer1");
+
+        /*
+         * when initializing the network
+         * */
+        Node node = Node.getInstance();
+        node.initTest();
+
+        /*
+         * when we want our node to start listening
+         * */
+        node.startListening();
     }
 
 }

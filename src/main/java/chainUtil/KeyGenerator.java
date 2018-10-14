@@ -67,7 +67,6 @@ public class KeyGenerator {
 
     private PublicKey loadPublicKey() {
         // Read Public Key.
-        System.out.println(getResourcesFilePath("public.key"));
         File filePublicKey = new File(getResourcesFilePath("public.key"));
         FileInputStream fis = null;
         KeyFactory keyFactory = null;

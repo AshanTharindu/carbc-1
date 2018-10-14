@@ -1,22 +1,17 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
-import core.blockchain.Block;
-import core.blockchain.Blockchain;
-import core.connection.BlockJDBCDAO;
+import controller.Controller;
 import network.Node;
 import org.slf4j.impl.SimpleLogger;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-public class BlockAddingTest {
-    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, InterruptedException {
+public class AndroidTest {
+    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
 
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
@@ -36,17 +31,15 @@ public class BlockAddingTest {
          * when initializing the network
          * */
         Node node = Node.getInstance();
-        node.initTest();
+        node.init();
 
         /*
          * when we want our node to start listening
          * */
         node.startListening();
 
-        Block block = Blockchain.createGenesis();
-        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
-        System.out.println(block.getBlockHeader().getBlockTime());
-        Blockchain.addBlocktoBlockchain(block);
-
+        Controller controller = new Controller();
+//        controller.startNode();
+        controller.testNetwork("192.168.8.102", 42761,"testMessage");
     }
 }

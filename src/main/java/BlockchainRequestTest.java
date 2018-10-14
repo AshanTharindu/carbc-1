@@ -1,6 +1,7 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
+import core.consensus.BlockchainRequester;
 import network.Node;
 import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
@@ -28,7 +29,7 @@ public class BlockchainRequestTest {
          * A Config common to all: network, blockchain, etc.
          * */
         CommonConfigHolder commonConfigHolder = CommonConfigHolder.getInstance();
-        commonConfigHolder.setConfigUsingResource("peer2");
+        commonConfigHolder.setConfigUsingResource("peer1");
 
         /*
          * when initializing the network
@@ -69,6 +70,9 @@ public class BlockchainRequestTest {
 //        }
 //        System.out.println("max is: "+max);
 //        System.out.println("key is: "+key2);
+
+        BlockchainRequester.getInstance().setBlockchainRequest(4);
+
 
     }
 }

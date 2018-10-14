@@ -52,7 +52,7 @@ public class CommonListenerHandler extends ChannelInboundHandlerAdapter {
             ackMessage.addHeader("keepActive", "false");
             ChannelFuture f = ctx.writeAndFlush(ackMessage);
 
-            log.info("Message received from: {}" +clientIP);
+            log.info("Message received from: {}" ,clientIP);
 
             //if the msg we received had the header "keepActive" set to false
             //then close the channel

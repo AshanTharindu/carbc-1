@@ -38,18 +38,20 @@ public class FirstNodeTest {
          * A Config common to all: network, blockchain, etc.
          * */
         CommonConfigHolder commonConfigHolder = CommonConfigHolder.getInstance();
-        commonConfigHolder.setConfigUsingResource("peer1");
+        commonConfigHolder.setConfigUsingResource("peer3");
+
         /*
          * when initializing the network
          * */
         Node node = Node.getInstance();
         node.initTest();
+        node.getNodeConfig().setNodeID("5678");
 
         /*
          * when we want our node to start listening
          * */
         node.startListening();
-//        MessageSender.getInstance().requestIP(49211);
+        MessageSender.getInstance().requestIP();
 
     }
 }

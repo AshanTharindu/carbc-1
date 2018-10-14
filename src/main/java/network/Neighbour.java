@@ -17,6 +17,13 @@ public class Neighbour {
         this.port = port;
     }
 
+    public Neighbour(String peerID, String ip, int port, String publicKey) {
+        this.peerID = peerID;
+        this.ip = ip;
+        this.port = port;
+        this.publicKey = publicKey;
+    }
+
     public String getIp() {
         return ip;
     }

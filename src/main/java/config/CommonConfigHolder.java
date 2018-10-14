@@ -30,10 +30,14 @@ public final class CommonConfigHolder {
         return configJson;
     }
 
-    public void setConfigUsingResource(String peerName) throws FileUtilityException {
+    public void setConfigUsingResource(String peerName) {
         String resourcePath = System.getProperty(Constants.CARBC_HOME)
                 + "/src/main/resources/" + peerName + ".json";
-        this.configJson = new JSONObject(FileUtils.readFileContentAsText(resourcePath));
+        try {
+            this.configJson = new JSONObject(FileUtils.readFileContentAsText(resourcePath));
+        } catch (FileUtilityException e) {
+            e.printStackTrace();
+        }
     }
 
 

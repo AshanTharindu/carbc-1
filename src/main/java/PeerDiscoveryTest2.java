@@ -2,16 +2,12 @@ import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
 import network.Node;
+import network.communicationHandler.MessageSender;
 import org.slf4j.impl.SimpleLogger;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
+public class PeerDiscoveryTest2 {
 
-public class AgreementRequestTest {
-    public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
-
+    public static void main(String[] args) throws FileUtilityException {
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
 
         /*
@@ -24,20 +20,20 @@ public class AgreementRequestTest {
          * A Config common to all: network, blockchain, etc.
          * */
         CommonConfigHolder commonConfigHolder = CommonConfigHolder.getInstance();
-        commonConfigHolder.setConfigUsingResource("peer1");
+        commonConfigHolder.setConfigUsingResource("peer2");
 
         /*
          * when initializing the network
          * */
         Node node = Node.getInstance();
-        node.init();
+        node.initTest();
+        node.getNodeConfig().setNodeID("1234");
 
         /*
          * when we want our node to start listening
          * */
         node.startListening();
 
-        String status = "Block Received";
-
+        MessageSender.getInstance().requestIP();
     }
 }

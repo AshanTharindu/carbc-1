@@ -1,10 +1,12 @@
 package core.consensus;
 
 import chainUtil.ChainUtil;
+import controller.Controller;
 import core.blockchain.Block;
 import core.blockchain.BlockInfo;
 import core.blockchain.Transaction;
 import core.connection.BlockJDBCDAO;
+import core.connection.HistoryDAO;
 import core.connection.Identity;
 import core.smartContract.BlockValidity;
 import network.Neighbour;
@@ -39,7 +41,6 @@ public class Consensus {
         nonApprovedBlocks = new ArrayList<>();
         agreementCollectors = new ArrayList<>();
         approvedBlocks = new ArrayList<>();
-
     }
 
     public static Consensus getInstance() {
@@ -50,7 +51,19 @@ public class Consensus {
     }
 
     //block broadcasting and sending agreements
-    public synchronized void handleNonApprovedBlock(Block block) throws SQLException {
+
+    public void broadcastBlock(Block block, String data) {
+        HistoryDAO historyDAO = new HistoryDAO();
+        try {
+            historyDAO.saveBlockWithAdditionalData(block, data);
+            handleNonApprovedBlock(block);
+            MessageSender.broadCastBlock(block);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void handleNonApprovedBlock(Block block) {
         if (!isDuplicateBlock(block)) {
             if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
                     block.getBlockHeader().getSignature(),block.getBlockHeader().getHash())) {
@@ -179,8 +192,15 @@ public class Consensus {
     public void sendAgreementForBlock(Block block) {
         String blockHash = block.getBlockHeader().getHash();
         String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
-        MessageSender.getInstance().sendAgreement(signedBlock, blockHash);
-        System.out.println("agreement sent");
+        MessageSender.sendAgreement(signedBlock, blockHash);
+        log.info("Agreement Sent for: {}", block.getBlockHeader().getHash());
+    }
+
+    public void sendAgreementForBlockTest(Block block) {
+        String blockHash = block.getBlockHeader().getHash();
+        String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
+        MessageSender.sendAgreementTest(signedBlock, blockHash);
+        log.info("Agreement Sent for: {}", block.getBlockHeader().getHash());
     }
 
     //no need of synchronizing
@@ -205,15 +225,34 @@ public class Consensus {
         handleAgreement(new Agreement(signature, signedBlock, blockHash, publicKey));
     }
 
-
-    public void requestAdditionalData(Block block) {
-        String blockHash = ChainUtil.getInstance().getBlockHash(block.getBlockBody());
+    public void handleReceivedAdditionalData(String blockHash, String additionalData) {
+        Block block = getBlockByBlockHash(blockHash);
+        if(block != null) {
+            String data = block.getBlockBody().getTransaction().getData();
+            JSONObject jsonData = new JSONObject(data);
+            String additionalDataField = jsonData.getString("additionalData");
+            if(additionalDataField.equals(ChainUtil.getHash(additionalData))) {
+                jsonData.put("additionalData", additionalData);
+                block.getBlockBody().getTransaction().setData(jsonData.toString());
+                Controller controller = new Controller();
+                controller.notifyReceivedAdditionalData();
+                log.info("Additional Data added to the block");
+            }
+        } else {
+            log.info("No block found for blockHash: {} ", blockHash);
+        }
 
     }
 
-    public void handleAdditionalDataRequest(String ip, int listeningPort, String signedBlock, String blockHash, String peerID) {
-        String data = getAdditionalDataForBlock(blockHash).toString();
+    public Block getBlockByBlockHash(String blockHash) {
+        for(Block block: nonApprovedBlocks) {
+            if(blockHash.equals(block.getBlockHeader().getHash())) {
+                return block;
+            }
+        }
+        return null;
     }
+
 
     public JSONObject getAdditionalDataForBlock(String blockHash) {
         return new JSONObject();

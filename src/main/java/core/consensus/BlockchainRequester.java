@@ -2,6 +2,9 @@ package core.consensus;
 
 import chainUtil.ChainUtil;
 import core.blockchain.Block;
+import core.blockchain.Blockchain;
+import core.connection.BlockJDBCDAO;
+import network.Neighbour;
 import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
 
@@ -33,25 +36,26 @@ public class BlockchainRequester {
     }
 
     //blockchain request methods
-    public synchronized void handleBlockchainHashRequest(String ip, int listeningPort) {
-//        if(Blockchain.getInstance().getBlockchainArray().size() >=1) {
-//            sendSignedBlockChain(ip, listeningPort);
-//        }
+    public synchronized void handleBlockchainHashRequest(Neighbour blockchainRequeseter) {
+        long blockChainLength = Blockchain.getRecentBlockNumber();
+        if (blockChainLength > 1) {
+            sendSignedBlockChain(blockchainRequeseter);
+        }
     }
 
-    public synchronized void sendSignedBlockChain(String ip, int listeningPort) {
-        BlockchainShare blockchainShare = new BlockchainShare(ip, listeningPort);
-        String blockchainHash = ChainUtil.getInstance().getBlockChainHash(blockchainShare.getBlockChainInstance());
+    public synchronized void sendSignedBlockChain(Neighbour blockchainRequeseter) {
+        BlockchainShare blockchainShare = new BlockchainShare(blockchainRequeseter);
+        String blockchainHash = ChainUtil.getHash(Blockchain.getBlockchain(0).toString());
         blockchainShareDetails.add(blockchainShare);
         String signedBlockchainHash = ChainUtil.getInstance().digitalSignature(blockchainHash);
-        MessageSender.getInstance().sendSignedBlockChain(ip, listeningPort, signedBlockchainHash, blockchainHash);
+        MessageSender.sendSignedBlockChain(blockchainRequeseter, signedBlockchainHash, blockchainHash);
 
     }
 
     //no need of synchronizing
     public void sendBlockchain(String ip, int listeningPort) throws Exception {
-        JSONObject blockchainInfo = ChainUtil.getInstance().getBlockchain(0);
-        MessageSender.getInstance().sendBlockchainToPeer(
+        JSONObject blockchainInfo = Blockchain.getBlockchain(0);
+        MessageSender.sendBlockchainToPeer(
                 ip,
                 listeningPort,
                 blockchainInfo.getString("blockchain"),
@@ -69,11 +73,9 @@ public class BlockchainRequester {
         return null;
     }
 
-    public synchronized void handleReceivedSignedBlockchain(String publicKey, String ip, int listeningPort, String signedBlockchain,
-                                                            String blockchainHash) {
-//        if(ChainUtil.getInstance().verifyUser())
-        if (ChainUtil.getInstance().signatureVerification(publicKey, signedBlockchain, blockchainHash)) {
-            BlockchainReceiver blockchainReceiver = new BlockchainReceiver(publicKey, ip, listeningPort, signedBlockchain, blockchainHash);
+    public synchronized void handleReceivedSignedBlockchain(Neighbour peer, String signedBlockchain, String blockchainHash) {
+        if (ChainUtil.getInstance().signatureVerification(peer.getPublicKey(), signedBlockchain, blockchainHash)) {
+            BlockchainReceiver blockchainReceiver = new BlockchainReceiver(peer, signedBlockchain, blockchainHash);
             blockchainReceiveDetails.add(blockchainReceiver);
             blockchainRequest -= 1;
             if (blockchainRequest == 0) {
@@ -135,7 +137,7 @@ public class BlockchainRequester {
     public void requestBlockchain() {
         BlockchainReceiver blockchainReceiver = getBlockchainReceiverfromPK(findCorrectBlockchain());
         requestedBlockchainHash = blockchainReceiver.getBlockchainHash();
-        MessageSender.getInstance().requestBlockchainFromPeer(blockchainReceiver.getIp(), blockchainReceiver.getListeningPort());
+        MessageSender.requestBlockchainFromPeer(blockchainReceiver.getIp(), blockchainReceiver.getListeningPort());
     }
 
     //no need of synchronizing

@@ -33,7 +33,7 @@ public class AgreementCollector extends Thread{
     private final Logger log = LoggerFactory.getLogger(AgreementCollector.class);
 
 
-    public AgreementCollector(Block block) throws SQLException {
+    public AgreementCollector(Block block) {
         this.agreementCollectorId = generateAgreementCollectorId(block);
         this.block = block;
         this.agreements = new ArrayList<>();
@@ -51,7 +51,7 @@ public class AgreementCollector extends Thread{
         //TODO: I have not handled the other case
     }
 
-    public void setMandatoryAgreements() throws SQLException {
+    public void setMandatoryAgreements() {
 
         synchronized (this){
             String event = this.block.getBlockBody().getTransaction().getEvent();

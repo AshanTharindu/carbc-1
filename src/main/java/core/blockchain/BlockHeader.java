@@ -1,7 +1,9 @@
 package core.blockchain;
 
 import chainUtil.ChainUtil;
+import core.connection.BlockJDBCDAO;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
@@ -15,11 +17,11 @@ public class BlockHeader {
 
     public BlockHeader(){}
 
-    public BlockHeader(String previousHash, String hash){
-        this.previousHash = previousHash;
+    public BlockHeader(String hash){
+        this.previousHash = Blockchain.getPreviousHash();
         this.blockTime = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
         this.hash = hash;
-        this.blockNumber = ChainUtil.getInstance().getRecentBlockNumber() + 1;
+        this.blockNumber = Blockchain.getRecentBlockNumber() + 1;
         signature = ChainUtil.getInstance().digitalSignature(hash);
     }
 
@@ -65,5 +67,9 @@ public class BlockHeader {
 
     public String getSignature() {
         return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }

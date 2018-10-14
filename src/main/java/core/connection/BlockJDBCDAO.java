@@ -1,6 +1,7 @@
 package core.connection;
 
 import chainUtil.ChainUtil;
+import core.blockchain.Block;
 import core.blockchain.BlockInfo;
 import org.json.JSONObject;
 
@@ -73,7 +74,7 @@ public class BlockJDBCDAO {
 
         String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
                 "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
-                "FROM `Blockchain` WHERE `block_number` >= ? AND `validity` = `T`";
+                "FROM `Blockchain` WHERE `block_number` >= ? AND `validity` = 1";
         String blockchain = "";
 
         try {
@@ -99,8 +100,6 @@ public class BlockJDBCDAO {
             return resultSet;
         }
     }
-
-
 
 
 
@@ -186,4 +185,72 @@ public class BlockJDBCDAO {
             return resultSet;
         }
     }
+
+    public long getRecentBlockNumber() throws SQLException {
+        String queryString = "SELECT `block_number` FROM Blockchain ORDER BY id DESC LIMIT 1";
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet result = null;
+        long blockNumber = 0;
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            result = ptmt.executeQuery();
+            if(result.next()) {
+                blockNumber = result.getLong("block_number");
+            }else {
+                blockNumber = 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (result != null)
+                result.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return blockNumber;
+        }
+    }
+
+    public String getPreviousHash() throws SQLException {
+        String queryString = "SELECT `block_hash` FROM Blockchain WHERE `validity` = 1 ORDER BY id DESC LIMIT 1";
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet result = null;
+        String previousHash = null;
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            result = ptmt.executeQuery();
+            if(result.next()) {
+                previousHash = result.getString("block_hash");
+            }else {
+                previousHash = null;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (result != null)
+                result.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return previousHash;
+        }
+    }
+
+//    public long getBlockchainLength() {
+//
+//    }
 }
