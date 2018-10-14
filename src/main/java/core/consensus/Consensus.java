@@ -54,7 +54,6 @@ public class Consensus {
         if (!isDuplicateBlock(block)) {
             if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
                     block.getBlockHeader().getSignature(),block.getBlockHeader().getHash())) {
-                nonApprovedBlocks.add(block);
                 boolean isPresent = false;
                 for (Block b : this.nonApprovedBlocks) {
                     if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
@@ -62,6 +61,7 @@ public class Consensus {
                         break;
                     }
                 }
+                nonApprovedBlocks.add(block);
                 if (!isPresent) {
                     TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                     timeKeeper.start();
@@ -150,6 +150,7 @@ public class Consensus {
             blockInfo.setEvent(block.getBlockBody().getTransaction().getEvent());
             blockInfo.setData(block.getBlockBody().getTransaction().getData().toString());
             blockInfo.setAddress(block.getBlockBody().getTransaction().getAddress());
+            blockInfo.setValidity(true);
 
             Identity identity = null;
             if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {

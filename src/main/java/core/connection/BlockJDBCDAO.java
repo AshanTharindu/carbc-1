@@ -40,7 +40,7 @@ public class BlockJDBCDAO {
             ptmt.setString(7, blockInfo.getSender());
             ptmt.setString(8, blockInfo.getEvent());
             ptmt.setString(9, blockInfo.getData());
-            ptmt.setString(8, blockInfo.getAddress());
+            ptmt.setString(10, blockInfo.getAddress());
             ptmt.executeUpdate();
 
             PreparedStatement psmt = connection.prepareStatement(query);

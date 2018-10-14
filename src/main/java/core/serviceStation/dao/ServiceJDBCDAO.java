@@ -1,6 +1,7 @@
 package core.serviceStation.dao;
 
 import core.connection.ConnectionFactory;
+import core.consensus.Consensus;
 import core.serviceStation.ServiceRecord;
 import core.serviceStation.ServiceType;
 import core.serviceStation.SparePart;
@@ -12,8 +13,24 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 
 public class ServiceJDBCDAO {
+    private static ServiceJDBCDAO INSTANCE;
+    private static Object mutex = new Object();
+
     private final Logger log = LoggerFactory.getLogger(ServiceJDBCDAO.class);
     Connection connection = null;
+
+    private ServiceJDBCDAO(){}
+
+    public static ServiceJDBCDAO getInstance() {
+        if(INSTANCE == null){
+            synchronized (mutex) {
+                if(INSTANCE == null){
+                    INSTANCE = new ServiceJDBCDAO();
+                }
+            }
+        }
+        return INSTANCE;
+    }
 
     //add a service to service type
     public boolean addServiceType(ServiceType serviceType) throws SQLException {

@@ -220,7 +220,7 @@ public class ChainUtil {
     }
 
     public static Timestamp convertStringToTimestamp(String time) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.hh.mm.ss");
         Date parsedDate = null;
         try {
             parsedDate = dateFormat.parse(time);
