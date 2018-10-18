@@ -86,6 +86,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             if (msg.method().equals(HttpMethod.POST)){
                 sendTransactionConfirmation(ctx, msg);
             }
+        }else if (msg.uri().equals("/serviceStation/requestAdditionalData")) {
+            if (msg.method().equals(HttpMethod.POST)){
+                requestAdditionalData(ctx, msg);
+            }
         } else {
             serveStatic(ctx, msg.uri());
         }
@@ -201,6 +205,30 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         String blockHash = jsonObject.getString("blockHash");
         Controller controller = new Controller();
         controller.sendConfirmation(blockHash);
+
+        //writing response
+        ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        ctx.write(response);
+    }
+
+    private void requestAdditionalData(ChannelHandlerContext ctx, FullHttpRequest msg){
+        //decode request
+        ByteBuf data = msg.content();
+        int readableBytes = data.readableBytes();
+        String body = data.toString(StandardCharsets.UTF_8);
+
+        //convert the text to JSON object from here.
+        JSONObject jsonObject = new JSONObject(body);
+        System.out.println(jsonObject);
+
+        String blockHash = jsonObject.getString("blockHash");
+        String sender = jsonObject.getString("sender");
+
+        Controller controller = new Controller();
+        controller.requestAdditionalData(blockHash, sender);
 
         //writing response
         ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);

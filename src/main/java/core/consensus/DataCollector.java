@@ -120,10 +120,10 @@ public class DataCollector {
         }
     }
 
-    public void requestAdditionalData(Block block) {
-        String blockHash = block.getBlockHeader().getHash();
+    public void requestAdditionalData(String blockHash, String peerID) {
+//        String blockHash = block.getBlockHeader().getHash();
         String signedBlock = ChainUtil.digitalSignature(blockHash);
-        String peerID = block.getBlockBody().getTransaction().getAddress();
+//        String peerID = block.getBlockBody().getTransaction().getAddress();
         AddtionalDataRequester addtionalDataRequester = new AddtionalDataRequester(peerID, blockHash);
         requestedAdditionalDataDetails.add(addtionalDataRequester);
         Neighbour dataOwner = Node.getInstance().getPeer(peerID);

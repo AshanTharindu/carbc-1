@@ -66,7 +66,6 @@ public class BlockJDBCDAO {
 
     }
 
-
     public ResultSet getBlockchain(long blockNumber) throws SQLException {
         Connection connection = null;
         PreparedStatement ptmt = null;
@@ -100,8 +99,6 @@ public class BlockJDBCDAO {
             return resultSet;
         }
     }
-
-
 
     //get an identity related transactions
     public void updateIdentityTableAtBlockchainReceipt() throws SQLException {
@@ -250,7 +247,4 @@ public class BlockJDBCDAO {
         }
     }
 
-//    public long getBlockchainLength() {
-//
-//    }
 }
