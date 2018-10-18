@@ -38,24 +38,25 @@ public class DataCollector {
         return dataCollector;
     }
 
-    public void requestTransactionData(String vehicleID, String date, String peerID) {
+    public void requestTransactionData(String type, String vehicleID, String date, String peerID) {
         Neighbour dataOwner = Node.getInstance().getPeer(peerID);
         if (dataOwner != null) {
-            TransactionDataRequester dataRequester = new TransactionDataRequester(peerID, vehicleID, date);
+            TransactionDataRequester dataRequester = new TransactionDataRequester(type, peerID, vehicleID, date);
             dataRequester.setDataOwner(dataOwner);
             requestedTransactionDataDetails.add(dataRequester);
-            requestTransactionDataFromDataOwner(vehicleID, date, dataOwner);
+            requestTransactionDataFromDataOwner(type, vehicleID, date, dataOwner);
         } else {
             log.info("No Peer Details found for: {}", peerID);
             PeerDetailsCollector.getInstance().addPeerDetail(new PeerDetail(peerID, "TransactionData"));
-            TransactionDataRequester dataRequester = new TransactionDataRequester(peerID, vehicleID, date);
+            TransactionDataRequester dataRequester = new TransactionDataRequester(type, peerID, vehicleID, date);
             requestedTransactionDataDetails.add(dataRequester);
             MessageSender.requestPeerDetails(peerID);
         }
     }
 
-    public void requestTransactionDataFromDataOwner(String vehicleID, String date, Neighbour dataOwner) {
+    public void requestTransactionDataFromDataOwner(String transactionType, String vehicleID, String date, Neighbour dataOwner) {
         JSONObject jsonObject = new JSONObject();
+        jsonObject.put("transactionType", transactionType);
         jsonObject.put("vehicleID", vehicleID);
         jsonObject.put("dataOwner", dataOwner.getPeerID());
         jsonObject.put("date", date);
@@ -82,7 +83,8 @@ public class DataCollector {
 
             if(requestedType.equals("TransactionData")) {
                 TransactionDataRequester transactionDataRequester = (TransactionDataRequester)dataRequester;
-                requestTransactionDataFromDataOwner(transactionDataRequester.getVehicleID(), transactionDataRequester.getDate(), dataOwner);
+                requestTransactionDataFromDataOwner(transactionDataRequester.getTransactionType(),
+                        transactionDataRequester.getVehicleID(), transactionDataRequester.getDate(), dataOwner);
             }else if(requestedType.equals("AdditionalData")) {
                 AddtionalDataRequester addtionalDataRequester = (AddtionalDataRequester)dataRequester;
                 requestAdditionalDataFromDataOwner(addtionalDataRequester.getBlockHash(), dataOwner);

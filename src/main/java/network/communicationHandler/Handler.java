@@ -1,6 +1,7 @@
 package network.communicationHandler;
 
 import DataOwners.ServiceStation;
+import chainUtil.ChainUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import core.consensus.BlockchainRequester;
@@ -48,6 +49,7 @@ public class Handler extends Thread{
 
                 case "Hello":
                     handleHelloRequest();
+
                     break;
 
                 case "HelloResponse":
@@ -111,6 +113,10 @@ public class Handler extends Thread{
                     log.info("Test Message Received");
                     break;
 
+                case "TestSignature":
+                    checkSignatureVerfication(data);
+                    break;
+
                 default:
                     System.out.println("default");
 
@@ -133,6 +139,7 @@ public class Handler extends Thread{
         MessageSender.sendHelloResponse(Node.getInstance().getNodeConfig().getListenerPort(),ip, listeningPort, peerID);
         Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
+
 
     public void handleHelloResponse() {
         JSONObject clientInfo = new JSONObject(data);
@@ -219,6 +226,7 @@ public class Handler extends Thread{
     public void handleRequestTransactionData(String data) {
         JSONObject jsonObject = new JSONObject(data);
         String dataOwner = jsonObject.getString("dataOwner");
+        String transactionType = jsonObject.getString("transactionType");
         String dataRequester = jsonObject.getString("nodeID");
         String vehicleID = jsonObject.getString("vehicleID");
         String date = jsonObject.getString("date");
@@ -226,8 +234,12 @@ public class Handler extends Thread{
         String signedData = jsonObject.getString("signedData");
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("listeningPort");
-        ServiceStation serviceStation = new ServiceStation();
-        serviceStation.getServiceRecord(vehicleID, signature, signedData, dataRequester, ip, listeningPort);
+
+        if(transactionType.equals("repair&service")) {
+            ServiceStation serviceStation = new ServiceStation();
+            serviceStation.getServiceRecord(vehicleID, signature, signedData, dataRequester, ip, listeningPort);
+        }
+
     }
 
     public void handleReceivedTransactionData(String data) {
@@ -261,6 +273,16 @@ public class Handler extends Thread{
         String blockHash = jsonObject.getString("blockHash");
         String additionalData = jsonObject.getString("additionalData");
         Consensus.getInstance().handleReceivedAdditionalData(blockHash, additionalData);
+    }
+
+    //test method
+    public void checkSignatureVerfication(String data) {
+        JSONObject jsonObject = new JSONObject(data);
+        String pk = jsonObject.getString("pk");
+        String signature = jsonObject.getString("signature");
+        String signedData = jsonObject.getString("signedData");
+        boolean verifiction = ChainUtil.signatureVerification(pk, signature, signedData);
+        log.info("signature verified");
     }
 
 }

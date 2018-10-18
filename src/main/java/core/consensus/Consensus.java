@@ -67,6 +67,7 @@ public class Consensus {
         if (!isDuplicateBlock(block)) {
             if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
                     block.getBlockHeader().getSignature(),block.getBlockHeader().getHash())) {
+                log.info("signature verified for block: ", block.getBlockHeader().getBlockNumber());
                 nonApprovedBlocks.add(block);
                 boolean isPresent = false;
                 for (Block b : this.nonApprovedBlocks) {

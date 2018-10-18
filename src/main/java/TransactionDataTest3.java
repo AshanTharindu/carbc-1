@@ -51,7 +51,7 @@ public class TransactionDataTest3 {
 
             String time = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
 
-            DataCollector.getInstance().requestTransactionData("12345", time, "12345");
+            DataCollector.getInstance().requestTransactionData("repair&service", "12345", time, "12345");
 
         } catch (Exception e) {
             e.getMessage();

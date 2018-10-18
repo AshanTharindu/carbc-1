@@ -46,7 +46,7 @@ public class TransactionDataTest2 {
 ////            System.out.println(KeyGenerator.getInstance().getPublicKeyAsString());
 //            System.out.println(serviceJDBCDAO.getCustomerPublicKey("3081f13081a806072a8648ce38040130819c0241"));
             String time = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
-            DataCollector.getInstance().requestTransactionDataFromDataOwner("12345",time, new Neighbour("3081f13081a806072a8648ce38040130819c0241","127.0.0.1", 49211));
+//            DataCollector.getInstance().requestTransactionDataFromDataOwner("12345",time, new Neighbour("3081f13081a806072a8648ce38040130819c0241","127.0.0.1", 49211));
         } catch (Exception e) {
             e.getMessage();
         }
