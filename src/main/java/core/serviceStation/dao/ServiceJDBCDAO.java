@@ -1,6 +1,8 @@
 package core.serviceStation.dao;
 
 import core.connection.ConnectionFactory;
+import core.consensus.Consensus;
+import core.serviceStation.Service;
 import core.serviceStation.ServiceRecord;
 import core.serviceStation.ServiceType;
 import core.serviceStation.SparePart;
@@ -12,8 +14,24 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 
 public class ServiceJDBCDAO {
+    private static ServiceJDBCDAO INSTANCE;
+    private static Object mutex = new Object();
+
     private final Logger log = LoggerFactory.getLogger(ServiceJDBCDAO.class);
     Connection connection = null;
+
+    private ServiceJDBCDAO(){}
+
+    public static ServiceJDBCDAO getInstance() {
+        if(INSTANCE == null){
+            synchronized (mutex) {
+                if(INSTANCE == null){
+                    INSTANCE = new ServiceJDBCDAO();
+                }
+            }
+        }
+        return INSTANCE;
+    }
 
     //add a service to service type
     public boolean addServiceType(ServiceType serviceType) throws SQLException {
@@ -48,15 +66,15 @@ public class ServiceJDBCDAO {
 
         try {
             String queryString = "INSERT INTO `ServiceRecord`( " +
-                    "`vehicle_id`, `cost`, `serviced_date`) VALUES (?,?,?)";
+                    "`vehicle_id`, `serviced_date`) VALUES (?,?)";
 
-            connection = ConnectionFactory.getInstance().getConnection();
+            ConnectionFactory connectionFactory = ConnectionFactory.getInstance();
+            connection = connectionFactory.getConnection();
             ptmt = connection.prepareStatement(queryString,
                     Statement.RETURN_GENERATED_KEYS);
 
             ptmt.setString(1, serviceRecord.getVehicle_id());
-            ptmt.setInt(2, serviceRecord.getCost());
-            ptmt.setTimestamp(3, serviceRecord.getServiced_date());
+            ptmt.setTimestamp(2, serviceRecord.getServiced_date());
             boolean succeed = ptmt.execute();
 
             log.debug("Vehicle id :{}. Status - inserted service record :{}",
@@ -64,20 +82,26 @@ public class ServiceJDBCDAO {
 
             ResultSet rs = ptmt.getGeneratedKeys();
 
-            String query = "INSERT INTO `Service`(`record_id`, `service_id`, `spare_part_serial_number`) " +
-                    "VALUES (?,?,?)";
+            String query = "INSERT INTO `Service`(`record_id`, `service_id`, `spare_part_serial_number`, `cost`) " +
+                    "VALUES (?,?,?,?)";
 
             if (rs.next()){
                 int record_id = rs.getInt(1);
 
                 pstm = connection.prepareStatement(query);
                 pstm.setInt(1, record_id);
-                pstm.setInt(2, serviceRecord.getService().getService_id());
-                pstm.setString(3, serviceRecord.getService().getSparePart());
-                succeed = pstm.execute();
 
-                log.debug("Record id :{}. Status - inserted service :{}",
-                        record_id, succeed);
+                for(int i = 0; i < serviceRecord.getService().size(); i++){
+                    Service service = serviceRecord.getService().get(i);
+                    pstm.setInt(2, service.getService_id());
+                    pstm.setString(3, service.getSparePart());
+                    pstm.setInt(4, service.getCost());
+                    succeed = pstm.execute();
+
+                    log.debug("Record id :{}. Status - inserted service :{}",
+                            record_id, succeed);
+                }
+
             }
             log.info("Service record is inserted to the database successfully");
 
@@ -127,7 +151,7 @@ public class ServiceJDBCDAO {
 
 
     //return service details by vehicle number
-    public JSONObject getServiceRecords(String vehicle_id) throws SQLException {
+    public JSONObject getLastServiceRecord(String vehicle_id) throws SQLException {
         String queryString = "SELECT s.record_id, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
                 " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
@@ -175,6 +199,67 @@ public class ServiceJDBCDAO {
             if (connection != null)
                 connection.close();
             return serviceRecord;
+        }
+    }
+
+    //return service details by vehicle number
+    public JSONArray getAllServiceRecords(String vehicle_id) throws SQLException {
+        String queryString = "SELECT s.record_id, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
+                " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
+                "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
+                "ON s.service_id = st.service_id LEFT JOIN `SparePart` sp " +
+                "ON s.spare_part_serial_number = sp.serial_number " +
+                "WHERE `vehicle_id` = ? AND DATE(`serviced_date`) = CURDATE()";
+
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        JSONArray serviceArray = new JSONArray();
+        JSONObject serviceRecord = new JSONObject();
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, vehicle_id);
+            resultSet = ptmt.executeQuery();
+
+            JSONArray arr = new JSONArray();
+            int recordId = -1;
+            int count = 0;
+
+            while (resultSet.next()){
+                if (recordId != resultSet.getInt(1)){
+                    if (count != 0){
+                        serviceRecord.put("services", arr);
+                        arr = new JSONArray();
+                        serviceArray.put(serviceRecord);
+                    }
+                    count++;
+                    serviceRecord = new JSONObject();
+                    recordId = resultSet.getInt(1);
+                    serviceRecord.put("vehicle_id", resultSet.getString("vehicle_id"));
+                    serviceRecord.put("serviced_date", resultSet.getTimestamp("serviced_date"));
+                }
+                JSONObject services = new JSONObject();
+                services.put("service_type", resultSet.getString("service_type"));
+                services.put("spare_part", resultSet.getString("spare_part"));
+                services.put("seller", resultSet.getString("seller"));
+                arr.put(services);
+            }
+            serviceRecord.put("services", arr);
+            serviceArray.put(serviceRecord);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return serviceArray;
         }
     }
 

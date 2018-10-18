@@ -69,7 +69,7 @@ public class AgreementCollector extends Thread{
 
                 case "ServiceRepair":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("ServiceStation")
-                            .getString("address"));
+                            .getString("publicKey"));
                     for (int i = 0; i < thirdParties.length(); i++){
                         getSpecialValidators().add(thirdParties.getString(i));
                     }
@@ -77,37 +77,37 @@ public class AgreementCollector extends Thread{
 
                 case "Insure":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("InsuranceCompany")
-                            .getString("address"));
+                            .getString("publicKey"));
                     break;
 
                 case "Lease":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("LeasingCompany")
-                            .getString("address"));
+                            .getString("publicKey"));
                     break;
 
                 case "BankLoan":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("Bank")
-                            .getString("address"));
+                            .getString("publicKey"));
                     break;
 
                 case "RenewRegistration":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("RMV")
-                            .getString("address"));
+                            .getString("publicKey"));
                     break;
 
                 case "RegisterVehicle":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("RMV")
-                            .getString("address"));
+                            .getString("publicKey"));
                     break;
 
                 case "RenewInsurance":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("InsuranceCompany")
-                            .getString("address"));
+                            .getString("publicKey"));
                     break;
 
                 case "BuySpareParts":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("SparePartProvider")
-                            .getString("address"));
+                            .getString("publicKey"));
                     break;
 
             }

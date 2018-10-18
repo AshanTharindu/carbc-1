@@ -8,26 +8,19 @@ import core.blockchain.Transaction;
 import core.connection.BlockJDBCDAO;
 import core.connection.HistoryDAO;
 import core.connection.Identity;
-import core.smartContract.BlockValidity;
-import network.Neighbour;
-import network.Node;
+import core.serviceStation.webSocketServer.webSocket.WebSocketMessageHandler;
 import core.smartContract.TimeKeeper;
 import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
-public class Consensus {
+public class Consensus extends Observable {
 
     private static Consensus consensus;
     private final Logger log = LoggerFactory.getLogger(Consensus.class);
@@ -38,7 +31,7 @@ public class Consensus {
     private ArrayList<Transaction> addedTransaction;
 
     private Consensus() {
-        nonApprovedBlocks = new ArrayList<>();
+        nonApprovedBlocks = (new ArrayList<>());
         agreementCollectors = new ArrayList<>();
         approvedBlocks = new ArrayList<>();
     }
@@ -63,6 +56,11 @@ public class Consensus {
         }
     }
 
+    public synchronized void testHandleNonApprovedBlock(Block block){
+        this.nonApprovedBlocks.add(block);
+        WebSocketMessageHandler.addBlockToNotificationArray(block);
+    }
+
     public synchronized void handleNonApprovedBlock(Block block) {
         if (!isDuplicateBlock(block)) {
             if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
@@ -70,12 +68,18 @@ public class Consensus {
                 log.info("signature verified for block: ", block.getBlockHeader().getBlockNumber());
                 nonApprovedBlocks.add(block);
                 boolean isPresent = false;
-                for (Block b : this.nonApprovedBlocks) {
+                for (Block b : this.getNonApprovedBlocks()) {
                     if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
                         isPresent = true;
                         break;
                     }
                 }
+//                getNonApprovedBlocks().add(block);
+                addBlockToNonApprovedBlocks(block);
+                //TODO: should notify the ui
+//                WebSocketMessageHandler.testUpdate(nonApprovedBlocks);
+
+
                 if (!isPresent) {
                     TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                     timeKeeper.start();
@@ -103,7 +107,7 @@ public class Consensus {
         System.out.println("Inside checkAgreementsForBlock method");
 
         ArrayList<Block> qualifiedBlocks = new ArrayList<>();
-        for (Block b : this.nonApprovedBlocks) {
+        for (Block b : this.getNonApprovedBlocks()) {
             if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)) {
                 String blockHash = b.getBlockHeader().getHash();
                 AgreementCollector agreementCollector = getAgreementCollector(blockHash);
@@ -131,14 +135,16 @@ public class Consensus {
 
             Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(qualifiedBlock.getBlockHeader().getBlockTime());
 
-            synchronized (nonApprovedBlocks) {
+            synchronized (getNonApprovedBlocks()) {
                 for (Block b : qualifiedBlocks) {
                     if (blockTimestamp.after(ChainUtil.convertStringToTimestamp(b.getBlockHeader().getBlockTime()))) {
-                        this.nonApprovedBlocks.remove(qualifiedBlock);
+//                        this.getNonApprovedBlocks().remove(qualifiedBlock);
+                        removeBlockFromNonApprovedBlocks(qualifiedBlock);
                         qualifiedBlock = b;
                         blockTimestamp = ChainUtil.convertStringToTimestamp(b.getBlockHeader().getBlockTime());
                     } else {
-                        this.nonApprovedBlocks.remove(b);
+//                        this.getNonApprovedBlocks().remove(b);
+                        removeBlockFromNonApprovedBlocks(b);
                     }
                 }
             }
@@ -164,6 +170,7 @@ public class Consensus {
             blockInfo.setEvent(block.getBlockBody().getTransaction().getEvent());
             blockInfo.setData(block.getBlockBody().getTransaction().getData().toString());
             blockInfo.setAddress(block.getBlockBody().getTransaction().getAddress());
+            blockInfo.setValidity(true);
 
             Identity identity = null;
             if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
@@ -182,7 +189,7 @@ public class Consensus {
 
     //no need of synchronizing
     public boolean isDuplicateBlock(Block block) {
-        if (nonApprovedBlocks.contains(block)) {
+        if (getNonApprovedBlocks().contains(block)) {
             return true;
         }
         return false;
@@ -245,7 +252,7 @@ public class Consensus {
     }
 
     public Block getBlockByBlockHash(String blockHash) {
-        for(Block block: nonApprovedBlocks) {
+        for(Block block: getNonApprovedBlocks()) {
             if(blockHash.equals(block.getBlockHeader().getHash())) {
                 return block;
             }
@@ -262,4 +269,20 @@ public class Consensus {
         return approvedBlocks;
     }
 
+
+    public ArrayList<Block> getNonApprovedBlocks() {
+        return nonApprovedBlocks;
+    }
+
+    public void addBlockToNonApprovedBlocks(Block nonApprovedBlock) {
+        this.nonApprovedBlocks.add(nonApprovedBlock);
+        setChanged();
+        notifyObservers();
+    }
+
+    public void removeBlockFromNonApprovedBlocks(Block nonApprovedBlock) {
+        this.nonApprovedBlocks.remove(nonApprovedBlock);
+        setChanged();
+        notifyObservers();
+    }
 }

@@ -1,6 +1,9 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
+import core.serviceStation.Service;
+import core.serviceStation.ServiceRecord;
+import core.serviceStation.dao.ServiceJDBCDAO;
 import network.Node;
 import org.slf4j.impl.SimpleLogger;
 
@@ -11,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 
 public class TransactionDataTest {
@@ -46,19 +50,19 @@ public class TransactionDataTest {
         }
 
 //        String time = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
-//        ServiceJDBCDAO serviceJDBCDAO = new ServiceJDBCDAO();
-//
-//        Service service = new Service();
-//        service.setSparePart("8888");
-//        service.setService_id(14);
-//
-//        ServiceRecord serviceRecord = new ServiceRecord();
-//        serviceRecord.setVehicle_id("23456");
-//        serviceRecord.setServiced_date(new Timestamp(System.currentTimeMillis()));
-//        serviceRecord.setCost(100000);
-//        serviceRecord.setService(service);
-//
-//        serviceJDBCDAO.addServiceRecord(serviceRecord);
+        ServiceJDBCDAO serviceJDBCDAO = ServiceJDBCDAO.getInstance();
+
+        Service service = new Service();
+        service.setSparePart("8888");
+        service.setService_id(14);
+        service.setCost(1000);
+
+        ServiceRecord serviceRecord = new ServiceRecord();
+        serviceRecord.setVehicle_id("23456");
+        serviceRecord.setServiced_date(new Timestamp(System.currentTimeMillis()));
+        serviceRecord.setService(service);
+
+        serviceJDBCDAO.addServiceRecord(serviceRecord);
 
 //        DataCollector.getInstance().requestTransactionData("ca83838", time,"abcd1234");
     }

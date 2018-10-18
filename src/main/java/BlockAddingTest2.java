@@ -74,7 +74,7 @@ public class BlockAddingTest2 {
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
         BlockHeader blockHeader = new BlockHeader(blockHash);
 
-            System.out.println(blockHeader.getBlockTime());
+        System.out.println(blockHeader.getBlockTime());
         Block block = new Block(blockHeader, blockBody);
 //        MessageSender.getInstance().broadCastBlockTest(block);
 //        Thread.sleep(4000);

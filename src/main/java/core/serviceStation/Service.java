@@ -4,6 +4,15 @@ public class Service {
     private int record_id;
     private int service_id;
     private String spare_part_serial_number;
+    private int cost;
+
+    public Service(){}
+
+    public Service(int service_id, String spare_part_serial_number, int cost){
+        this.service_id = service_id;
+        this.spare_part_serial_number = spare_part_serial_number;
+        this.cost = cost;
+    }
 
     public int getRecord_id() {
         return record_id;
@@ -19,6 +28,14 @@ public class Service {
 
     public void setService_id(int service_id) {
         this.service_id = service_id;
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
     }
 
     public String getSparePart() {

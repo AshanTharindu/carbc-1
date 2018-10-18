@@ -4,6 +4,12 @@ public class ServiceType {
     private int service_id;
     private String service_type;
 
+    public ServiceType(){}
+
+    public ServiceType(String service_type){
+        this.service_type = service_type;
+    }
+
     public int getService_id() {
         return service_id;
     }
