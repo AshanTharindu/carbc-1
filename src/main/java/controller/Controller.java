@@ -25,8 +25,8 @@ public class Controller {
     private final Logger log = LoggerFactory.getLogger(Controller.class);
 
 
-    public void requestTransactionData(String vehicleID, String date, String peerID) {
-        DataCollector.getInstance().requestTransactionData(vehicleID, date, peerID);
+    public void requestTransactionData(String type, String vehicleID, String date, String peerID) {
+        DataCollector.getInstance().requestTransactionData(type, vehicleID, date, peerID);
     }
 
     public void sendTransaction(String transactionType, String event, String data) throws ParseException {
@@ -105,7 +105,7 @@ public class Controller {
          * A Config common to all: network, blockchain, etc.
          * */
         CommonConfigHolder commonConfigHolder = CommonConfigHolder.getInstance();
-        commonConfigHolder.setConfigUsingResource("peer1");
+        commonConfigHolder.setConfigUsingResource("peer2");
 
         /*
          * when initializing the network

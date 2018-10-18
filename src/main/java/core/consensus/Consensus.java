@@ -65,6 +65,8 @@ public class Consensus extends Observable {
         if (!isDuplicateBlock(block)) {
             if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
                     block.getBlockHeader().getSignature(),block.getBlockHeader().getHash())) {
+                log.info("signature verified for block: ", block.getBlockHeader().getBlockNumber());
+                nonApprovedBlocks.add(block);
                 boolean isPresent = false;
                 if(getNonApprovedBlocks().size()>0) {
                     for (Block b : this.getNonApprovedBlocks()) {
