@@ -144,7 +144,7 @@ public class DataCollector {
         MessageSender.  requestAdditionalData(jsonObject, dataOwner);
     }
 
-    public void handleReceivedAdditionalData(String blockHash, String signedBlock, Neighbour dataRequester) {
+    public void handleReceivedAdditionalData(String blockHash, String signedBlock, Neighbour dataRequester) throws SQLException {
         if(ChainUtil.signatureVerification(dataRequester.getPublicKey(), signedBlock, blockHash)) {
             Controller controller = new Controller();
             controller.handleAdditionalDataRequest(blockHash, dataRequester);

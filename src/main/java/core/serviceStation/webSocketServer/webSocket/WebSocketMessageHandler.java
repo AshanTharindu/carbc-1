@@ -1,6 +1,7 @@
 package core.serviceStation.webSocketServer.webSocket;
 
 import core.blockchain.Block;
+import core.connection.HistoryDAO;
 import core.consensus.Consensus;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -17,7 +18,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -139,6 +140,30 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
 
         PromiseCombiner promiseCombiner = new PromiseCombiner();
         TextWebSocketFrame tws = new TextWebSocketFrame(stringBlock);
+
+        allChannels.stream()
+                .forEach(c -> {
+                    promiseCombiner.add(c.writeAndFlush(tws).addListener(new ChannelFutureListener() {
+                        @Override
+                        public void operationComplete(ChannelFuture future) throws Exception {
+                            if (!future.isSuccess()) {
+                                LOGGER.info("Failed to write to channel: {}", future.cause());
+                            }
+                        }
+                    }));
+                });
+    }
+
+    public static void giveAdditionalData(String blockHash, String dataRequester) throws SQLException {
+        HistoryDAO historyDAO = new HistoryDAO();
+        JSONObject jsonObject = historyDAO.getBlockData(blockHash);
+
+        jsonObject.put("action", "additionalDataRequest");
+        jsonObject.put("requester", dataRequester);
+        String blockInfo = jsonObject.toString();
+
+        PromiseCombiner promiseCombiner = new PromiseCombiner();
+        TextWebSocketFrame tws = new TextWebSocketFrame(blockInfo);
 
         allChannels.stream()
                 .forEach(c -> {

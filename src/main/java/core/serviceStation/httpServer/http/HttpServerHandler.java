@@ -84,7 +84,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             }
         }else if (msg.uri().equals("/serviceStation/confirmTransaction")) {
             if (msg.method().equals(HttpMethod.POST)){
-//                setServiceTypes(ctx, msg);
+                sendTransactionConfirmation(ctx, msg);
             }
         } else {
             serveStatic(ctx, msg.uri());

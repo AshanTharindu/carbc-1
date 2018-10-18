@@ -1,0 +1,45 @@
+{
+  "data": {
+    "serviceType": "",
+    "servicedDate": "",
+    "SparePartSerialNumber": "",
+    "SparePartShop": "",
+    "cost": "",
+    "SecondaryParty": {
+      "serviceStation": {
+        "name":"",
+        "publicKey":""
+      }
+    },
+    "ThirdParty": {
+      "SparePartProvider":"address1"
+    }
+  },
+
+  "data": {
+    "insuranceType": "",
+    "insuranceNumber": "",
+    "validityPeriod": "",
+    "SecondaryParty": {
+      "insuranceCompany": {
+        "name":"",
+        "publicKey":""
+      }
+    },
+    "ThirdParty":{
+
+    }
+  },
+
+  "data": {
+    "SecondaryParty": {
+      "newOwner": {
+        "name":"",
+        "publicKey":""
+      }
+    },
+    "ThirdParty":{
+
+    }
+  }
+}

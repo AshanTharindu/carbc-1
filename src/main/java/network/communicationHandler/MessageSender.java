@@ -44,7 +44,7 @@ public class MessageSender {
 //        RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
         RequestMessage requestIPMessage = MessageCreator.createSpecificMessage(jsonObject, "Register", "0");
         requestIPMessage.addHeader("keepActive", "false");
-        Node.getInstance().sendMessageToPeer("127.0.0.1", 49154,requestIPMessage);
+        Node.getInstance().sendMessageToPeer("192.168.8.101", 49154,requestIPMessage);
     }
 
     public static void sendHelloResponse(int listeningPort, String clientIP, int clientPort, String peerID) {

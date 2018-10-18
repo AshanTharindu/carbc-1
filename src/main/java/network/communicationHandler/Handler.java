@@ -238,7 +238,7 @@ public class Handler extends Thread{
         DataCollector.getInstance().handleReceivedTransactionData(transactionData, signature, signedData, peerID);
     }
 
-    public void handleAdditionalDataRequest(String data) {
+    public void handleAdditionalDataRequest(String data) throws SQLException {
         JSONObject jsonObject = new JSONObject(data);
         String dataOwner = jsonObject.getString("dataOwner");
         String ip = jsonObject.getString("ip");

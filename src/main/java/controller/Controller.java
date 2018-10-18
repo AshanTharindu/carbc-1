@@ -7,6 +7,7 @@ import constants.Constants;
 import core.blockchain.*;
 import core.consensus.Consensus;
 import core.consensus.DataCollector;
+import core.serviceStation.webSocketServer.webSocket.WebSocketMessageHandler;
 import network.Client.RequestMessage;
 import network.Neighbour;
 import network.Node;
@@ -15,6 +16,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.SimpleLogger;
+
+import java.sql.SQLException;
 import java.text.ParseException;
 
 public class Controller {
@@ -64,8 +67,9 @@ public class Controller {
     }
 
 
-    public void handleAdditionalDataRequest(String blockHash, Neighbour dataRequester) {
+    public void handleAdditionalDataRequest(String blockHash, Neighbour dataRequester) throws SQLException {
         log.info("Additional Data Request for block: {} From: {} ",blockHash, dataRequester.getPeerID());
+        WebSocketMessageHandler.giveAdditionalData(blockHash, dataRequester.getPeerID());
     }
 
     public void sendAddtionalDataForRequester(String blockHash, Neighbour dataRequester) {
