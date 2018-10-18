@@ -68,35 +68,8 @@ public class Peer3Test {
         broadcastServer.start();
 
 
-        JSONObject jsonObject = new JSONObject();
-        JSONObject jsonObjectNewOwner = new JSONObject();
-        JSONObject jsonSecondary = new JSONObject();
-
-        jsonObjectNewOwner.put("name", "Ashan");
-        jsonObjectNewOwner.put("publicKey", KeyGenerator.getInstance().getPublicKeyAsString());
-
-        jsonSecondary.put("NewOwner", jsonObjectNewOwner);
-        jsonObject.put("SecondaryParty", jsonSecondary);
-        jsonObject.put("ThirdParty", new JSONArray());
-
-        System.out.println(jsonObject);
-
-        String sender = KeyGenerator.getInstance().getPublicKeyAsString();
-        String nodeID = Node.getInstance().getNodeConfig().getNodeID();
-        Transaction transaction = new Transaction("V",sender,"ExchangeOwnership", jsonObject.toString(), nodeID);
-
-        BlockBody blockBody = new BlockBody();
-        blockBody.setTransaction(transaction);
-        String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
-        BlockHeader blockHeader = new BlockHeader(blockHash);
-
-        System.out.println(blockHeader.getBlockTime());
-        Block block = new Block(blockHeader, blockBody);
-
-        Consensus.getInstance().testHandleNonApprovedBlock(block);
-
-        Test test = new Test();
-        test.start();
+//        Test test = new Test();
+//        test.start();
 
     }
 }

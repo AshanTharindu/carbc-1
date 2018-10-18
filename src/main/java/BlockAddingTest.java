@@ -4,6 +4,7 @@ import constants.Constants;
 import core.blockchain.Block;
 import core.blockchain.Blockchain;
 import core.connection.BlockJDBCDAO;
+import core.serviceStation.webSocketServer.BroadcastServer;
 import network.Node;
 import org.slf4j.impl.SimpleLogger;
 
@@ -43,10 +44,17 @@ public class BlockAddingTest {
          * */
         node.startListening();
 
-        Block block = Blockchain.createGenesis();
-        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
-        System.out.println(block.getBlockHeader().getBlockTime());
-        Blockchain.addBlocktoBlockchain(block);
+//        Block block = Blockchain.createGenesis();
+//        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
+//        System.out.println(block.getBlockHeader().getBlockTime());
+//        Blockchain.addBlocktoBlockchain(block);
+
+
+        /*
+         * starting UI web socket communication
+         * */
+        BroadcastServer broadcastServer = new BroadcastServer();
+        broadcastServer.start();
 
     }
 }

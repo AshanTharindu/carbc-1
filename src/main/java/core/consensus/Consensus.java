@@ -31,7 +31,7 @@ public class Consensus extends Observable {
     private ArrayList<Transaction> addedTransaction;
 
     private Consensus() {
-        nonApprovedBlocks = (new ArrayList<>());
+        nonApprovedBlocks = new ArrayList<>();
         agreementCollectors = new ArrayList<>();
         approvedBlocks = new ArrayList<>();
     }
@@ -68,16 +68,20 @@ public class Consensus extends Observable {
                 log.info("signature verified for block: ", block.getBlockHeader().getBlockNumber());
                 nonApprovedBlocks.add(block);
                 boolean isPresent = false;
-                for (Block b : this.getNonApprovedBlocks()) {
-                    if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
-                        isPresent = true;
-                        break;
+                if(getNonApprovedBlocks().size()>0) {
+                    for (Block b : this.getNonApprovedBlocks()) {
+                        if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
+                            isPresent = true;
+                            break;
+                        }
                     }
                 }
 //                getNonApprovedBlocks().add(block);
-                addBlockToNonApprovedBlocks(block);
+//                addBlockToNonApprovedBlocks(block);
+                this.nonApprovedBlocks.add(block);
                 //TODO: should notify the ui
 //                WebSocketMessageHandler.testUpdate(nonApprovedBlocks);
+                WebSocketMessageHandler.addBlockToNotificationArray(block);
 
 
                 if (!isPresent) {
@@ -196,11 +200,10 @@ public class Consensus extends Observable {
     }
 
     //no need of synchronizing
-    public void sendAgreementForBlock(Block block) {
-        String blockHash = block.getBlockHeader().getHash();
+    public void sendAgreementForBlock(String blockHash) {
         String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
         MessageSender.sendAgreement(signedBlock, blockHash);
-        log.info("Agreement Sent for: {}", block.getBlockHeader().getHash());
+        log.info("Agreement Sent for: {}", blockHash);
     }
 
     public void sendAgreementForBlockTest(Block block) {
