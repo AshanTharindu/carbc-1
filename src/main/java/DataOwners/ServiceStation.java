@@ -21,10 +21,9 @@ public class ServiceStation {
         String customerPublicKey = getCustomerPublicKey(dataRequester);
         if(ChainUtil.signatureVerification(customerPublicKey,signature,signedData)) {
             log.info("Customer signature verified: {}", dataRequester);
-            ServiceJDBCDAO serviceJDBCDAO = new ServiceJDBCDAO();
             JSONObject serviceRecord = null;
             try {
-                serviceRecord = serviceJDBCDAO.getServiceRecords(vehicleId);
+                serviceRecord = ServiceJDBCDAO.getInstance().getLastServiceRecord(vehicleId);
                 log.info("service records found for: {}", vehicleId);
                 MessageSender.sendTransactionData(serviceRecord,ip, listeningPort,dataRequester);
             } catch (SQLException e) {
@@ -36,10 +35,9 @@ public class ServiceStation {
     }
 
     public String getCustomerPublicKey(String nodeID) {
-        ServiceJDBCDAO serviceJDBCDAO = new ServiceJDBCDAO();
         String publicKey = null;
         try {
-            publicKey = serviceJDBCDAO.getCustomerPublicKey(nodeID);
+            publicKey = ServiceJDBCDAO.getInstance().getCustomerPublicKey(nodeID);
         } catch (SQLException e) {
             e.printStackTrace();
         }

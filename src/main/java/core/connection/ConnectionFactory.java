@@ -14,7 +14,7 @@ public class ConnectionFactory {
     private String dbUser;
     private String dbPwd;
 
-    private static ConnectionFactory connectionFactory = null;
+    private static ConnectionFactory connectionFactory;
 
     private ConnectionFactory() {
         try {
@@ -45,7 +45,7 @@ public class ConnectionFactory {
         return conn;
     }
 
-    public static ConnectionFactory getInstance() {
+    public synchronized static ConnectionFactory getInstance() {
         if (connectionFactory == null) {
             connectionFactory = new ConnectionFactory();
         }

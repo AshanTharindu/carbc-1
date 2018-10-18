@@ -1,4 +1,4 @@
-package core.serviceStation.client.http;
+package core.serviceStation.httpServer.http;
 
 import com.google.common.cache.Cache;
 import io.netty.channel.Channel;

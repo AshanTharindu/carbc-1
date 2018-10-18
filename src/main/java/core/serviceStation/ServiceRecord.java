@@ -3,14 +3,14 @@ package core.serviceStation;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 
 public class ServiceRecord {
     private int record_id;
     private String vehicle_id;
-    private int cost;
     private Timestamp serviced_date;
-    private Service service;
+    private ArrayList<Service> services;
 
 
     public int getRecord_id() {
@@ -29,14 +29,6 @@ public class ServiceRecord {
         this.vehicle_id = vehicle_id;
     }
 
-    public int getCost() {
-        return cost;
-    }
-
-    public void setCost(int cost) {
-        this.cost = cost;
-    }
-
     public Timestamp getServiced_date() {
         return serviced_date;
     }
@@ -45,11 +37,14 @@ public class ServiceRecord {
         this.serviced_date = serviced_date;
     }
 
-    public Service getService() {
-        return service;
+    public ArrayList<Service> getService() {
+        return services;
     }
 
     public void setService(Service service) {
-        this.service = service;
+        if (services == null){
+            this.services = new ArrayList<>();
+        }
+        this.services.add(service);
     }
 }

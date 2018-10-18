@@ -5,7 +5,6 @@ import constants.Constants;
 import org.json.JSONObject;
 import utils.FileUtils;
 
-import javax.xml.crypto.Data;
 
 public class DatabaseConfig {
     private static final DatabaseConfig INSTANCE = new DatabaseConfig();
@@ -22,8 +21,9 @@ public class DatabaseConfig {
     }
 
     public void setConfigUsingResource() throws FileUtilityException {
-        String resourcePath = System.getProperty(Constants.CARBC_HOME)
-                + "/src/main/resources/db.json";
+//        String resourcePath = System.getProperty(Constants.CARBC_HOME)
+//                + "/src/main/resources/db.json";
+        String resourcePath = "/home/sajinie/Documents/fyp_stuff/CARbc/car-bc-extended/src/main/resources/db.json";
         this.dbConfig = new JSONObject(FileUtils.readFileContentAsText(resourcePath));
     }
 

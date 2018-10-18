@@ -1,8 +1,10 @@
-package core.serviceStation.client.http;
+package core.serviceStation.httpServer.http;
 
 import com.google.common.cache.Cache;
 import com.google.common.io.Resources;
+import core.serviceStation.Service;
 import core.serviceStation.ServiceRecord;
+import core.serviceStation.ServiceType;
 import core.serviceStation.dao.ServiceJDBCDAO;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -11,11 +13,12 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Map;
+import java.sql.Timestamp;
 
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -70,6 +73,14 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             if (msg.method().equals(HttpMethod.POST)){
                 getVehicleInfo(ctx, msg);
             }
+        }else if (msg.uri().equals("/serviceStation/setServiceType")) {
+            if (msg.method().equals(HttpMethod.POST)){
+                setServiceTypes(ctx, msg);
+            }
+        }else if (msg.uri().equals("/serviceStation/registerCustomer")) {
+            if (msg.method().equals(HttpMethod.POST)){
+//                setServiceTypes(ctx, msg);
+            }
         } else {
             serveStatic(ctx, msg.uri());
         }
@@ -77,18 +88,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     }
 
     private void storeServiceData(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        int num = 0;
-        for (Map.Entry<Long, String> entry : dataCache.asMap().entrySet()) {
-            sb.append(entry.getValue());
-            num++;
-            if (num < dataCache.asMap().size()) {
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-
         //decode request
         ByteBuf data = msg.content();
         int readableBytes = data.readableBytes();
@@ -100,15 +99,25 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
         ServiceRecord serviceRecord = new ServiceRecord();
         serviceRecord.setVehicle_id(jsonObject.getString("vehicleId"));
-//        serviceRecord.setServiced_date();
+        serviceRecord.setServiced_date(new Timestamp(System.currentTimeMillis()));
+        JSONArray services = jsonObject.getJSONArray("services");
 
+        for (int i = 0; i < services.length(); i++){
+            JSONObject serviceObject = (JSONObject) services.get(i);
+            int serviceId = serviceObject.getInt("serviceId");
+            String sparePartSerialNumber = serviceObject.getString("sparePartSerialNumber");
+            int cost = serviceObject.getInt("cost");
+            Service service = new Service(serviceId, sparePartSerialNumber, cost);
+
+            serviceRecord.setService(service);
+        }
 
         ServiceJDBCDAO.getInstance().addServiceRecord(serviceRecord);
 
-
+        //writing response
         ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
         ctx.write(response);
     }
@@ -123,15 +132,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         JSONObject jsonObject = new JSONObject(body);
         System.out.println(jsonObject);
 
-        String vehicleNumber = jsonObject.getString("vehicleNumber");
+        String vehicleNumber = jsonObject.getString("vehicleId");
         String date = jsonObject.getString("date");
-;
-//        JSONObject vehicleData = ServiceJDBCDAO.getInstance().getServiceRecords(vehicleNumber);
-        JSONObject j = new JSONObject();
-        j.put("key", "value");
 
-        String stringVehicleDara = j.toString();
-//        String stringVehicleDara = vehicleData.toString();
+        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getAllServiceRecords(vehicleNumber);
+        String stringVehicleDara = vehicleData.toString();
 
         try {
             byte[] raw = stringVehicleDara.getBytes(StandardCharsets.UTF_8);
@@ -153,6 +158,29 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 //        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
 //        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
 //        ctx.write(response);
+    }
+
+    private void setServiceTypes(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+        //decode request
+        ByteBuf data = msg.content();
+        int readableBytes = data.readableBytes();
+        String body = data.toString(StandardCharsets.UTF_8);
+
+        //convert the text to JSON object from here.
+        JSONObject jsonObject = new JSONObject(body);
+        System.out.println(jsonObject);
+
+        String serviceType = jsonObject.getString("serviceType");
+
+        ServiceType serviceTypeObject = new ServiceType(serviceType);
+        ServiceJDBCDAO.getInstance().addServiceType(serviceTypeObject);
+
+        //writing response
+        ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        ctx.write(response);
     }
 
     private void serveStatic(ChannelHandlerContext ctx, String path) throws Exception {

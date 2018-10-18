@@ -1,8 +1,8 @@
-package core.serviceStation.client;
+package core.serviceStation.httpServer;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import core.serviceStation.client.http.HttpServerInitializer;
+import core.serviceStation.httpServer.http.HttpServerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -20,7 +20,6 @@ public class Server {
         Cache<Long, String> dataCache = CacheBuilder.newBuilder()
                 .maximumSize(60)
                 .build();
-
 
         EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
 
