@@ -6,7 +6,7 @@
   },
   "ServiceRepair":{
     "id": 2,
-    "params":{"vehicleId":"","location":"","repairInfo":{"vehicle_id":"", "cost":"", "serviced_date":"", "service_type":"", "spare_part":""}, "secondaryParty":{"ServiceStation":{"name": "Janashakthi", "address":"address"}}, "ThirdParty":{"SparePartProvider":["address1", "address2"]}},
+    "params":{"vehicleId":"", "repairInfo":{"cost":"", "serviced_date":"", "service_type":"", "spare_part":""}, "secondaryParty":{"ServiceStation":{"name": "Janashakthi", "address":"address"}}, "ThirdParty":{"SparePartProvider":["address1", "address2"]}},
     "mandatoryValidators": ["ServiceStation"]
   },
   "Insure":{
