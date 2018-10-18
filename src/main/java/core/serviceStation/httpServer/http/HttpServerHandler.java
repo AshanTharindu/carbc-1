@@ -2,6 +2,7 @@ package core.serviceStation.httpServer.http;
 
 import com.google.common.cache.Cache;
 import com.google.common.io.Resources;
+import controller.Controller;
 import core.serviceStation.Service;
 import core.serviceStation.ServiceRecord;
 import core.serviceStation.ServiceType;
@@ -78,6 +79,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 setServiceTypes(ctx, msg);
             }
         }else if (msg.uri().equals("/serviceStation/registerCustomer")) {
+            if (msg.method().equals(HttpMethod.POST)){
+//                setServiceTypes(ctx, msg);
+            }
+        }else if (msg.uri().equals("/serviceStation/confirmTransaction")) {
             if (msg.method().equals(HttpMethod.POST)){
 //                setServiceTypes(ctx, msg);
             }
@@ -174,6 +179,28 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
         ServiceType serviceTypeObject = new ServiceType(serviceType);
         ServiceJDBCDAO.getInstance().addServiceType(serviceTypeObject);
+
+        //writing response
+        ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        ctx.write(response);
+    }
+
+    private void sendTransactionConfirmation(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+        //decode request
+        ByteBuf data = msg.content();
+        int readableBytes = data.readableBytes();
+        String body = data.toString(StandardCharsets.UTF_8);
+
+        //convert the text to JSON object from here.
+        JSONObject jsonObject = new JSONObject(body);
+        System.out.println(jsonObject);
+
+        String blockHash = jsonObject.getString("blockHash");
+        Controller controller = new Controller();
+        controller.sendConfirmation(blockHash);
 
         //writing response
         ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);
