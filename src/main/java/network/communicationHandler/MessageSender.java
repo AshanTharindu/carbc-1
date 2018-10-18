@@ -140,7 +140,7 @@ public class MessageSender {
         RequestMessage blockMessage = MessageCreator.createMessage(jsonObject,"BlockBroadcast");
         blockMessage.addHeader("keepActive", "false");
         blockMessage.addHeader("messageType", "BlockBroadcast");
-        Node.getInstance().sendMessageToPeer("192.168.8.102",42761, blockMessage);
+        Node.getInstance().sendMessageToPeer("192.168.8.102",49211, blockMessage);
     }
 
     public static void sendAgreement(String signedBlock, String blockHash) {

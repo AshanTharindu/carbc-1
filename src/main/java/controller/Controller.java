@@ -29,7 +29,7 @@ public class Controller {
     public void sendTransaction(String transactionType, String event, String data) throws ParseException {
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
         String nodeID = Node.getInstance().getNodeConfig().getNodeID();
-        Transaction transaction = new Transaction(transactionType,sender,event, data, nodeID);
+        Transaction transaction = new Transaction(transactionType, sender, event, data, nodeID);
 
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
