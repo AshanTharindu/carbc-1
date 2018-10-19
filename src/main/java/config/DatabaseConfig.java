@@ -24,12 +24,12 @@ public class DatabaseConfig {
 //        String resourcePath = System.getProperty(Constants.CARBC_HOME)
 //                + "/src/main/resources/db.json";
 
-        DatabaseConfig databaseConfig = DatabaseConfig.getInstance();
-        databaseConfig.setConfigUsingResource();
-        JSONObject dbDetail = databaseConfig.getDBJson();
-        String resourcePath = dbDetail.getString("path");
+//        DatabaseConfig databaseConfig = DatabaseConfig.getInstance();
+//        databaseConfig.setConfigUsingResource();
+//        JSONObject dbDetail = databaseConfig.getDBJson();
+//        String resourcePath = dbDetail.getString("path");
 
-//        String resourcePath = "/home/sajinie/Documents/fyp_stuff/CARbc/car-bc-extended/src/main/resources/db.json";
+        String resourcePath = "/home/sajinie/Documents/fyp_stuff/CARbc/car-bc-extended/src/main/resources/db.json";
         this.dbConfig = new JSONObject(FileUtils.readFileContentAsText(resourcePath));
     }
 

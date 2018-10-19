@@ -1,20 +1,14 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
-import core.blockchain.Block;
-import core.blockchain.Blockchain;
-import core.connection.BlockJDBCDAO;
 import core.serviceStation.webSocketServer.BroadcastServer;
 import network.Node;
 import org.slf4j.impl.SimpleLogger;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class BlockAddingTest {
     public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, InterruptedException {

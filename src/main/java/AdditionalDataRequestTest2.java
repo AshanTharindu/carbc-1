@@ -71,6 +71,6 @@ public class AdditionalDataRequestTest2 {
         BlockHeader blockHeader = new BlockHeader(blockHash);
         Block block = new Block(blockHeader, blockBody);
 
-        DataCollector.getInstance().requestAdditionalData(block);
+//        DataCollector.getInstance().requestAdditionalData(block);
     }
 }

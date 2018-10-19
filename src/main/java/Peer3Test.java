@@ -1,19 +1,8 @@
 
-import chainUtil.ChainUtil;
-import chainUtil.KeyGenerator;
 import config.CommonConfigHolder;
 import constants.Constants;
-import controller.Controller;
-import core.blockchain.Block;
-import core.blockchain.BlockBody;
-import core.blockchain.BlockHeader;
-import core.blockchain.Transaction;
-import core.consensus.Consensus;
 import core.serviceStation.webSocketServer.BroadcastServer;
-import core.serviceStation.webSocketServer.Test;
 import network.Node;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.BufferedReader;

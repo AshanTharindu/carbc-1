@@ -151,7 +151,7 @@ public class ServiceJDBCDAO {
 
 
     //return service details by vehicle number
-    public JSONObject getLastServiceRecord(String vehicle_id) throws SQLException {
+    public JSONObject getAllServiceRecords(String vehicle_id) throws SQLException {
         String queryString = "SELECT s.record_id, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
                 " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
@@ -203,7 +203,7 @@ public class ServiceJDBCDAO {
     }
 
     //return service details by vehicle number
-    public JSONArray getAllServiceRecords(String vehicle_id) throws SQLException {
+    public JSONArray getLastServiceRecord(String vehicle_id) throws SQLException {
         String queryString = "SELECT s.record_id, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
                 " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
