@@ -182,8 +182,9 @@ public class Consensus extends Observable {
                 String publicKey = body.getString("publicKey");
                 String role = body.getString("role");
                 String name = body.getString("name");
+                String location = body.getString("location");
 
-                identity = new Identity(block.getBlockHeader().getHash(), publicKey, role, name);
+                identity = new Identity(block.getBlockHeader().getHash(), publicKey, role, name, location);
             }
             //TODO: need to check that this is the right block to add based on the previous hash
             BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
