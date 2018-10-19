@@ -80,5 +80,86 @@
       "name":"",
       "location":""
     }
-  ]
+  ],
+  "data":{
+    "vehicleId":"",
+    "insuranceCompanyPublicKey":"",
+    "insuranceCompanyName":"",
+    "insuranceNumber":""
+  },
+  "data":{
+    "vehicleId":"",
+    "leasingCompanyName":"",
+    "leasingCompanyPublicKey":"",
+    "leaseNumber":""
+  },
+  "data":{
+    "vehicleId":"",
+    "serviceStation":"",
+    "serviceStationPublicKey":""
+  },
+  "data":{
+    "vehicle_id": "22222A",
+    "serviced_date": "2018-10-19 13:55:05.0",
+    "cost": "",
+    "services": [
+      {
+        "serviceType": "Change the engine oil",
+        "serviceData": [
+          {
+            "seller": "Theshan Ranasinghe",
+            "sparePart": "Break Oil"
+          },
+          {
+            "seller": "Madhushika Jayasinghe",
+            "sparePart": "head lights"
+          }
+        ]
+      },
+      {
+        "serviceType": "Check level and refill Automatic/Manual Transmission Fluid",
+        "serviceData": [
+          {
+            "seller": "Ashan Dewasiri",
+            "sparePart": "tire"
+          },
+          {
+            "seller": "Sajinie Ranasinghe",
+            "sparePart": "AC"
+          }
+        ]
+      }
+    ]
+  },
+  "data":{
+    "vehicle_id": "22222A",
+    "insured_date": "2018-10-19 13:55:05.0",
+    "insurance_type": "",
+    "insurance_number": "",
+    "valid_from":"",
+    "valid_to":"",
+    "SecondaryParty": {
+      "InsuranceCompany": {
+        "name":"",
+        "publicKey":""
+      }
+    },
+    "ThirdParty": {}
+  },
+  "data":{
+    "vehicle_id": "22222A",
+    "leased_date": "2018-10-19 13:55:05.0",
+    "lease_type": "",
+    "lease_number": "",
+    "valid_from":"",
+    "valid_to":"",
+    "SecondaryParty": {
+      "LeasingCompany": {
+        "name":"",
+        "publicKey":""
+      }
+    },
+    "ThirdParty": {}
+  }
+
 }
