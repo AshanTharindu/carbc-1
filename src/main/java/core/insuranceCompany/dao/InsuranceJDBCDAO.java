@@ -91,10 +91,11 @@ public class InsuranceJDBCDAO {
 
     }
 
-    public JSONObject getVehicleInfo(String vehicleId) throws SQLException {
-        String query = "SELECT `record_id`, `vehicle_id`, `insured_data`, `insurance_id`, " +
-                "`insurance_number`, `valid_from`, `valid_to` FROM `InsuranceRecord` ir JOIN " +
-                "`InsuranceType` it ON ir.insurance_id = it.insurance_id WHERE `vehicle_id` = ?";
+    public JSONObject getVehicleInsuranceRecords(String vehicleId, String insuranceNumber) throws SQLException {
+        String query = "SELECT `record_id`, `vehicle_id`, `insured_date`, `insurance_number`, " +
+                "insurance_type, `valid_from`, `valid_to` FROM `InsuranceRecord` ir JOIN " +
+                "`InsuranceType` it ON ir.insurance_id = it.insurance_id WHERE `vehicle_id` = ? AND " +
+                "`insurance_number` = ?";
 
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
@@ -104,10 +105,16 @@ public class InsuranceJDBCDAO {
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(query);
             ptmt.setString(1, vehicleId);
+            ptmt.setString(2, insuranceNumber);
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
-                //TODO
+                insuranceRecord.put("vehicle_id", resultSet.getString("vehicle_id"));
+                insuranceRecord.put("insured_date", resultSet.getTimestamp("insured_date"));
+                insuranceRecord.put("insurance_number", resultSet.getString("vehicle_id"));
+                insuranceRecord.put("insurance_type", resultSet.getString("insurance_type"));
+                insuranceRecord.put("valid_from", resultSet.getString("valid_from"));
+                insuranceRecord.put("valid_to", resultSet.getString("valid_to"));
             }
 
         } catch (SQLException e) {

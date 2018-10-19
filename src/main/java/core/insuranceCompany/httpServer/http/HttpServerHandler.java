@@ -6,10 +6,6 @@ import controller.Controller;
 import core.insuranceCompany.InsuranceRecord;
 import core.insuranceCompany.InsuranceType;
 import core.insuranceCompany.dao.InsuranceJDBCDAO;
-import core.serviceStation.Service;
-import core.serviceStation.ServiceRecord;
-import core.serviceStation.ServiceType;
-import core.serviceStation.dao.ServiceJDBCDAO;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,7 +13,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -123,22 +118,23 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         System.out.println(jsonObject);
 
         String vehicleNumber = jsonObject.getString("vehicleId");
+        String insuranceNumber = jsonObject.getString("insuranceNumber");
 
-//        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getAllServiceRecords(vehicleNumber);
-//        String stringVehicleDara = vehicleData.toString();
-//
-//        try {
-//            byte[] raw = stringVehicleDara.getBytes(StandardCharsets.UTF_8);
-//            ByteBuf content = Unpooled.wrappedBuffer(raw);
-//
-//            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-//            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
-//            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-//            ctx.write(response);
-//        } catch (IllegalArgumentException ex) {
-//            ex.printStackTrace();
-//            serve404(ctx);
-//        }
+        JSONObject jsonInsuranceRecord = InsuranceJDBCDAO.getInstance().getVehicleInsuranceRecords(vehicleNumber, insuranceNumber);
+        String stringInsuranceRecord = jsonInsuranceRecord.toString();
+
+        try {
+            byte[] raw = stringInsuranceRecord.getBytes(StandardCharsets.UTF_8);
+            ByteBuf content = Unpooled.wrappedBuffer(raw);
+
+            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+            ctx.write(response);
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+            serve404(ctx);
+        }
     }
 
     private void setInsuranceTypes(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {

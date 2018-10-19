@@ -39,7 +39,6 @@ public class WebSocketMessageHandler extends SimpleChannelInboundHandler<WebSock
 
     private static final ChannelGroup allChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-//    private static final Channel chnnl = new Defa
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
