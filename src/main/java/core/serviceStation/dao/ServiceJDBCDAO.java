@@ -156,7 +156,7 @@ public class ServiceJDBCDAO {
 
     //return service details by vehicle number
     public JSONObject getLastServiceRecord(String vehicle_id) throws SQLException {
-        String queryString = "SELECT s.record_id, `vehicle_id`, `serviced_date`, `service_type`," +
+        String queryString = "SELECT s.record_id, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
                 " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
                 "ON s.service_id = st.service_id LEFT JOIN `SparePart` sp " +
@@ -186,6 +186,7 @@ public class ServiceJDBCDAO {
                     int recordId = resultSet.getInt(1);
                     serviceRecord.put("vehicle_id", resultSet.getString("vehicle_id"));
                     serviceRecord.put("serviced_date", resultSet.getTimestamp("serviced_date"));
+                    serviceRecord.put("cost", resultSet.getInt("cost"));
                     count = 1;
                 }
 
