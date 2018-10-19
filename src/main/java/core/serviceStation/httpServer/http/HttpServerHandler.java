@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -70,9 +71,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             if (msg.method().equals(HttpMethod.POST)){
                 storeServiceData(ctx, msg);
             }
-        }else if (msg.uri().equals("/serviceStation/getVehicleInfo")) {
+        }else if (msg.uri().equals("/serviceStation/getVehicleServiceRecord")) {
             if (msg.method().equals(HttpMethod.POST)){
-                getVehicleInfo(ctx, msg);
+                getVehicleServiceRecords(ctx, msg);
             }
         }else if (msg.uri().equals("/serviceStation/setServiceType")) {
             if (msg.method().equals(HttpMethod.POST)){
@@ -114,9 +115,17 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         for (int i = 0; i < services.length(); i++){
             JSONObject serviceObject = (JSONObject) services.get(i);
             int serviceId = serviceObject.getInt("serviceId");
-            String sparePartSerialNumber = serviceObject.getString("sparePartSerialNumber");
-            int cost = serviceObject.getInt("cost");
-            Service service = new Service(serviceId, sparePartSerialNumber, cost);
+            JSONArray sparePartSerialNumber = serviceObject.getJSONArray("sparePartSerialNumber");
+            ArrayList<String> spareParts = new ArrayList<>();
+
+            if (sparePartSerialNumber.length()>0){
+                for (int k = 0; k < sparePartSerialNumber.length(); k++){
+                    spareParts.add((String) sparePartSerialNumber.get(k));
+                }
+            }
+            Service service = new Service(serviceId, spareParts);
+
+//            Service service = new Service(serviceId, sparePartSerialNumber, cost);
 
             serviceRecord.setService(service);
         }
@@ -131,7 +140,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         ctx.write(response);
     }
 
-    private void getVehicleInfo(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+    private void getVehicleServiceRecords(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
         //decode request
         ByteBuf data = msg.content();
         int readableBytes = data.readableBytes();
@@ -144,7 +153,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         String vehicleNumber = jsonObject.getString("vehicleId");
         String date = jsonObject.getString("date");
 
-        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getAllServiceRecords(vehicleNumber);
+//        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getAllServiceRecords(vehicleNumber);
+        JSONObject vehicleData = ServiceJDBCDAO.getInstance().getLastServiceRecord(vehicleNumber);
         String stringVehicleDara = vehicleData.toString();
 
         try {

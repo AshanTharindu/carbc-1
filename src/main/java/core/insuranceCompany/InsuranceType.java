@@ -4,6 +4,12 @@ public class InsuranceType {
     private String insurance_id;
     private String insurance_type;
 
+    public InsuranceType(){}
+
+    public InsuranceType(String insurance_type){
+        this.insurance_type = insurance_type;
+    }
+
     public String getInsurance_id() {
         return insurance_id;
     }

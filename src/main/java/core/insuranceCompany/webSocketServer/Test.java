@@ -1,4 +1,4 @@
-package core.serviceStation.webSocketServer;
+package core.insuranceCompany.webSocketServer;
 
 import chainUtil.ChainUtil;
 import chainUtil.KeyGenerator;

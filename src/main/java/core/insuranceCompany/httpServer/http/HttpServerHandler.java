@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.io.Resources;
 import controller.Controller;
 import core.insuranceCompany.InsuranceRecord;
+import core.insuranceCompany.InsuranceType;
 import core.insuranceCompany.dao.InsuranceJDBCDAO;
 import core.serviceStation.Service;
 import core.serviceStation.ServiceRecord;
@@ -57,17 +58,21 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             if (msg.method().equals(HttpMethod.POST)){
                 storeInsuranceData(ctx, msg);
             }
-        }else if (msg.uri().equals("/insuranceCompany/getVehicleInfo")) {
+        }else if (msg.uri().equals("/insuranceCompany/getVehicleInsuranceRecord")) {
             if (msg.method().equals(HttpMethod.POST)){
-                getVehicleInfo(ctx, msg);
+                getVehicleInsuranceRecord(ctx, msg);
             }
-        }else if (msg.uri().equals("/insuranceCompany/setServiceType")) {
+        }else if (msg.uri().equals("/insuranceCompany/setInsuranceType")) {
             if (msg.method().equals(HttpMethod.POST)){
-                setServiceTypes(ctx, msg);
+                setInsuranceTypes(ctx, msg);
             }
         }else if (msg.uri().equals("/insuranceCompany/registerCustomer")) {
-            if (msg.method().equals(HttpMethod.POST)){
+            if (msg.method().equals(HttpMethod.POST)) {
 //                setServiceTypes(ctx, msg);
+            }
+        }else if (msg.uri().equals("/insuranceCompany/confirmTransaction")) {
+            if (msg.method().equals(HttpMethod.POST)){
+                sendTransactionConfirmation(ctx, msg);
             }
         } else {
             serveStatic(ctx, msg.uri());
@@ -107,7 +112,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         ctx.write(response);
     }
 
-    private void getVehicleInfo(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+    private void getVehicleInsuranceRecord(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
         //decode request
         ByteBuf data = msg.content();
         int readableBytes = data.readableBytes();
@@ -119,32 +124,24 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
         String vehicleNumber = jsonObject.getString("vehicleId");
 
-        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getAllServiceRecords(vehicleNumber);
-        String stringVehicleDara = vehicleData.toString();
-
-        try {
-            byte[] raw = stringVehicleDara.getBytes(StandardCharsets.UTF_8);
-            ByteBuf content = Unpooled.wrappedBuffer(raw);
-
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-            ctx.write(response);
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-            serve404(ctx);
-        }
-
-//        StringBuilder sb = new StringBuilder();
+//        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getAllServiceRecords(vehicleNumber);
+//        String stringVehicleDara = vehicleData.toString();
 //
-//        ByteBuf content = Unpooled.copiedBuffer(sb.toString(), CharsetUtil.UTF_8);
-//        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-//        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
-//        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-//        ctx.write(response);
+//        try {
+//            byte[] raw = stringVehicleDara.getBytes(StandardCharsets.UTF_8);
+//            ByteBuf content = Unpooled.wrappedBuffer(raw);
+//
+//            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+//            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
+//            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+//            ctx.write(response);
+//        } catch (IllegalArgumentException ex) {
+//            ex.printStackTrace();
+//            serve404(ctx);
+//        }
     }
 
-    private void setServiceTypes(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+    private void setInsuranceTypes(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
         //decode request
         ByteBuf data = msg.content();
         int readableBytes = data.readableBytes();
@@ -154,10 +151,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         JSONObject jsonObject = new JSONObject(body);
         System.out.println(jsonObject);
 
-        String serviceType = jsonObject.getString("serviceType");
+        String insuranceType = jsonObject.getString("insuranceType");
 
-        ServiceType serviceTypeObject = new ServiceType(serviceType);
-        ServiceJDBCDAO.getInstance().addServiceType(serviceTypeObject);
+        InsuranceType insuranceTypeObject = new InsuranceType(insuranceType);
+        InsuranceJDBCDAO.getInstance().addInsuranceType(insuranceTypeObject);
 
         //writing response
         ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);
