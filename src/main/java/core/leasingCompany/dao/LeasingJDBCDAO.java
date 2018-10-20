@@ -1,4 +1,4 @@
-package core.insuranceCompany.dao;
+package core.leasingCompany.dao;
 
 import core.connection.ConnectionFactory;
 import core.insuranceCompany.InsuranceRecord;
@@ -7,22 +7,25 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class InsuranceJDBCDAO {
-    private static InsuranceJDBCDAO INSTANCE;
+public class LeasingJDBCDAO {
+    private static LeasingJDBCDAO INSTANCE;
     private static Object mutex = new Object();
 
-    private final Logger log = LoggerFactory.getLogger(InsuranceJDBCDAO.class);
+    private final Logger log = LoggerFactory.getLogger(LeasingJDBCDAO.class);
     Connection connection = null;
 
-    private InsuranceJDBCDAO(){}
+    private LeasingJDBCDAO(){}
 
-    public static InsuranceJDBCDAO getInstance() {
+    public static LeasingJDBCDAO getInstance() {
         if(INSTANCE == null){
             synchronized (mutex) {
                 if(INSTANCE == null){
-                    INSTANCE = new InsuranceJDBCDAO();
+                    INSTANCE = new LeasingJDBCDAO();
                 }
             }
         }

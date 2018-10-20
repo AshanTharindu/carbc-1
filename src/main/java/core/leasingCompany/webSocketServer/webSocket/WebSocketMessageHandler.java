@@ -1,4 +1,4 @@
-package core.insuranceCompany.webSocketServer.webSocket;
+package core.leasingCompany.webSocketServer.webSocket;
 
 import core.blockchain.Block;
 import core.connection.HistoryDAO;

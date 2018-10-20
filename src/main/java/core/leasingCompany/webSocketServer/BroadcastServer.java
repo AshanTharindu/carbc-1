@@ -1,6 +1,6 @@
-package core.insuranceCompany.webSocketServer;
+package core.leasingCompany.webSocketServer;
 
-import core.serviceStation.webSocketServer.webSocket.BroadcastServerInitializer;
+import core.leasingCompany.webSocketServer.webSocket.BroadcastServerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;

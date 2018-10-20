@@ -1,4 +1,4 @@
-package core.insuranceCompany.webSocketServer.webSocket;
+package core.leasingCompany.webSocketServer.webSocket;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

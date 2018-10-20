@@ -1,4 +1,4 @@
-package core.insuranceCompany.httpServer;
+package core.leasingCompany.httpServer;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
