@@ -67,7 +67,7 @@ public class ServiceJDBCDAO {
 
         try {
             String queryString = "INSERT INTO `ServiceRecord`( " +
-                    "`vehicle_id`, `serviced_date`) VALUES (?,?)";
+                    "`vehicle_id`, `serviced_date`, `cost`) VALUES (?,?,?)";
 
             ConnectionFactory connectionFactory = ConnectionFactory.getInstance();
             connection = connectionFactory.getConnection();
@@ -76,6 +76,7 @@ public class ServiceJDBCDAO {
 
             ptmt.setString(1, serviceRecord.getVehicle_id());
             ptmt.setTimestamp(2, serviceRecord.getServiced_date());
+            ptmt.setInt(3, serviceRecord.getCost());
             boolean succeed = ptmt.execute();
 
             log.debug("Vehicle id :{}. Status - inserted service record :{}",
@@ -230,74 +231,76 @@ public class ServiceJDBCDAO {
     }
 
     //return service details by vehicle number
-    public JSONArray getAllServiceRecords(String vehicle_id) throws SQLException {
+    public JSONArray getAllServiceRecords() throws SQLException {
 
         String queryString = "SELECT s.record_id, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
                 " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
                 "ON s.service_id = st.service_id LEFT JOIN `SparePart` sp " +
-                "ON s.spare_part_serial_number = sp.serial_number " +
-                "WHERE `vehicle_id` = ?";
+                "ON s.spare_part_serial_number = sp.serial_number LIMIT 10";
 
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
         JSONArray serviceArray = new JSONArray();
-        JSONObject serviceRecord = new JSONObject();
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(queryString);
-            ptmt.setString(1, vehicle_id);
             resultSet = ptmt.executeQuery();
 
-//            JSONArray arr = new JSONArray();
-            JSONArray services = new JSONArray();
-            JSONArray serviceTypeArray = new JSONArray();
-            JSONObject service = new JSONObject();
-            int recordId = -1;
-            int count1 = 0;
-            int count2 = 0;
-            String temp = "";
+            serviceArray = formatServiceRecords(resultSet);
 
-            while (resultSet.next()){
-                if (recordId != resultSet.getInt(1)){
-                    if (count1 != 0){
-                        serviceRecord.put("services", services);
-                        services = new JSONArray();
-                        serviceArray.put(serviceRecord);
-                    }
-                    count1++;
-                    serviceRecord = new JSONObject();
-                    recordId = resultSet.getInt(1);
-                    serviceRecord.put("vehicleId", resultSet.getString("vehicle_id"));
-                    serviceRecord.put("servicedDate", resultSet.getTimestamp("serviced_date"));
-                }
-
-                String serviceType = resultSet.getString("service_type");
-
-                if (!temp.equals(serviceType)){
-                    if (count2 != 0){
-                        service.put("serviceData", serviceTypeArray);
-                        serviceTypeArray = new JSONArray();
-                        services.put(service);
-                    }
-                    count2++;
-                    service = new JSONObject();
-                    service.put("serviceType", serviceType);
-
-                }
-                JSONObject serviceData = new JSONObject();
-                serviceData.put("sparePart", resultSet.getString("spare_part"));
-                serviceData.put("seller", resultSet.getString("seller"));
-                serviceTypeArray.put(serviceData);
-
-
-                temp = serviceType;
-            }
-            service.put("serviceData", serviceTypeArray);
-            services.put(service);
-            serviceRecord.put("services", services);
-            serviceArray.put(serviceRecord);
+//            JSONArray services = new JSONArray();
+//            JSONArray serviceTypeArray = new JSONArray();
+//            JSONObject service = new JSONObject();
+//            int recordId = -1;
+//            int count1 = 0;
+//            int count2 = 0;
+//            String temp = "";
+//
+//            while (resultSet.next()){
+//                if (recordId != resultSet.getInt(1)){
+//                    if (count1 != 0){
+//                        service.put("serviceData", serviceTypeArray);
+//                        serviceTypeArray = new JSONArray();
+//                        services.put(service);
+//                        serviceRecord.put("services", services);
+//                        services = new JSONArray();
+//                        serviceArray.put(serviceRecord);
+//                        count2 = 0;
+//                    }
+//                    count1++;
+//                    serviceRecord = new JSONObject();
+//                    recordId = resultSet.getInt(1);
+//                    serviceRecord.put("vehicleId", resultSet.getString("vehicle_id"));
+//                    serviceRecord.put("servicedDate", resultSet.getTimestamp("serviced_date"));
+//                }
+//
+//                String serviceType = resultSet.getString("service_type");
+//
+//                if (!temp.equals(serviceType)){
+//                    if (count2 != 0){
+//                        service.put("serviceData", serviceTypeArray);
+//                        serviceTypeArray = new JSONArray();
+//                        services.put(service);
+//                    }
+//                    count2++;
+//                    service = new JSONObject();
+//                    service.put("serviceType", serviceType);
+//
+//                }
+//                JSONObject serviceData = new JSONObject();
+//                serviceData.put("sparePart", resultSet.getString("spare_part"));
+//                serviceData.put("seller", resultSet.getString("seller"));
+//                serviceTypeArray.put(serviceData);
+//
+//
+//                temp = serviceType;
+//            }
+//            service.put("serviceData", serviceTypeArray);
+//            services.put(service);
+//            serviceRecord.put("services", services);
+//            serviceArray.put(serviceRecord);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -341,5 +344,100 @@ public class ServiceJDBCDAO {
             return publicKey;
         }
 
+    }
+
+
+    public JSONArray getServiceRecordsPerVehicle(String vehicleId) throws SQLException {
+
+        String queryString = "SELECT s.record_id, `vehicle_id`, `cost`, `serviced_date`, `service_type`," +
+                " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
+                "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
+                "ON s.service_id = st.service_id LEFT JOIN `SparePart` sp " +
+                "ON s.spare_part_serial_number = sp.serial_number " +
+                "WHERE `vehicle_id` = ?";
+
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        JSONArray serviceArray = new JSONArray();
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, vehicleId);
+            resultSet = ptmt.executeQuery();
+
+            serviceArray = formatServiceRecords(resultSet);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return serviceArray;
+        }
+    }
+
+    public JSONArray formatServiceRecords(ResultSet resultSet) throws SQLException {
+        JSONArray serviceArray = new JSONArray();
+        JSONObject serviceRecord = new JSONObject();
+        JSONArray services = new JSONArray();
+        JSONArray serviceTypeArray = new JSONArray();
+        JSONObject service = new JSONObject();
+        int recordId = -1;
+        int count1 = 0;
+        int count2 = 0;
+        String temp = "";
+
+        while (resultSet.next()){
+            if (recordId != resultSet.getInt(1)){
+                if (count1 != 0){
+                    service.put("serviceData", serviceTypeArray);
+                    serviceTypeArray = new JSONArray();
+                    services.put(service);
+                    serviceRecord.put("services", services);
+                    services = new JSONArray();
+                    serviceArray.put(serviceRecord);
+                    count2 = 0;
+                }
+                count1++;
+                serviceRecord = new JSONObject();
+                recordId = resultSet.getInt(1);
+                serviceRecord.put("vehicleId", resultSet.getString("vehicle_id"));
+                serviceRecord.put("servicedDate", resultSet.getTimestamp("serviced_date"));
+            }
+
+            String serviceType = resultSet.getString("service_type");
+
+            if (!temp.equals(serviceType)){
+                if (count2 != 0){
+                    service.put("serviceData", serviceTypeArray);
+                    serviceTypeArray = new JSONArray();
+                    services.put(service);
+                }
+                count2++;
+                service = new JSONObject();
+                service.put("serviceType", serviceType);
+
+            }
+            JSONObject serviceData = new JSONObject();
+            serviceData.put("sparePart", resultSet.getString("spare_part"));
+            serviceData.put("seller", resultSet.getString("seller"));
+            serviceTypeArray.put(serviceData);
+
+
+            temp = serviceType;
+        }
+        service.put("serviceData", serviceTypeArray);
+        services.put(service);
+        serviceRecord.put("services", services);
+        serviceArray.put(serviceRecord);
+
+        return serviceArray;
     }
 }

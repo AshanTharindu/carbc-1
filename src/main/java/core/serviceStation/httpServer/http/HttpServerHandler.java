@@ -17,6 +17,7 @@ import io.netty.util.CharsetUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -46,7 +47,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             return;
         }
 
-//        HttpMethod HttpPMethod = msg.method();
+        HttpMethod HttpPMethod = msg.method();
+        System.out.println(msg);
+        System.out.println(HttpPMethod);
 //
 //
 //        System.out.println("Recieved request!");
@@ -71,9 +74,29 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             if (msg.method().equals(HttpMethod.POST)){
                 storeServiceData(ctx, msg);
             }
-        }else if (msg.uri().equals("/serviceStation/getVehicleServiceRecord")) {
+        }else if (msg.uri().equals("/serviceStation/getLastVehicleServiceRecord")) {
+//            getVehicleServiceRecords(ctx, msg);
+            if (msg.method().equals(HttpMethod.OPTIONS)){
+                resolvePrefightedRequests(ctx, msg);
+            }
             if (msg.method().equals(HttpMethod.POST)){
-                getVehicleServiceRecords(ctx, msg);
+                getLastVehicleServiceRecord(ctx, msg);
+            }
+        }else if (msg.uri().equals("/serviceStation/getServiceRecords")) {
+//            getVehicleServiceRecords(ctx, msg);
+            if (msg.method().equals(HttpMethod.OPTIONS)){
+                resolvePrefightedRequests(ctx, msg);
+            }
+            if (msg.method().equals(HttpMethod.POST)){
+                getServiceRecords(ctx, msg);
+            }
+        }else if (msg.uri().equals("/serviceStation/getServiceRecordsPerVehicle")) {
+//            getVehicleServiceRecords(ctx, msg);
+            if (msg.method().equals(HttpMethod.OPTIONS)){
+                resolvePrefightedRequests(ctx, msg);
+            }
+            if (msg.method().equals(HttpMethod.POST)){
+                getServiceRecordsPerVehicle(ctx, msg);
             }
         }else if (msg.uri().equals("/serviceStation/setServiceType")) {
             if (msg.method().equals(HttpMethod.POST)){
@@ -97,11 +120,12 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     }
 
-    private void storeServiceData(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+    private void storeServiceData(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException, UnsupportedEncodingException {
         //decode request
         ByteBuf data = msg.content();
         int readableBytes = data.readableBytes();
         String body = data.toString(StandardCharsets.UTF_8);
+
 
         //convert the text to JSON object from here.
         JSONObject jsonObject = new JSONObject(body);
@@ -140,14 +164,15 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         ctx.write(response);
     }
 
-    private void getVehicleServiceRecords(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+    private void getLastVehicleServiceRecord(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException, UnsupportedEncodingException {
         //decode request
         ByteBuf data = msg.content();
         int readableBytes = data.readableBytes();
         String body = data.toString(StandardCharsets.UTF_8);
+        String result = java.net.URLDecoder.decode(body, "UTF-8");
 
-        //convert the text to JSON object from here.
-        JSONObject jsonObject = new JSONObject(body);
+        JSONObject jsonObject = new JSONObject(result);
+//        JSONObject jsonObject = new JSONObject(result.split("=")[1]);
         System.out.println(jsonObject);
 
         String vehicleNumber = jsonObject.getString("vehicleId");
@@ -155,28 +180,39 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
 //        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getAllServiceRecords(vehicleNumber);
         JSONObject vehicleData = ServiceJDBCDAO.getInstance().getLastServiceRecord(vehicleNumber);
-        String stringVehicleDara = vehicleData.toString();
+        String stringVehicleData = vehicleData.toString();
 
-        try {
-            byte[] raw = stringVehicleDara.getBytes(StandardCharsets.UTF_8);
-            ByteBuf content = Unpooled.wrappedBuffer(raw);
+        writeResponse(ctx, stringVehicleData);
+    }
 
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-            ctx.write(response);
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-            serve404(ctx);
-        }
+    private void getServiceRecords(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+        //decode request
+        ByteBuf data = msg.content();
+        int readableBytes = data.readableBytes();
+        String body = data.toString(StandardCharsets.UTF_8);
 
-//        StringBuilder sb = new StringBuilder();
-//
-//        ByteBuf content = Unpooled.copiedBuffer(sb.toString(), CharsetUtil.UTF_8);
-//        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-//        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
-//        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-//        ctx.write(response);
+        JSONObject jsonObject = new JSONObject(body);
+        System.out.println(jsonObject);
+        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getAllServiceRecords();
+        String stringVehicleData = vehicleData.toString();
+
+        writeResponse(ctx, stringVehicleData);
+
+    }
+
+    private void getServiceRecordsPerVehicle(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+        //decode request
+        ByteBuf data = msg.content();
+        String body = data.toString(StandardCharsets.UTF_8);
+
+        JSONObject jsonObject = new JSONObject(body);
+        System.out.println(jsonObject);
+        String vehicleNumber = jsonObject.getString("vehicleId");
+        JSONArray vehicleData = ServiceJDBCDAO.getInstance().getServiceRecordsPerVehicle(vehicleNumber);
+        String stringVehicleData = vehicleData.toString();
+
+        writeResponse(ctx, stringVehicleData);
+
     }
 
     private void setServiceTypes(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
@@ -266,8 +302,36 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     private void serve404(ChannelHandlerContext ctx) {
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
-        response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, 0);
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
         ctx.write(response);
+    }
+
+    private void resolvePrefightedRequests(ChannelHandlerContext ctx, FullHttpRequest msg){
+        //writing response
+        ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+        response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, "POST");
+        response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, "Content-Type");
+//        response.headers().set(HttpHeaderNames.ACCESS_CONTROL_MAX_AGE, "86400");
+        ctx.write(response);
+    }
+
+    private void writeResponse(ChannelHandlerContext ctx, String stringVehicleData){
+        try {
+            byte[] raw = stringVehicleData.getBytes(StandardCharsets.UTF_8);
+            ByteBuf content = Unpooled.wrappedBuffer(raw);
+
+            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+            ctx.write(response);
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+            serve404(ctx);
+        }
     }
 
     @Override
