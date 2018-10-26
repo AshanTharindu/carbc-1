@@ -6,6 +6,7 @@ import config.EventConfigHolder;
 import core.blockchain.Block;
 import core.connection.BlockJDBCDAO;
 import core.connection.IdentityJDBC;
+import core.serviceStation.dao.ServiceJDBCDAO;
 import network.communicationHandler.MessageSender;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +39,6 @@ public class AgreementCollector extends Thread{
         this.block = block;
         this.agreements = new ArrayList<>();
         this.mandotaryAgreements = new Agreement[2]; //get from the block
-        this.rating = new Rating(block);
         this.blockJDBCDAO = new BlockJDBCDAO();
         this.identityJDBC = new IdentityJDBC();
         this.mandatoryValidators = new ArrayList<>();
@@ -60,6 +60,8 @@ public class AgreementCollector extends Thread{
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
 
+
+            //TODO: need to check whether parties are real or not before adding to the arrays
             switch (event){
                 case "ExchangeOwnership":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("NewOwner").getString("publicKey"));
@@ -68,21 +70,30 @@ public class AgreementCollector extends Thread{
                     break;
 
                 case "ServiceRepair":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("ServiceStation")
-                            .getString("publicKey"));
+                    String serviceStationPK = secondaryParties.getJSONObject("ServiceStation").getString("publicKey");
+                    if(serviceStationPK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
+                    }
+                    getMandatoryValidators().add(serviceStationPK);
                     for (int i = 0; i < thirdParties.length(); i++){
                         getSpecialValidators().add(thirdParties.getString(i));
                     }
                     break;
 
                 case "Insure":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("InsuranceCompany")
-                            .getString("publicKey"));
+                    String insurePK = secondaryParties.getJSONObject("InsuranceCompany").getString("publicKey");
+                    if(insurePK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
+                    }
+                    getMandatoryValidators().add(insurePK);
                     break;
 
                 case "Lease":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("LeasingCompany")
-                            .getString("publicKey"));
+                    String leasePK = secondaryParties.getJSONObject("LeasingCompany").getString("publicKey");
+                    if(leasePK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
+                    }
+                    getMandatoryValidators().add(leasePK);
                     break;
 
                 case "BankLoan":
@@ -96,14 +107,19 @@ public class AgreementCollector extends Thread{
                     break;
 
                 case "RegisterVehicle":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("RMV")
-                            .getString("publicKey"));
+                    String RMVPK = secondaryParties.getJSONObject("RMV").getString("publicKey");
+                    if(RMVPK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
+                    }
+                    getMandatoryValidators().add(RMVPK);
                     break;
 
                 case "RenewInsurance":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("InsuranceCompany")
-                            .getString("publicKey"));
-                    break;
+                    String insure_PK = secondaryParties.getJSONObject("InsuranceCompany").getString("publicKey");
+                    if(insure_PK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
+                    }
+                    getMandatoryValidators().add(insure_PK);
 
                 case "BuySpareParts":
                     getMandatoryValidators().add(secondaryParties.getJSONObject("SparePartProvider")
@@ -260,5 +276,17 @@ public class AgreementCollector extends Thread{
 
     public IdentityJDBC getIdentityJDBC() {
         return identityJDBC;
+    }
+
+    public void validateBlock() {
+        try {
+            String serviceData = ServiceJDBCDAO.getInstance().getAllServiceRecords(block.getBlockBody().getTransaction().getAddress()).toString();
+            if(block.getBlockBody().getTransaction().getData().equals(serviceData)) {
+                Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 }

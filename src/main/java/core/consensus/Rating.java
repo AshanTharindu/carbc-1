@@ -2,18 +2,24 @@ package core.consensus;
 
 import core.blockchain.Block;
 
+import java.util.ArrayList;
+
 public class Rating {
 
     private double value;
-    private Block block;
-    private String[] mandatoryValidators;
+    private int mandatory;
+    private int specialValidators;
+    private int other;
 
-    public Rating(Block block) {
-        this.block = block;
+    public Rating(String event, int mandatory, int specialValidators, int other) {
+        this.mandatory = mandatory;
+        this.specialValidators = specialValidators;
+        this.other = other;
         value = 0;
     }
 
-    public double reAdjustRating(Agreement agreement) {
+    public double calRating() {
+
         return value;
     }
 

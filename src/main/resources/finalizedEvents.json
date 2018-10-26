@@ -1,10 +1,7 @@
 {
   "data": {
-    "serviceType": "",
     "servicedDate": "",
-    "SparePartSerialNumber": "",
-    "SparePartShop": "",
-    "cost": "",
+    "cost": "hash",
     "SecondaryParty": {
       "serviceStation": {
         "name":"",
@@ -12,8 +9,36 @@
       }
     },
     "ThirdParty": {
-      "SparePartProvider":"address1"
-    }
+      "SparePartProvider":["address1", "address2"]
+    },
+    "services": [
+      {
+        "serviceType": "",
+        "serviceData": [
+          {
+            "SparePartSerialNumber": "",
+            "SparePartProvider": "address1"
+          },
+          {
+            "SparePartSerialNumber": "",
+            "SparePartProvider": "address2"
+          }
+        ]
+      },
+      {
+        "serviceType": "",
+        "serviceData": [
+          {insure_PK
+            "SparePartSerialNumber": "",
+            "SparePartProvider": ""
+          },
+          {
+            "SparePartSerialNumber": "",
+            "SparePartProvider": ""
+          }
+        ]
+      }
+    ]
   },
 
   "data": {

@@ -36,10 +36,6 @@ public class Block {
 
     public void broadcast(){}
 
-    public String getBlockHash(){
-        return ChainUtil.getInstance().getBlockHash(blockBody);
-    }
-
     public static JSONObject getBlockRepresentation(Block block){
         JSONObject jsonBlock = new JSONObject();
 
