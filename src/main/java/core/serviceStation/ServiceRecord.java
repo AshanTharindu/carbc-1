@@ -11,6 +11,7 @@ public class ServiceRecord {
     private String vehicle_id;
     private Timestamp serviced_date;
     private ArrayList<Service> services;
+    private int cost;
 
 
     public int getRecord_id() {
@@ -46,5 +47,13 @@ public class ServiceRecord {
             this.services = new ArrayList<>();
         }
         this.services.add(service);
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
     }
 }

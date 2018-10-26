@@ -11,8 +11,8 @@ public class notificationTest {
         /*
          * starting UI web socket communication
          */
-        BroadcastServer broadcastServer = new BroadcastServer();
-        broadcastServer.start();
+//        BroadcastServer broadcastServer = new BroadcastServer();
+//        broadcastServer.start();
 
 
     }

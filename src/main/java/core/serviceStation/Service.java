@@ -1,8 +1,11 @@
 package core.serviceStation;
 
+import java.util.ArrayList;
+
 public class Service {
     private int record_id;
     private int service_id;
+    private ArrayList<String> spareParts;
     private String spare_part_serial_number;
     private int cost;
 
@@ -12,6 +15,11 @@ public class Service {
         this.service_id = service_id;
         this.spare_part_serial_number = spare_part_serial_number;
         this.cost = cost;
+    }
+
+    public Service(int service_id, ArrayList<String> spareParts){
+        this.service_id = service_id;
+        this.spareParts = spareParts;
     }
 
     public int getRecord_id() {
@@ -44,5 +52,17 @@ public class Service {
 
     public void setSparePart(String sparePart) {
         this.spare_part_serial_number = sparePart;
+    }
+
+    public ArrayList<String> getSpareParts() {
+        return spareParts;
+    }
+
+    public void addSparePart(String spareParts) {
+        this.spareParts.add(spareParts);
+    }
+
+    public void setSpareParts(ArrayList<String> spareParts) {
+        this.spareParts = spareParts;
     }
 }
