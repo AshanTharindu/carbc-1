@@ -187,8 +187,6 @@ public class Handler extends Thread{
     public void handleReceivedAgreement(){
         log.info("inside handleReceivedAgreement method");
         JSONObject jsonObject = new JSONObject(data);
-        System.out.println(jsonObject);
-//        String signature = jsonObject.getString("digitalSignature");
         String signedBlock = jsonObject.getString("signedBlock");
         String blockHash = jsonObject.getString("blockHash");
         String publicKey = jsonObject.getString("publicKey");

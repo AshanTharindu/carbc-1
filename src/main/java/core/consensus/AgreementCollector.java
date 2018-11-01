@@ -7,7 +7,6 @@ import core.blockchain.Block;
 import core.connection.BlockJDBCDAO;
 import core.connection.IdentityJDBC;
 import core.serviceStation.dao.ServiceJDBCDAO;
-import network.communicationHandler.MessageSender;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -21,9 +20,11 @@ public class AgreementCollector extends Thread{
 
     private String agreementCollectorId;
     private Block block;
-    private Agreement[] mandotaryAgreements;
+    private Agreement[] mandatoryAgreements;
     private ArrayList<String> agreedNodes;
     private Rating rating;
+    private int mandatoryCount;
+    private int secondaryCount;
 
     private ArrayList<String> mandatoryValidators;
     private ArrayList<String> specialValidators;
@@ -38,7 +39,7 @@ public class AgreementCollector extends Thread{
         this.agreementCollectorId = generateAgreementCollectorId(block);
         this.block = block;
         this.agreements = new ArrayList<>();
-        this.mandotaryAgreements = new Agreement[2]; //get from the block
+        this.mandatoryAgreements = new Agreement[2]; //get from the block
         this.blockJDBCDAO = new BlockJDBCDAO();
         this.identityJDBC = new IdentityJDBC();
         this.mandatoryValidators = new ArrayList<>();
@@ -59,6 +60,9 @@ public class AgreementCollector extends Thread{
             System.out.println(blockData);
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
+            rating = new Rating(event);
+            secondaryCount = thirdParties.length();
+            rating.setSpecialValidators(secondaryCount);
 
 
             //TODO: need to check whether parties are real or not before adding to the arrays
@@ -128,6 +132,8 @@ public class AgreementCollector extends Thread{
 
             }
         }
+        mandatoryCount = mandatoryValidators.size();
+        rating.setMandatory(mandatoryCount);
 
         if (mandatoryValidators.size()>0){
             for (int i = 0; i<mandatoryValidators.size(); i++){
@@ -245,8 +251,8 @@ public class AgreementCollector extends Thread{
         return agreementCollectorId;
     }
 
-    public Agreement[] getMandotaryAgreements() {
-        return mandotaryAgreements;
+    public Agreement[] getMandatoryAgreements() {
+        return mandatoryAgreements;
     }
 
     public ArrayList<Agreement> getAgreements() {
@@ -280,7 +286,7 @@ public class AgreementCollector extends Thread{
 
     public void validateBlock() {
         try {
-            String serviceData = ServiceJDBCDAO.getInstance().getAllServiceRecords(block.getBlockBody().getTransaction().getAddress()).toString();
+            String serviceData = ServiceJDBCDAO.getInstance().getLastServiceRecord(block.getBlockBody().getTransaction().getAddress()).toString();
             if(block.getBlockBody().getTransaction().getData().equals(serviceData)) {
                 Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
             }
@@ -288,5 +294,17 @@ public class AgreementCollector extends Thread{
             e.printStackTrace();
         }
 
+    }
+
+    public Rating getRating() {
+        return rating;
+    }
+
+    public int getMandatoryArraySize() {
+        return mandatoryValidators.size();
+    }
+
+    public int getSecondaryArraySize() {
+        return specialValidators.size();
     }
 }
