@@ -48,8 +48,8 @@ public class BlockSender extends Thread {
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
         BlockHeader blockHeader = new BlockHeader(blockHash);
         Block block = new Block(blockHeader, blockBody);
-        MessageSender.broadCastBlockTest(block);
-//        Consensus.getInstance().broadcastBlock(block, data.toString());
+//        MessageSender.broadCastBlockTest(block);
+        Consensus.getInstance().broadcastBlock(block, data.toString());
     }
 
     public void sendTransaction() {

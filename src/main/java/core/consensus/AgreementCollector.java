@@ -62,7 +62,7 @@ public class AgreementCollector{
             JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
             System.out.println(blockData);
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
-            JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
+            JSONObject thirdParties = blockData.getJSONObject("ThirdParty");
             String pubKey;
             secondaryCount = thirdParties.length();
             rating.setSpecialValidators(secondaryCount);
@@ -89,8 +89,10 @@ public class AgreementCollector{
                         validateBlock();
                     }
                     getMandatoryValidators().add(pubKey);
-                    for (int i = 0; i < thirdParties.length(); i++){
-                        getSpecialValidators().add(thirdParties.getString(i));
+
+                    JSONArray sparePartProvider = thirdParties.getJSONArray("SparePartProvider");
+                    for (int i = 0; i < sparePartProvider.length(); i++){
+                        getSpecialValidators().add(sparePartProvider.getString(i));
                     }
                     break;
 
