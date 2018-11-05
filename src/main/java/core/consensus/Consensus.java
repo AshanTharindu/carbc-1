@@ -1,6 +1,7 @@
 package core.consensus;
 
 import chainUtil.ChainUtil;
+import chainUtil.KeyGenerator;
 import controller.Controller;
 import core.blockchain.Block;
 import core.blockchain.BlockInfo;
@@ -85,16 +86,26 @@ public class Consensus extends Observable {
                 //TODO: should notify the ui
 //                WebSocketMessageHandler.testUpdate(nonApprovedBlocks);
 
-                AgreementCollector agreementCollector = new AgreementCollector(block);
+
 
                 if (!isPresent) {
                     TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                     timeKeeper.start();
                 }
 
-
+                AgreementCollector agreementCollector = new AgreementCollector(block);
                 System.out.println("agreementcolletor ID: "+agreementCollector.getAgreementCollectorId());
                 agreementCollectors.add(agreementCollector);
+                if (agreementCollector.succeed){
+                    String blockHash = block.getBlockHeader().getHash();
+                    String digitalSignature = ChainUtil.digitalSignature(block.getBlockHeader().getHash());
+                    String signedBlock = digitalSignature;
+                    Agreement agreement = new Agreement(digitalSignature, signedBlock, blockHash,
+                            KeyGenerator.getInstance().getPublicKeyAsString());
+
+                    Consensus.getInstance().handleAgreement(agreement);
+                }
+
                 log.info("agreement Collector added, size: {}", agreementCollectors.size());
 
                 //now need to check the relevant party is registered as with desired roles
@@ -110,6 +121,8 @@ public class Consensus extends Observable {
 
         ArrayList<Block> qualifiedBlocks = new ArrayList<>();
         for (Block b : this.getNonApprovedBlocks()) {
+            System.out.println("inside for loop");
+
             if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)) {
                 String blockHash = b.getBlockHeader().getHash();
                 AgreementCollector agreementCollector = getAgreementCollector(blockHash);
@@ -137,9 +150,12 @@ public class Consensus extends Observable {
     }
 
     public Block selectQualifiedBlock(ArrayList<Block> qualifiedBlocks) throws SQLException, ParseException {
+        System.out.println("inside consensus/selectQualifiedBlock");
+
         Block qualifiedBlock = null;
 
         if (qualifiedBlocks.size() != 0) {
+            System.out.println("inside if block; qualifiedBlocks.size() != 0");
             qualifiedBlock = qualifiedBlocks.get(0);
 
             Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(qualifiedBlock.getBlockHeader().getBlockTime());
@@ -166,9 +182,12 @@ public class Consensus extends Observable {
     }
 
     public void addBlockToBlockchain(ArrayList<Block> qualifiedBlocks) throws SQLException, ParseException {
+        System.out.println("inside Consensus/addBlockToBlockchain()");
         Block block = selectQualifiedBlock(qualifiedBlocks);
 
         if (block != null) {
+            System.out.println("if (block != null)");
+
             BlockInfo blockInfo = new BlockInfo();
             blockInfo.setPreviousHash(block.getBlockHeader().getPreviousHash());
             blockInfo.setHash(block.getBlockHeader().getHash());

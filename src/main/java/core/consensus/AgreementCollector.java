@@ -36,6 +36,8 @@ public class AgreementCollector{
     private int threshold;
     private final Logger log = LoggerFactory.getLogger(AgreementCollector.class);
 
+    boolean succeed = false;
+
 
     public AgreementCollector(Block block) throws SQLException {
         this.agreementCollectorId = generateAgreementCollectorId(block);
@@ -155,7 +157,7 @@ public class AgreementCollector{
                     }
 
                     if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        RmvValidation.validateBlock(block);
+                        succeed = RmvValidation.validateBlock(block);
                     }
                     break;
 
