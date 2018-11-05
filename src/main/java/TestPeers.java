@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 
 public class TestPeers {
     public static void main(String[] args) throws FileUtilityException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException {
@@ -29,7 +30,7 @@ public class TestPeers {
         node.init();
 
         System.out.println("****************");
-        getPeer();
+        getAllPeers();
     }
 
     public static void getPeer() {
@@ -37,6 +38,18 @@ public class TestPeers {
             NeighbourDAO neighbourDAO = new NeighbourDAO();
             Neighbour neighbour = neighbourDAO.getPeer("16de46ff1f9e7c273a63754fe56cc753eb6bbab");
             System.out.println(new JSONObject(neighbour));
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getAllPeers() {
+        try {
+            NeighbourDAO neighbourDAO = new NeighbourDAO();
+            ArrayList<Neighbour> neighbours = neighbourDAO.getPeers();
+            for (Neighbour neighbour : neighbours) {
+                System.out.println(new JSONObject(neighbour));
+            }
         }catch (Exception e) {
             e.printStackTrace();
         }

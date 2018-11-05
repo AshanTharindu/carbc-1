@@ -85,14 +85,14 @@ public class Consensus extends Observable {
                 //TODO: should notify the ui
 //                WebSocketMessageHandler.testUpdate(nonApprovedBlocks);
 
-                AgreementCollector agreementCollector = new AgreementCollector(block);
+
 
                 if (!isPresent) {
                     TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                     timeKeeper.start();
                 }
 
-
+                AgreementCollector agreementCollector = new AgreementCollector(block);
                 System.out.println("agreementcolletor ID: "+agreementCollector.getAgreementCollectorId());
                 agreementCollectors.add(agreementCollector);
                 log.info("agreement Collector added, size: {}", agreementCollectors.size());

@@ -92,7 +92,7 @@ public final class Node {
 //        Random random = new Random();
 //        long peerID = random.nextLong();
         String publicKey = KeyGenerator.getInstance().getPublicKeyAsString();
-        String peerID = publicKey.substring(publicKey.length()-40);
+        String peerID = publicKey.substring(publicKey.length() - 40);
 
         //Create config
         this.nodeConfig = new NodeConfig(peerID);
@@ -139,7 +139,7 @@ public final class Node {
     //send message to a specific peer
     public void sendMessageToPeer(String IP, int port, RequestMessage requestMessage) {
         Client client = new Client();
-        client.initTest(IP,port,requestMessage);
+        client.initTest(IP, port, requestMessage);
         client.start();
         log.info("Initialized client");
     }
@@ -147,10 +147,16 @@ public final class Node {
     //broadcast message to the network
     public void broadcast(RequestMessage requestMessage) {
         System.out.println(nodeConfig.getNeighbours().size());
-        for(Neighbour neighbour: nodeConfig.getNeighbours()) {
-            Client client = new Client();
-            client.initTest(neighbour.getIp(),neighbour.getPort(),requestMessage);
-            client.start();
+        try {
+            NeighbourDAO neighbourDAO = new NeighbourDAO();
+            ArrayList<Neighbour> neighbours = neighbourDAO.getPeers();
+            for (Neighbour neighbour : neighbours) {
+                Client client = new Client();
+                client.initTest(neighbour.getIp(), neighbour.getPort(), requestMessage);
+                client.start();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -176,18 +182,18 @@ public final class Node {
             String peerID = peersJson.getString("peerID");
             int peerPort = peersJson.getInt("ListeningPort");
 //            String peerPublicKey = peersJson.getString("publicKey");
-            Neighbour neighbour = new Neighbour(peerID, peerIP,peerPort);
+            Neighbour neighbour = new Neighbour(peerID, peerIP, peerPort);
             tempNeighbour.add(neighbour);
         }
     }
 
     public void talkToPeers(List<Neighbour> neighbours) {
-        for(Neighbour neighbour: neighbours) {
+        for (Neighbour neighbour : neighbours) {
             JSONObject portInfo = new JSONObject();
-            portInfo.put("ListeningPort",nodeConfig.getListenerPort());
+            portInfo.put("ListeningPort", nodeConfig.getListenerPort());
             portInfo.put("nodeID", nodeConfig.getNodeID());
             RequestMessage helloMsg = HelloMessageCreator.createHelloMessage(portInfo);
-            sendMessageToPeer(neighbour.getIp(),neighbour.getPort(),helloMsg);
+            sendMessageToPeer(neighbour.getIp(), neighbour.getPort(), helloMsg);
         }
     }
 
@@ -204,26 +210,26 @@ public final class Node {
         Neighbour node = getPeer(peerID);
         NeighbourDAO neighbourDAO = new NeighbourDAO();
 
-        if(node == null) {
+        if (node == null) {
             Neighbour neighbour = new Neighbour(peerID, ip, port);
             nodeConfig.addNeighbour(neighbour);
             neighbourDAO.saveNeighbours(neighbour);
-            log.info("Active Peer Added: {}" , peerID);
+            log.info("Active Peer Added: {}", peerID);
         } else {
             String nodeIp = node.getIp();
             int NodePort = node.getPort();
 
-            if(!ip.equals(nodeIp) || port != NodePort) {
+            if (!ip.equals(nodeIp) || port != NodePort) {
                 Node.getInstance().getNodeConfig().updateNeighbourDetails(peerID, ip, port);
                 neighbourDAO.updatePeer(peerID, ip, port);
                 log.info("peer data updated successfully: ", peerID);
-            }else {
+            } else {
                 log.info("peer data already have");
             }
         }
 
-        for(Neighbour peer: nodeConfig.getNeighbours()) {
-            System.out.println("IP: "+ peer.getIp() + " port: " + peer.getPort());
+        for (Neighbour peer : nodeConfig.getNeighbours()) {
+            System.out.println("IP: " + peer.getIp() + " port: " + peer.getPort());
         }
     }
 
@@ -242,7 +248,7 @@ public final class Node {
 //        }
 //        return null;
         try {
-             neighbour = neighbourDAO.getPeer(peerID);
+            neighbour = neighbourDAO.getPeer(peerID);
         } catch (SQLException e) {
             e.printStackTrace();
         }
