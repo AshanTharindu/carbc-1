@@ -117,4 +117,40 @@ public class RMVJDBCDAO {
         return getRegistrationInfo(queryString, registrationNumber);
     }
 
+    public JSONObject getOwnershipInfo(String registrationNumber) throws SQLException {
+        String queryString = "SELECT `id`, `vehicle_registration_number`, `pre_owner`, `new_owner`, `date` FROM `Ownership`" +
+                " WHERE `vehicle_registration_number` = ?";
+
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        JSONObject ownershipInfo = new JSONObject();
+
+        try{
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, registrationNumber);
+            resultSet = ptmt.executeQuery();
+
+            if (resultSet.next()){
+                ownershipInfo.put("registrationNumber", resultSet.getString("vehicle_registration_number"));
+                ownershipInfo.put("preOwner", resultSet.getString("pre_owner"));
+                ownershipInfo.put("newOwner", resultSet.getString("new_owner"));
+                ownershipInfo.put("date", resultSet.getTimestamp("date"));
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return ownershipInfo;
+        }
+    }
+
 }
