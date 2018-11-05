@@ -31,7 +31,7 @@ public class RegisterVehicleTest {
         registration.put("model", "Toyota");
         registration.put("year_of_manufacture", "2012");
         JSONObject secondaryParty = new JSONObject();
-        JSONArray thirdParty = new JSONObject();
+        JSONObject thirdParty = new JSONObject();
 
         registration.put("SecondaryParty", secondaryParty);
         registration.put("ThirdParty", thirdParty);
