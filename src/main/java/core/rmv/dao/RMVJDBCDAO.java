@@ -38,7 +38,7 @@ public class RMVJDBCDAO {
     public boolean addRegistrationRecord(Registration registration) throws SQLException {
         String queryString = "INSERT INTO `Registration`(`vehicle_id`, `registration_number`, `current_owner`, " +
                 "`engine_number`, `vehicle_class`, `condition_and_note`, `make`, `model`, `year_of_manufacture`) " +
-                "VALUES (?,?,?,?,?,?,?,?,?)";
+                "VALUES (?,?,?,?,?,?,?,?)";
 
         PreparedStatement ptmt = null;
         boolean succeed = false;
@@ -46,15 +46,14 @@ public class RMVJDBCDAO {
         try {
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(queryString);
-            ptmt.setString(1, registration.getVehicleId());
-            ptmt.setString(2, registration.getRegistrationNumber());
-            ptmt.setString(3, registration.getCondition());
-            ptmt.setString(4, registration.getEngineNumber());
-            ptmt.setString(5, registration.getVehicleClass());
-            ptmt.setString(6, registration.getCondition());
-            ptmt.setString(7, registration.getMake());
-            ptmt.setString(8, registration.getModel());
-            ptmt.setString(9, registration.getYearOfManufacture());
+            ptmt.setString(1, registration.getRegistrationNumber());
+            ptmt.setString(2, registration.getCondition());
+            ptmt.setString(3, registration.getEngineNumber());
+            ptmt.setString(4, registration.getVehicleClass());
+            ptmt.setString(5, registration.getCondition());
+            ptmt.setString(6, registration.getMake());
+            ptmt.setString(7, registration.getModel());
+            ptmt.setString(8, registration.getYearOfManufacture());
             succeed = ptmt.execute();
 
         } catch (SQLException e) {
@@ -84,7 +83,6 @@ public class RMVJDBCDAO {
             resultSet = ptmt.executeQuery();
 
             while (resultSet.next()){
-                registrationInfo.put("vehicleId", resultSet.getString("vehicle_id"));
                 registrationInfo.put("registrationNumber", resultSet.getString("registration_number"));
                 registrationInfo.put("currentOwner", resultSet.getString("current_owner"));
                 registrationInfo.put("engineNumber", resultSet.getString("engine_number"));
@@ -110,13 +108,6 @@ public class RMVJDBCDAO {
         }
     }
 
-    public JSONObject getRegistrationInfoByVehicleId(String vehicleId) throws SQLException {
-
-        String queryString = "SELECT `vehicle_id`, `registration_number`, `current_owner`, `engine_number`, `vehicle_class`, " +
-                "`condition_and_note`, `make`, `model`, `year_of_manufacture` FROM `Registration` WHERE `vehicle_id` = ?";
-
-        return getRegistrationInfo(queryString, vehicleId);
-    }
 
     public JSONObject getRegistrationInfoByRegistrationNumber(String registrationNumber) throws SQLException {
 
