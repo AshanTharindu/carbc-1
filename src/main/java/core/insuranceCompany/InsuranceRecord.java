@@ -1,7 +1,5 @@
 package core.insuranceCompany;
 
-import com.sun.xml.internal.ws.spi.db.DatabindingException;
-
 import java.sql.Date;
 import java.sql.Timestamp;
 

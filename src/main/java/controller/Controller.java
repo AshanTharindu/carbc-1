@@ -29,10 +29,34 @@ public class Controller {
         DataCollector.getInstance().requestTransactionData(type, vehicleID, date, peerID);
     }
 
-    public void sendTransaction(String transactionType, String event, String data) throws ParseException {
+    public void sendTransaction(String event, String vehicleID, JSONObject data) {
+        BlockSender blockSender = new BlockSender(event, vehicleID, data);
+        blockSender.start();
+    }
+
+    public void sendServiceTransaction(String vehicleID, JSONObject data) {
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
         String nodeID = Node.getInstance().getNodeConfig().getNodeID();
-        Transaction transaction = new Transaction(transactionType, sender, event, data, nodeID);
+
+//        JSONObject dataJson = new JSONObject();
+//        dataJson.put("serviceType", data.get("serviceType"));
+//        dataJson.put("servicedDate", data.get("servicedDate"));
+//        dataJson.put("SparePartSerialNumber", data.get("SparePartSerialNumber"));
+//        dataJson.put("SparePartShop", data.get("SparePartShop"));
+//
+//        JSONObject secondaryParty = new JSONObject();
+//        JSONObject serviceStation = new JSONObject();
+//        serviceStation.put("name", data.get("name"));
+//        serviceStation.put("publicKey", data.get("name"));
+//        secondaryParty.put("serviceStation", serviceStation);
+//
+//        JSONObject thirdParty = new JSONObject();
+//        thirdParty.put("SparePartProvider", data.get("SparePartProvider"));
+//        dataJson.put("SecondaryParty", secondaryParty);
+//        dataJson.put("ThirdParty", thirdParty);
+
+        data.put("cost", ChainUtil.getHash(data.getString("cost")));
+        Transaction transaction = new Transaction("V", sender, "ServiceRepair", data.toString(), vehicleID);
 
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
@@ -41,7 +65,35 @@ public class Controller {
 
         Block block = new Block(blockHeader, blockBody);
         System.out.println(new JSONObject(block));
-        Consensus.getInstance().broadcastBlock(block, data);
+        Consensus.getInstance().broadcastBlock(block, data.toString());
+    }
+
+    public void sendInsureTransaction(String vehicleID, JSONObject data) {
+        String sender = KeyGenerator.getInstance().getPublicKeyAsString();
+        Transaction transaction = new Transaction("V", sender, "Insure", data.toString(), vehicleID);
+
+        BlockBody blockBody = new BlockBody();
+        blockBody.setTransaction(transaction);
+        String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
+        BlockHeader blockHeader = new BlockHeader(blockHash);
+
+        Block block = new Block(blockHeader, blockBody);
+        System.out.println(new JSONObject(block));
+        Consensus.getInstance().broadcastBlock(block, data.toString());
+    }
+
+    public void sendOwnershipTransaction(String vehicleID, JSONObject data) {
+        String sender = KeyGenerator.getInstance().getPublicKeyAsString();
+        Transaction transaction = new Transaction("V", sender, "Insure", data.toString(), vehicleID);
+
+        BlockBody blockBody = new BlockBody();
+        blockBody.setTransaction(transaction);
+        String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
+        BlockHeader blockHeader = new BlockHeader(blockHash);
+
+        Block block = new Block(blockHeader, blockBody);
+        System.out.println(new JSONObject(block));
+        Consensus.getInstance().broadcastBlock(block, data.toString());
     }
 
     public void sendConfirmation(String blockHash) {

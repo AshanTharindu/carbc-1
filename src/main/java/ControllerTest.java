@@ -1,3 +1,6 @@
+import network.Node;
+import org.json.JSONObject;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,8 +22,24 @@ public class ControllerTest {
 ////            Timestamp time = new java.sql.Timestamp(parsedDate.getTime())
 //        }
 
-        java.util.Date date = new Timestamp(System.currentTimeMillis());
-        Timestamp timestamp = new Timestamp(date.getTime());
-        System.out.println(timestamp);
-    }
+//        java.util.Date date = new Timestamp(System.currentTimeMillis());
+//        Timestamp timestamp = new Timestamp(date.getTime());
+//        System.out.println(timestamp);
+//
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("key1", "key1");
+//        System.out.println(jsonObject);
+//
+//        jsonObject.put("key1", "ke1hash");
+//        System.out.println(jsonObject);
+//        Random random = new Random(System.currentTimeMillis());
+//
+//        for(int i =0; i< 10; i++) {
+//            int number = 10000 + Math.abs(random.nextInt(90000));
+//            System.out.println(number);
+//        }
+
+        Node.getInstance().startNode("12345", 42111);
+
+            }
 }

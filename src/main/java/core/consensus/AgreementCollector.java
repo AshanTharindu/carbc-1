@@ -7,7 +7,7 @@ import core.blockchain.Block;
 import core.connection.BlockJDBCDAO;
 import core.connection.IdentityJDBC;
 import core.serviceStation.webSocketServer.webSocket.WebSocketMessageHandler;
-import network.communicationHandler.MessageSender;
+import core.serviceStation.dao.ServiceJDBCDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -21,8 +21,11 @@ public class AgreementCollector{
 
     private String agreementCollectorId;
     private Block block;
+    private Agreement[] mandatoryAgreements;
     private ArrayList<String> agreedNodes;
     private Rating rating;
+    private int mandatoryCount;
+    private int secondaryCount;
 
     private ArrayList<String> mandatoryValidators;
     private ArrayList<String> specialValidators;
@@ -37,7 +40,7 @@ public class AgreementCollector{
         this.agreementCollectorId = generateAgreementCollectorId(block);
         this.block = block;
         this.agreements = new ArrayList<>();
-        this.rating = new Rating(block);
+        this.rating = new Rating(block.getBlockBody().getTransaction().getEvent());
         this.blockJDBCDAO = new BlockJDBCDAO();
         this.identityJDBC = new IdentityJDBC();
         this.mandatoryValidators = new ArrayList<>();
@@ -61,7 +64,11 @@ public class AgreementCollector{
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
             String pubKey;
+            secondaryCount = thirdParties.length();
+            rating.setSpecialValidators(secondaryCount);
 
+
+            //TODO: need to check whether parties are real or not before adding to the arrays
             switch (event){
                 case "ExchangeOwnership":
                     pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
@@ -72,13 +79,16 @@ public class AgreementCollector{
                     break;
 
                 case "ServiceRepair":
-                    pubKey = secondaryParties.getJSONObject("ServiceStation")
-                            .getString("publicKey");
+                    pubKey = secondaryParties.getJSONObject("ServiceStation").getString("publicKey");
                     getMandatoryValidators().add(pubKey);
                     if (isMandatoryPartyValid("ServiceStation", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
 
                     }
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
+                    }
+                    getMandatoryValidators().add(pubKey);
                     for (int i = 0; i < thirdParties.length(); i++){
                         getSpecialValidators().add(thirdParties.getString(i));
                     }
@@ -88,6 +98,11 @@ public class AgreementCollector{
                     pubKey = secondaryParties.getJSONObject("InsuranceCompany")
                             .getString("publicKey");
                     getMandatoryValidators().add(pubKey);
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
+                    }
+                    getMandatoryValidators().add(pubKey);
+
                     if (isMandatoryPartyValid("InsuranceCompany", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }
@@ -99,6 +114,9 @@ public class AgreementCollector{
                     getMandatoryValidators().add(pubKey);
                     if (isMandatoryPartyValid("LeasingCompany", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
+                    }
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
                     }
                     break;
 
@@ -136,6 +154,9 @@ public class AgreementCollector{
                     if (isMandatoryPartyValid("InsuranceCompany", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        validateBlock();
+                    }
                     break;
 
                 case "BuySpareParts":
@@ -149,6 +170,8 @@ public class AgreementCollector{
 
             }
         }
+        mandatoryCount = mandatoryValidators.size();
+        rating.setMandatory(mandatoryCount);
 
         if (mandatoryValidators.size()>0){
             for (int i = 0; i<mandatoryValidators.size(); i++){
@@ -277,6 +300,10 @@ public class AgreementCollector{
         return agreementCollectorId;
     }
 
+    public Agreement[] getMandatoryAgreements() {
+        return mandatoryAgreements;
+    }
+
     public ArrayList<Agreement> getAgreements() {
         return agreements;
     }
@@ -284,7 +311,6 @@ public class AgreementCollector{
     public int getAgreedNodesCount() {
         return getAgreedNodes().size();
     }
-
 
     public ArrayList<String> getMandatoryValidators() {
                                                                                                                                         return mandatoryValidators;
@@ -304,5 +330,29 @@ public class AgreementCollector{
 
     public IdentityJDBC getIdentityJDBC() {
         return identityJDBC;
+    }
+
+    public void validateBlock() {
+        try {
+            String serviceData = ServiceJDBCDAO.getInstance().getLastServiceRecord(block.getBlockBody().getTransaction().getAddress()).toString();
+            if(block.getBlockBody().getTransaction().getData().equals(serviceData)) {
+                Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public Rating getRating() {
+        return rating;
+    }
+
+    public int getMandatoryArraySize() {
+        return mandatoryValidators.size();
+    }
+
+    public int getSecondaryArraySize() {
+        return specialValidators.size();
     }
 }
