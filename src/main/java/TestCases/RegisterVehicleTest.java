@@ -11,13 +11,13 @@ import org.json.JSONObject;
 public class RegisterVehicleTest {
     public static void main(String[] args) {
         startNodeTest();
-        MessageSender.requestIP();
+
     }
 
     public static void startNodeTest(){
         Controller controller = new Controller();
         controller.startNode();
-
+        MessageSender.requestIP();
         controller.sendTransaction("RegisterVehicle", null, createRegisterJSON() );
 
     }

@@ -146,6 +146,7 @@ public final class Node {
 
     //broadcast message to the network
     public void broadcast(RequestMessage requestMessage) {
+        System.out.println(nodeConfig.getNeighbours().size());
         for(Neighbour neighbour: nodeConfig.getNeighbours()) {
             Client client = new Client();
             client.initTest(neighbour.getIp(),neighbour.getPort(),requestMessage);
