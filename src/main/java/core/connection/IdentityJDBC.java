@@ -58,7 +58,7 @@ public class IdentityJDBC {
 
     //get an identity of a person by address
     public JSONObject getIdentityByAddress(String address) throws SQLException {
-        String query = "SELECT public_key, role, name, location FROM `Identity` WHERE `address` = ?";
+        String query = "SELECT public_key, role, name, location FROM `Identity` WHERE `public_key` = ?";
         return getIdentity(query, address);
     }
 

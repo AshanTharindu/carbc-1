@@ -62,7 +62,7 @@ public class AgreementCollector{
             JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
             System.out.println(blockData);
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
-            JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
+            JSONObject thirdParties = blockData.getJSONObject("ThirdParty");
             String pubKey;
             secondaryCount = thirdParties.length();
             rating.setSpecialValidators(secondaryCount);
@@ -73,8 +73,8 @@ public class AgreementCollector{
                 case "ExchangeOwnership":
                     pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
                     getMandatoryValidators().add(pubKey);
-//                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
-//                    getMandatoryValidators().add(obj.getString("publicKey"));
+                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
+                    getMandatoryValidators().add(obj.getString("publicKey"));
 
                     break;
 
@@ -89,8 +89,10 @@ public class AgreementCollector{
                         validateBlock();
                     }
                     getMandatoryValidators().add(pubKey);
-                    for (int i = 0; i < thirdParties.length(); i++){
-                        getSpecialValidators().add(thirdParties.getString(i));
+
+                    JSONArray sparePartProvider = thirdParties.getJSONArray("SparePartProvider");
+                    for (int i = 0; i < sparePartProvider.length(); i++){
+                        getSpecialValidators().add(sparePartProvider.getString(i));
                     }
                     break;
 
@@ -139,9 +141,14 @@ public class AgreementCollector{
                     break;
 
                 case "RegisterVehicle":
-                    pubKey = secondaryParties.getJSONObject("RMV")
-                            .getString("publicKey");
-                    getMandatoryValidators().add(pubKey);
+//                    pubKey = secondaryParties.getJSONObject("RMV")
+//                            .getString("publicKey");
+
+                    JSONObject object = getIdentityJDBC().getIdentityByRole("RMV");
+                    pubKey = object.getString("publicKey");
+                    getMandatoryValidators().add(object.getString("publicKey"));
+
+//                    getMandatoryValidators().add(pubKey);
                     if (isMandatoryPartyValid("RMV", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }

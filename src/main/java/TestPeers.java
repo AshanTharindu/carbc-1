@@ -1,7 +1,10 @@
 import Exceptions.FileUtilityException;
 import config.CommonConfigHolder;
 import constants.Constants;
+import core.connection.NeighbourDAO;
+import network.Neighbour;
 import network.Node;
+import org.json.JSONObject;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
@@ -24,5 +27,18 @@ public class TestPeers {
         //when initializing the network
         Node node = Node.getInstance();
         node.init();
+
+        System.out.println("****************");
+        getPeer();
+    }
+
+    public static void getPeer() {
+        try {
+            NeighbourDAO neighbourDAO = new NeighbourDAO();
+            Neighbour neighbour = neighbourDAO.getPeer("16de46ff1f9e7c273a63754fe56cc753eb6bbab");
+            System.out.println(new JSONObject(neighbour));
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

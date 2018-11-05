@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -230,12 +231,21 @@ public final class Node {
     }
 
     public Neighbour getPeer(String peerID) {
-        for(Neighbour neighbour: nodeConfig.getNeighbours()) {
-            if(peerID.equals(neighbour.getPeerID())) {
-                return neighbour;
-            }
+        NeighbourDAO neighbourDAO = new NeighbourDAO();
+        Neighbour neighbour = null;
+
+//        for(Neighbour neighbour: nodeConfig.getNeighbours()) {
+//            if(peerID.equals(neighbour.getPeerID())) {
+//                return neighbour;
+//            }
+//        }
+//        return null;
+        try {
+             neighbour = neighbourDAO.getPeer(peerID);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return null;
+        return neighbour;
     }
 
     public String getNodeId() {

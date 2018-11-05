@@ -33,6 +33,7 @@ public class BlockSender extends Thread {
         switch (event) {
             case "RegisterVehicle":
                 sendRegisterTransaction();
+                break;
 
             default:
                 sendTransaction();

@@ -1,5 +1,7 @@
 package TestCases;
 
+import controller.Controller;
+import network.communicationHandler.MessageSender;
 import chainUtil.KeyGenerator;
 import com.google.gson.JsonObject;
 import controller.Controller;
@@ -9,7 +11,7 @@ import org.json.JSONObject;
 public class RegisterVehicleTest {
     public static void main(String[] args) {
         startNodeTest();
-
+        MessageSender.requestIP();
     }
 
     public static void startNodeTest(){
@@ -37,6 +39,10 @@ public class RegisterVehicleTest {
         registration.put("ThirdParty", thirdParty);
 
         return registration;
+    }
+
+    public static void ttest(){
+
     }
 
 
