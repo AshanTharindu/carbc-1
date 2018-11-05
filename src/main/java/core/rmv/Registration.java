@@ -2,7 +2,6 @@ package core.rmv;
 
 public class Registration {
 
-    private String vehicleId;
     private String registrationNumber;
     private String currentOwner;
     private String engineNumber;
@@ -12,14 +11,6 @@ public class Registration {
     private String model;
     private String yearOfManufacture;
 
-
-    public String getVehicleId() {
-        return vehicleId;
-    }
-
-    public void setVehicleId(String vehicleId) {
-        this.vehicleId = vehicleId;
-    }
 
     public String getRegistrationNumber() {
         return registrationNumber;

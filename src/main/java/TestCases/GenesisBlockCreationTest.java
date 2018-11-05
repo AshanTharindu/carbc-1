@@ -1,11 +1,9 @@
-import constants.Constants;
-import core.blockchain.Blockchain;
+package TestCases;
+
 import network.Node;
-import org.slf4j.impl.SimpleLogger;
 
-public class BlockchainTest2 {
+public class GenesisBlockCreationTest {
     public static void main(String[] args) {
-
         Node node = Node.getInstance();
         node.startNode();
     }
