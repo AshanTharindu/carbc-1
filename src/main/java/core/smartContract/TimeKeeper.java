@@ -15,7 +15,8 @@ public class TimeKeeper extends Thread{
     public void run() {
         try {
             System.out.println("Inside TimeKeeper");
-            Thread.sleep(30000);
+            Thread.sleep(20000);
+            System.out.println("time expired");
             Consensus.getInstance().checkAgreementsForBlock(blockHash);
 
         } catch (InterruptedException e) {

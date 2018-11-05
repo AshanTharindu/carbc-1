@@ -82,7 +82,7 @@ public class RMVJDBCDAO {
             ptmt.setString(1, type);
             resultSet = ptmt.executeQuery();
 
-            while (resultSet.next()){
+            if (resultSet.next()){
                 registrationInfo.put("registrationNumber", resultSet.getString("registration_number"));
                 registrationInfo.put("currentOwner", resultSet.getString("current_owner"));
                 registrationInfo.put("engineNumber", resultSet.getString("engine_number"));
@@ -111,7 +111,7 @@ public class RMVJDBCDAO {
 
     public JSONObject getRegistrationInfoByRegistrationNumber(String registrationNumber) throws SQLException {
 
-        String queryString = "SELECT `vehicle_id`, `registration_number`, `current_owner`, `engine_number`, `vehicle_class`, " +
+        String queryString = "SELECT `registration_number`, `current_owner`, `engine_number`, `vehicle_class`, " +
                 "`condition_and_note`, `make`, `model`, `year_of_manufacture` FROM `Registration` WHERE `registration_number` = ?";
 
         return getRegistrationInfo(queryString, registrationNumber);
