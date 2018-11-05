@@ -76,8 +76,18 @@ public class AgreementCollector{
                 case "ExchangeOwnership":
                     pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
                     getMandatoryValidators().add(pubKey);
+
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        succeed = RmvValidation.validateBlock(block);
+                    }
+
                     JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
-                    getMandatoryValidators().add(obj.getString("publicKey"));
+                    pubKey = obj.getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        succeed = RmvValidation.validateBlock(block);
+                    }
 
                     break;
 

@@ -21,6 +21,8 @@ public class RmvValidation {
 
             switch (event){
                 case "ExchangeOwnership":
+                    System.out.println("inside ownership exchange switch case in validate block");
+                    succeed = validateOwnershipExchangeBlock(block);
                     break;
 
                 case "RegisterVehicle":
@@ -47,8 +49,28 @@ public class RmvValidation {
 
     }
 
-    public static void validateOwnershipExchangeBlock(Block block){
+    public static boolean validateOwnershipExchangeBlock(Block block) throws SQLException {
+        System.out.println("inside validateBlock/validateOwnershipExchangeBlock");
+        JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
+        String registration_number = blockData.getString("registration_number");
 
+        JSONObject ownershipData = RMVJDBCDAO.getInstance().getOwnershipInfo(registration_number);
+
+        String vehicle_registration_number = blockData.getString("registrationNumber");
+        String pre_owner = blockData.getString("preOwner");
+        String new_owner = blockData.getString("newOwner");
+//        String date = blockData.getString("date");
+
+        String vehicleRegistrationNumber = ownershipData.getString("registrationNumber");
+        String preOwner = ownershipData.getString("preOwner");
+        String newOwner = ownershipData.getString("newOwner");
+//        String date1 = ownershipData.getString("date");
+
+        if (vehicle_registration_number.equals(vehicleRegistrationNumber) && pre_owner.equals(preOwner) && new_owner.equals(newOwner)){
+            System.out.println("succeeded in validateBlock/validateOwnershipExchangeBlock");
+            return true;
+        }
+        return false;
     }
 
     public static boolean validateRegistrationBlock(Block block) throws SQLException {

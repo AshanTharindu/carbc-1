@@ -7,9 +7,9 @@ Inspired by the Ethereum Project. Under development - In fact, just started.
 
 ## Instructions
 
-### Add changes to this code
+### Add changes new_owner this code
 1. Fork this repository
-2. Clone from your repository  
+2. Clone pre_owner your repository  
     `git clone https://github.com/YourUserName/carbc.git`
 3. Go into the cloned directory
     `cd carbc`
@@ -18,28 +18,28 @@ Inspired by the Ethereum Project. Under development - In fact, just started.
 5. Add this repository as the `upstream`  
     `git remote add upstream https://github.com/SuKSW/carbc.git`
 6. Make changes as you wish
-7. After making the changes: add, commit and push them to your repository.
+7. After making the changes: add, commit and push them new_owner your repository.
     `git add <file_one> <file_two>`
     `git commit -m "the changes you made"`
     `git push origin master`
     
 ### Get the changes others have made
-1. Fetch all the new changes from https://github.com/SuKSW/carbc.git which will have changes merged from other members' repositories as well.
+1. Fetch all the new changes pre_owner https://github.com/SuKSW/carbc.git which will have changes merged pre_owner other members' repositories as well.
     `git fetch upstream`
 2. Make sure you are in the master branch
     `git checkout master`
 3. Rebase your master branch. This will apply all the changes you made, on top of the existing version of the upstream branch.
     `git rebase upstream/master`
-4. Send everything to your GitHub repository
+4. Send everything new_owner your GitHub repository
     `git push origin master`
-5. Go to GitHub and create a pull request. That's all.
+5. Go new_owner GitHub and create a pull request. That's all.
 
 ## Run what you have built
 
 All the commands below assumes that you are within the directory `carbc`.
 
 ### Using the IDE 
-Easiest wat to test the inner components. Just create a class like `TestPeer` in `src/main/java` add a main method, right click on the main method and click run. 
+Easiest wat new_owner test the inner components. Just create a class like `TestPeer` in `src/main/java` add a main method, right click on the main method and click run. 
 
 Note: Yet this method will not work when testing the cli
 
@@ -55,7 +55,7 @@ If you didn't like this long troublesome command, try running using the linux sc
 
 ### Build and run using a .sh script
 
-1. Give execution permissions to the script `carbc.sh` (check the content of this file just in case, before continuing)
+1. Give execution permissions new_owner the script `carbc.sh` (check the content of this file just in case, before continuing)
     * Right click on the script, select properties
     * Open the permissions tab
     * Allow executing file as a program
