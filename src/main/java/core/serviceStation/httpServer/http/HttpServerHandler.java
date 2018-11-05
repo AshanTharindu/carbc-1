@@ -46,10 +46,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             System.out.println("closed");
             return;
         }
-
-        HttpMethod HttpPMethod = msg.method();
-        System.out.println(msg);
-        System.out.println(HttpPMethod);
+//
+//        HttpMethod HttpPMethod = msg.method();
+//        System.out.println(msg);
+//        System.out.println(HttpPMethod);
 //
 //
 //        System.out.println("Recieved request!");
@@ -71,6 +71,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         if (msg.uri().equals("/serviceStation")) {
             serveStatic(ctx, "/index.html");
         } else if (msg.uri().equals("/serviceStation/storeServiceData")) {
+            if (msg.method().equals(HttpMethod.OPTIONS)){
+                resolvePrefightedRequests(ctx, msg);
+            }
             if (msg.method().equals(HttpMethod.POST)){
                 storeServiceData(ctx, msg);
             }
@@ -91,7 +94,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 getServiceRecords(ctx, msg);
             }
         }else if (msg.uri().equals("/serviceStation/getServiceRecordsPerVehicle")) {
-//            getVehicleServiceRecords(ctx, msg);
             if (msg.method().equals(HttpMethod.OPTIONS)){
                 resolvePrefightedRequests(ctx, msg);
             }
@@ -99,8 +101,18 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 getServiceRecordsPerVehicle(ctx, msg);
             }
         }else if (msg.uri().equals("/serviceStation/setServiceType")) {
+            if (msg.method().equals(HttpMethod.OPTIONS)){
+                resolvePrefightedRequests(ctx, msg);
+            }
             if (msg.method().equals(HttpMethod.POST)){
                 setServiceTypes(ctx, msg);
+            }
+        }else if (msg.uri().equals("/serviceStation/getServiceTypes")) {
+            if (msg.method().equals(HttpMethod.OPTIONS)){
+                resolvePrefightedRequests(ctx, msg);
+            }
+            if (msg.method().equals(HttpMethod.POST)){
+                getServiceTypes(ctx, msg);
             }
         }else if (msg.uri().equals("/serviceStation/registerCustomer")) {
             if (msg.method().equals(HttpMethod.POST)){
@@ -131,30 +143,30 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         JSONObject jsonObject = new JSONObject(body);
         System.out.println(jsonObject);
 
-        ServiceRecord serviceRecord = new ServiceRecord();
-        serviceRecord.setVehicle_id(jsonObject.getString("vehicleId"));
-        serviceRecord.setServiced_date(new Timestamp(System.currentTimeMillis()));
-        JSONArray services = jsonObject.getJSONArray("services");
-
-        for (int i = 0; i < services.length(); i++){
-            JSONObject serviceObject = (JSONObject) services.get(i);
-            int serviceId = serviceObject.getInt("serviceId");
-            JSONArray sparePartSerialNumber = serviceObject.getJSONArray("sparePartSerialNumber");
-            ArrayList<String> spareParts = new ArrayList<>();
-
-            if (sparePartSerialNumber.length()>0){
-                for (int k = 0; k < sparePartSerialNumber.length(); k++){
-                    spareParts.add((String) sparePartSerialNumber.get(k));
-                }
-            }
-            Service service = new Service(serviceId, spareParts);
-
-//            Service service = new Service(serviceId, sparePartSerialNumber, cost);
-
-            serviceRecord.setService(service);
-        }
-
-        ServiceJDBCDAO.getInstance().addServiceRecord(serviceRecord);
+//        ServiceRecord serviceRecord = new ServiceRecord();
+//        serviceRecord.setVehicle_id(jsonObject.getString("vehicleId"));
+//        serviceRecord.setServiced_date(new Timestamp(System.currentTimeMillis()));
+//        JSONArray services = jsonObject.getJSONArray("services");
+//
+//        for (int i = 0; i < services.length(); i++){
+//            JSONObject serviceObject = (JSONObject) services.get(i);
+//            int serviceId = serviceObject.getInt("serviceId");
+//            JSONArray sparePartSerialNumber = serviceObject.getJSONArray("sparePartSerialNumber");
+//            ArrayList<String> spareParts = new ArrayList<>();
+//
+//            if (sparePartSerialNumber.length()>0){
+//                for (int k = 0; k < sparePartSerialNumber.length(); k++){
+//                    spareParts.add((String) sparePartSerialNumber.get(k));
+//                }
+//            }
+//            Service service = new Service(serviceId, spareParts);
+//
+////            Service service = new Service(serviceId, sparePartSerialNumber, cost);
+//
+//            serviceRecord.setService(service);
+//        }
+//
+//        ServiceJDBCDAO.getInstance().addServiceRecord(serviceRecord);
 
         //writing response
         ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);
@@ -238,6 +250,12 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         ctx.write(response);
     }
 
+    private void getServiceTypes(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
+        JSONArray jsonArray = ServiceJDBCDAO.getInstance().getServiceTypes();
+        String stringServiceTypes = jsonArray.toString();
+
+        writeResponse(ctx, stringServiceTypes);
+    }
     private void sendTransactionConfirmation(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
         //decode request
         ByteBuf data = msg.content();

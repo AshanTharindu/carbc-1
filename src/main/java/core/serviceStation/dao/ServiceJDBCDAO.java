@@ -60,6 +60,42 @@ public class ServiceJDBCDAO {
         }
     }
 
+    public JSONArray getServiceTypes() throws SQLException {
+        System.out.println("get service types");
+        String queryString = "SELECT `service_id`, `service_type` FROM `ServiceType`";
+
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        JSONArray serviceTypeArray = new JSONArray();
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            resultSet = ptmt.executeQuery();
+
+            while (resultSet.next()){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("service_id", resultSet.getInt("service_id"));
+                jsonObject.put("service_type", resultSet.getString("service_type"));
+
+                serviceTypeArray.put(jsonObject);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return serviceTypeArray;
+        }
+    }
+
     //add a service to the service record and update service table accordingly
     public boolean addServiceRecord(ServiceRecord serviceRecord) throws SQLException {
         PreparedStatement ptmt = null;
@@ -237,7 +273,7 @@ public class ServiceJDBCDAO {
                 " `spare_part`, `seller` FROM `ServiceRecord` sr INNER JOIN `Service` s " +
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
                 "ON s.service_id = st.service_id LEFT JOIN `SparePart` sp " +
-                "ON s.spare_part_serial_number = sp.serial_number LIMIT 10";
+                "ON s.spare_part_serial_number = sp.serial_number ORDER BY s.record_id DESC";
 
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
@@ -250,57 +286,6 @@ public class ServiceJDBCDAO {
 
             serviceArray = formatServiceRecords(resultSet);
 
-//            JSONArray services = new JSONArray();
-//            JSONArray serviceTypeArray = new JSONArray();
-//            JSONObject service = new JSONObject();
-//            int recordId = -1;
-//            int count1 = 0;
-//            int count2 = 0;
-//            String temp = "";
-//
-//            while (resultSet.next()){
-//                if (recordId != resultSet.getInt(1)){
-//                    if (count1 != 0){
-//                        service.put("serviceData", serviceTypeArray);
-//                        serviceTypeArray = new JSONArray();
-//                        services.put(service);
-//                        serviceRecord.put("services", services);
-//                        services = new JSONArray();
-//                        serviceArray.put(serviceRecord);
-//                        count2 = 0;
-//                    }
-//                    count1++;
-//                    serviceRecord = new JSONObject();
-//                    recordId = resultSet.getInt(1);
-//                    serviceRecord.put("vehicleId", resultSet.getString("vehicle_id"));
-//                    serviceRecord.put("servicedDate", resultSet.getTimestamp("serviced_date"));
-//                }
-//
-//                String serviceType = resultSet.getString("service_type");
-//
-//                if (!temp.equals(serviceType)){
-//                    if (count2 != 0){
-//                        service.put("serviceData", serviceTypeArray);
-//                        serviceTypeArray = new JSONArray();
-//                        services.put(service);
-//                    }
-//                    count2++;
-//                    service = new JSONObject();
-//                    service.put("serviceType", serviceType);
-//
-//                }
-//                JSONObject serviceData = new JSONObject();
-//                serviceData.put("sparePart", resultSet.getString("spare_part"));
-//                serviceData.put("seller", resultSet.getString("seller"));
-//                serviceTypeArray.put(serviceData);
-//
-//
-//                temp = serviceType;
-//            }
-//            service.put("serviceData", serviceTypeArray);
-//            services.put(service);
-//            serviceRecord.put("services", services);
-//            serviceArray.put(serviceRecord);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -354,7 +339,7 @@ public class ServiceJDBCDAO {
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
                 "ON s.service_id = st.service_id LEFT JOIN `SparePart` sp " +
                 "ON s.spare_part_serial_number = sp.serial_number " +
-                "WHERE `vehicle_id` = ?";
+                "WHERE `vehicle_id` = ? ORDER BY s.record_id DESC";
 
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
@@ -408,6 +393,7 @@ public class ServiceJDBCDAO {
                 count1++;
                 serviceRecord = new JSONObject();
                 recordId = resultSet.getInt(1);
+                serviceRecord.put("recordId", recordId);
                 serviceRecord.put("vehicleId", resultSet.getString("vehicle_id"));
                 serviceRecord.put("servicedDate", resultSet.getTimestamp("serviced_date"));
             }
