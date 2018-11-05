@@ -74,20 +74,20 @@ public class AgreementCollector{
             //TODO: need to check whether parties are real or not before adding to the arrays
             switch (event){
                 case "ExchangeOwnership":
-                    pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
-                    getMandatoryValidators().add(pubKey);
-
-                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        succeed = RmvValidation.validateBlock(block);
-                    }
-
-//                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
-//                    pubKey = obj.getString("publicKey");
+//                    pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
 //                    getMandatoryValidators().add(pubKey);
 //
 //                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
 //                        succeed = RmvValidation.validateBlock(block);
 //                    }
+
+                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
+                    pubKey = obj.getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        succeed = RmvValidation.validateBlock(block);
+                    }
 
                     break;
 
