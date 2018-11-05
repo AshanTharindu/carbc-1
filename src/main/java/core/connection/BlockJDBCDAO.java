@@ -12,6 +12,7 @@ public class BlockJDBCDAO {
 
         Connection connection = null;
         PreparedStatement ptmt = null;
+        PreparedStatement psmt = null;
         ResultSet resultSet = null;
 
         String transactionId = blockInfo.getTransactionId();
@@ -44,12 +45,14 @@ public class BlockJDBCDAO {
             ptmt.setString(10, blockInfo.getAddress());
             ptmt.executeUpdate();
 
-            PreparedStatement psmt = connection.prepareStatement(query);
-            psmt.setString(1, identity.getBlock_hash());
-            psmt.setString(2, identity.getPublic_key());
-            psmt.setString(3, identity.getRole());
-            psmt.setString(4, identity.getName());
-            psmt.executeUpdate();
+            if (transactionType.equals("I")){
+                psmt = connection.prepareStatement(query);
+                psmt.setString(1, identity.getBlock_hash());
+                psmt.setString(2, identity.getPublic_key());
+                psmt.setString(3, identity.getRole());
+                psmt.setString(4, identity.getName());
+                psmt.executeUpdate();
+            }
 
             System.out.println("Block is Added Successfully");
 
@@ -59,6 +62,8 @@ public class BlockJDBCDAO {
         } finally {
             if (ptmt != null)
                 ptmt.close();
+            if (psmt != null)
+                psmt.close();
             if (connection != null)
                 connection.close();
             return true;
