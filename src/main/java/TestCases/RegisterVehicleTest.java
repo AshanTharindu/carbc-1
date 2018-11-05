@@ -18,7 +18,7 @@ public class RegisterVehicleTest {
         Controller controller = new Controller();
         controller.startNode();
 
-        controller.sendTransaction("RegisterVehicle", null, createRegisterJSON() );
+//        controller.sendTransaction("RegisterVehicle", null, createRegisterJSON() );
 
     }
 
