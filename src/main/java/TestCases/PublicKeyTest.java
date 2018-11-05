@@ -1,6 +1,5 @@
 package TestCases;
 
-import chainUtil.KeyGenerator;
 import controller.Controller;
 
 public class PublicKeyTest {

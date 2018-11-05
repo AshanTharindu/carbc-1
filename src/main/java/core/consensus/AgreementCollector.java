@@ -73,8 +73,8 @@ public class AgreementCollector{
                 case "ExchangeOwnership":
                     pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
                     getMandatoryValidators().add(pubKey);
-//                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
-//                    getMandatoryValidators().add(obj.getString("publicKey"));
+                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
+                    getMandatoryValidators().add(obj.getString("publicKey"));
 
                     break;
 
@@ -139,9 +139,14 @@ public class AgreementCollector{
                     break;
 
                 case "RegisterVehicle":
-                    pubKey = secondaryParties.getJSONObject("RMV")
-                            .getString("publicKey");
-                    getMandatoryValidators().add(pubKey);
+//                    pubKey = secondaryParties.getJSONObject("RMV")
+//                            .getString("publicKey");
+
+                    JSONObject object = getIdentityJDBC().getIdentityByRole("RMV");
+                    pubKey = object.getString("publicKey");
+                    getMandatoryValidators().add(object.getString("publicKey"));
+
+//                    getMandatoryValidators().add(pubKey);
                     if (isMandatoryPartyValid("RMV", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }
