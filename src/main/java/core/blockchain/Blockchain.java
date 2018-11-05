@@ -2,21 +2,19 @@ package core.blockchain;
 
 import chainUtil.ChainUtil;
 import core.connection.BlockJDBCDAO;
-import core.consensus.Consensus;
 import network.communicationHandler.MessageSender;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Member;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class Blockchain {
 
-    private static Blockchain blockchain;
+    //changed line 17 and 26-28
+    private static Blockchain blockchain = new Blockchain();
     private static long blockchainLength;
     private static final Logger log = LoggerFactory.getLogger(Blockchain.class);
 
@@ -26,9 +24,6 @@ public class Blockchain {
     }
 
     public static Blockchain getInstance() {
-        if (blockchain == null) {
-            blockchain = new Blockchain();
-        }
         return blockchain;
     }
 
