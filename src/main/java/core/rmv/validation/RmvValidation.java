@@ -58,7 +58,7 @@ public class RmvValidation {
 
         String vehicle_registration_number = blockData.getString("registrationNumber");
         String pre_owner = blockData.getString("preOwner");
-        String new_owner = blockData.getString("newOwner");
+        String new_owner = blockData.getJSONObject("SecondaryParty").getJSONObject("NewOwner").getString("publicKey");
 //        String date = blockData.getString("date");
 
         String vehicleRegistrationNumber = ownershipData.getString("registrationNumber");
