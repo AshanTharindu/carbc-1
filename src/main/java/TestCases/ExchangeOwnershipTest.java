@@ -14,7 +14,7 @@ public class ExchangeOwnershipTest {
         Controller controller = new Controller();
         controller.startNode();
 //        MessageSender.requestIP();
-        controller.sendTransaction("ExchangeOwnership", null, createRegisterJSON() );
+        controller.sendTransaction("ExchangeOwnership", "V-1234", createRegisterJSON() );
     }
 
     public static JSONObject createRegisterJSON(){
