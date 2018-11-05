@@ -6,8 +6,9 @@ import config.EventConfigHolder;
 import core.blockchain.Block;
 import core.connection.BlockJDBCDAO;
 import core.connection.IdentityJDBC;
+import core.rmv.validation.RmvValidation;
+import core.serviceStation.validation.ServiceStationValidation;
 import core.serviceStation.webSocketServer.webSocket.WebSocketMessageHandler;
-import core.serviceStation.dao.ServiceJDBCDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -86,7 +87,7 @@ public class AgreementCollector{
 
                     }
                     if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        validateBlock();
+                        ServiceStationValidation.validateBlock(block);
                     }
                     getMandatoryValidators().add(pubKey);
 
@@ -101,7 +102,7 @@ public class AgreementCollector{
                             .getString("publicKey");
                     getMandatoryValidators().add(pubKey);
                     if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        validateBlock();
+//                        validateBlock();
                     }
                     getMandatoryValidators().add(pubKey);
 
@@ -118,7 +119,7 @@ public class AgreementCollector{
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }
                     if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        validateBlock();
+//                        validateBlock();
                     }
                     break;
 
@@ -152,6 +153,10 @@ public class AgreementCollector{
                     if (isMandatoryPartyValid("RMV", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }
+
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                        RmvValidation.validateBlock(block);
+                    }
                     break;
 
                 case "RenewInsurance":
@@ -162,7 +167,7 @@ public class AgreementCollector{
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }
                     if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        validateBlock();
+//                        validateBlock();
                     }
                     break;
 
@@ -339,17 +344,17 @@ public class AgreementCollector{
         return identityJDBC;
     }
 
-    public void validateBlock() {
-        try {
-            String serviceData = ServiceJDBCDAO.getInstance().getLastServiceRecord(block.getBlockBody().getTransaction().getAddress()).toString();
-            if(block.getBlockBody().getTransaction().getData().equals(serviceData)) {
-                Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-    }
+//    public void validateBlock() {
+//        try {
+//            String serviceData = ServiceJDBCDAO.getInstance().getLastServiceRecord(block.getBlockBody().getTransaction().getAddress()).toString();
+//            if(block.getBlockBody().getTransaction().getData().equals(serviceData)) {
+//                Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
     public Rating getRating() {
         return rating;

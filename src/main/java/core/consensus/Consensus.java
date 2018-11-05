@@ -205,7 +205,7 @@ public class Consensus extends Observable {
 
     //no need of synchronizing
     public void sendAgreementForBlock(String blockHash) {
-        String signedBlock = ChainUtil.getInstance().digitalSignature(blockHash);
+        String signedBlock = ChainUtil.digitalSignature(blockHash);
         MessageSender.sendAgreement(signedBlock, blockHash);
         log.info("Agreement Sent for: {}", blockHash);
     }
