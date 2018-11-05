@@ -1,7 +1,5 @@
 package core.connection;
 
-import chainUtil.ChainUtil;
-import core.blockchain.Block;
 import core.blockchain.BlockInfo;
 import org.json.JSONObject;
 
