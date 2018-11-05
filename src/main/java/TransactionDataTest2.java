@@ -4,6 +4,7 @@ import constants.Constants;
 import core.consensus.DataCollector;
 import network.Neighbour;
 import network.Node;
+import network.communicationHandler.MessageSender;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class TransactionDataTest2 {
              * when we want our node to start listening
              * */
             node.startListening();
+            MessageSender.getInstance().requestIP();
 
 //            ServiceJDBCDAO serviceJDBCDAO = new ServiceJDBCDAO();
 //            System.out.println(serviceJDBCDAO.getServiceRecords("12345"));

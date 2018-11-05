@@ -162,7 +162,7 @@ public class ServiceJDBCDAO {
                 "ON sr.record_id = s.record_id LEFT JOIN `ServiceType` st " +
                 "ON s.service_id = st.service_id LEFT JOIN `SparePart` sp " +
                 "ON s.spare_part_serial_number = sp.serial_number " +
-                "WHERE `vehicle_id` = ? AND DATE(`serviced_date`) = CURDATE() ORDER BY `service_type`, s.record_id";
+                "WHERE `vehicle_id` = ? ORDER BY `service_type`, s.record_id";
 
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;

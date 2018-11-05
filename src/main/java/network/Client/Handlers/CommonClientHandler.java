@@ -51,7 +51,8 @@ public class CommonClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+//        cause.printStackTrace();
+        log.info("cannot find peer");
         ctx.close();
     }
 }

@@ -1,6 +1,7 @@
 package controller;
 
 import network.communicationHandler.MessageSender;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import chainUtil.ChainUtil;
@@ -32,6 +33,9 @@ public class BlockSender extends Thread {
         switch (event) {
             case "RegisterVehicle":
                 sendRegisterTransaction();
+
+            default:
+                sendTransaction();
         }
     }
 
@@ -57,5 +61,28 @@ public class BlockSender extends Thread {
         BlockHeader blockHeader = new BlockHeader(blockHash);
         Block block = new Block(blockHeader, blockBody);
         Consensus.getInstance().broadcastBlock(block, data.toString());
+    }
+
+    public String getDataJsonObject(JSONObject data, String event) {
+        String jsonData = null;
+        switch (event) {
+            case "ServiceRepair":
+                jsonData = createServiceRepairJson(data);
+        }
+
+        return jsonData;
+    }
+
+    public String createServiceRepairJson(JSONObject data) {
+        JSONArray services = data.getJSONArray("services");
+        JSONArray sparePartProvider = new JSONArray();
+        for(int service = 0; service < services.length(); service++) {
+            JSONArray serviceData = services.getJSONObject(service).getJSONArray("serviceData");
+            for(int part = 0; part < serviceData.length(); part++) {
+                sparePartProvider.put(serviceData.getJSONObject(part).get("seller"));
+            }
+        }
+        data.put("ThirdParty", sparePartProvider);
+        return data.toString();
     }
 }

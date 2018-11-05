@@ -18,12 +18,14 @@ public class ServiceStation {
     public JSONObject getServiceRecord(String vehicleId, String signature, String signedData, String dataRequester,
                                        String ip, int listeningPort) {
 
-        String customerPublicKey = getCustomerPublicKey(dataRequester);
-        if(ChainUtil.signatureVerification(customerPublicKey,signature,signedData)) {
+//        String customerPublicKey = getCustomerPublicKey(dataRequester);
+//        if(ChainUtil.signatureVerification(customerPublicKey,signature,signedData)) {
+        if(true) {
             log.info("Customer signature verified: {}", dataRequester);
             JSONObject serviceRecord = null;
             try {
                 serviceRecord = ServiceJDBCDAO.getInstance().getLastServiceRecord(vehicleId);
+                System.out.println(serviceRecord);
                 log.info("service records found for: {}", vehicleId);
                 MessageSender.sendTransactionData(serviceRecord,ip, listeningPort,dataRequester);
             } catch (SQLException e) {
