@@ -81,13 +81,13 @@ public class AgreementCollector{
                         succeed = RmvValidation.validateBlock(block);
                     }
 
-                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
-                    pubKey = obj.getString("publicKey");
-                    getMandatoryValidators().add(pubKey);
-
-                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        succeed = RmvValidation.validateBlock(block);
-                    }
+//                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
+//                    pubKey = obj.getString("publicKey");
+//                    getMandatoryValidators().add(pubKey);
+//
+//                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+//                        succeed = RmvValidation.validateBlock(block);
+//                    }
 
                     break;
 
