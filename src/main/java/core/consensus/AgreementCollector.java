@@ -6,6 +6,7 @@ import config.EventConfigHolder;
 import core.blockchain.Block;
 import core.connection.BlockJDBCDAO;
 import core.connection.IdentityJDBC;
+import core.serviceStation.webSocketServer.webSocket.WebSocketMessageHandler;
 import core.serviceStation.dao.ServiceJDBCDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,7 +17,7 @@ import java.security.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class AgreementCollector extends Thread{
+public class AgreementCollector{
 
     private String agreementCollectorId;
     private Block block;
@@ -35,11 +36,11 @@ public class AgreementCollector extends Thread{
     private final Logger log = LoggerFactory.getLogger(AgreementCollector.class);
 
 
-    public AgreementCollector(Block block) {
+    public AgreementCollector(Block block) throws SQLException {
         this.agreementCollectorId = generateAgreementCollectorId(block);
         this.block = block;
         this.agreements = new ArrayList<>();
-        this.mandatoryAgreements = new Agreement[2]; //get from the block
+        this.rating = new Rating(block.getBlockBody().getTransaction().getEvent());
         this.blockJDBCDAO = new BlockJDBCDAO();
         this.identityJDBC = new IdentityJDBC();
         this.mandatoryValidators = new ArrayList<>();
@@ -52,7 +53,9 @@ public class AgreementCollector extends Thread{
         //TODO: I have not handled the other case
     }
 
-    public void setMandatoryAgreements() {
+
+
+    public void setMandatoryAgreements() throws SQLException {
 
         synchronized (this){
             String event = this.block.getBlockBody().getTransaction().getEvent();
@@ -60,7 +63,7 @@ public class AgreementCollector extends Thread{
             System.out.println(blockData);
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONArray thirdParties = blockData.getJSONArray("ThirdParty");
-            rating = new Rating(event);
+            String pubKey;
             secondaryCount = thirdParties.length();
             rating.setSpecialValidators(secondaryCount);
 
@@ -68,66 +71,101 @@ public class AgreementCollector extends Thread{
             //TODO: need to check whether parties are real or not before adding to the arrays
             switch (event){
                 case "ExchangeOwnership":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("NewOwner").getString("publicKey"));
+                    pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
 //                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
 //                    getMandatoryValidators().add(obj.getString("publicKey"));
+
                     break;
 
                 case "ServiceRepair":
-                    String serviceStationPK = secondaryParties.getJSONObject("ServiceStation").getString("publicKey");
-                    if(serviceStationPK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                    pubKey = secondaryParties.getJSONObject("ServiceStation").getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+                    if (isMandatoryPartyValid("ServiceStation", pubKey)){
+                        WebSocketMessageHandler.addBlockToNotificationArray(block);
+
+                    }
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
                         validateBlock();
                     }
-                    getMandatoryValidators().add(serviceStationPK);
+                    getMandatoryValidators().add(pubKey);
                     for (int i = 0; i < thirdParties.length(); i++){
                         getSpecialValidators().add(thirdParties.getString(i));
                     }
                     break;
 
                 case "Insure":
-                    String insurePK = secondaryParties.getJSONObject("InsuranceCompany").getString("publicKey");
-                    if(insurePK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                    pubKey = secondaryParties.getJSONObject("InsuranceCompany")
+                            .getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
                         validateBlock();
                     }
-                    getMandatoryValidators().add(insurePK);
+                    getMandatoryValidators().add(pubKey);
+
+                    if (isMandatoryPartyValid("InsuranceCompany", pubKey)){
+                        WebSocketMessageHandler.addBlockToNotificationArray(block);
+                    }
                     break;
 
                 case "Lease":
-                    String leasePK = secondaryParties.getJSONObject("LeasingCompany").getString("publicKey");
-                    if(leasePK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                    pubKey = secondaryParties.getJSONObject("LeasingCompany")
+                            .getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+                    if (isMandatoryPartyValid("LeasingCompany", pubKey)){
+                        WebSocketMessageHandler.addBlockToNotificationArray(block);
+                    }
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
                         validateBlock();
                     }
-                    getMandatoryValidators().add(leasePK);
                     break;
 
                 case "BankLoan":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("Bank")
-                            .getString("publicKey"));
+                    pubKey = secondaryParties.getJSONObject("Bank")
+                            .getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+                    if (isMandatoryPartyValid("Bank", pubKey)){
+                        WebSocketMessageHandler.addBlockToNotificationArray(block);
+                    }
                     break;
 
                 case "RenewRegistration":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("RMV")
-                            .getString("publicKey"));
+                    pubKey = secondaryParties.getJSONObject("RMV")
+                            .getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+                    if (isMandatoryPartyValid("RMV", pubKey)){
+                        WebSocketMessageHandler.addBlockToNotificationArray(block);
+                    }
                     break;
 
                 case "RegisterVehicle":
-                    String RMVPK = secondaryParties.getJSONObject("RMV").getString("publicKey");
-                    if(RMVPK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        validateBlock();
+                    pubKey = secondaryParties.getJSONObject("RMV")
+                            .getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+                    if (isMandatoryPartyValid("RMV", pubKey)){
+                        WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }
-                    getMandatoryValidators().add(RMVPK);
                     break;
 
                 case "RenewInsurance":
-                    String insure_PK = secondaryParties.getJSONObject("InsuranceCompany").getString("publicKey");
-                    if(insure_PK.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                    pubKey = secondaryParties.getJSONObject("InsuranceCompany")
+                            .getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+                    if (isMandatoryPartyValid("InsuranceCompany", pubKey)){
+                        WebSocketMessageHandler.addBlockToNotificationArray(block);
+                    }
+                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
                         validateBlock();
                     }
-                    getMandatoryValidators().add(insure_PK);
+                    break;
 
                 case "BuySpareParts":
-                    getMandatoryValidators().add(secondaryParties.getJSONObject("SparePartProvider")
-                            .getString("publicKey"));
+                    pubKey = secondaryParties.getJSONObject("SparePartProvider")
+                            .getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
+                    if (isMandatoryPartyValid("SparePartProvider", pubKey)){
+                        WebSocketMessageHandler.addBlockToNotificationArray(block);
+                    }
                     break;
 
             }
@@ -146,6 +184,17 @@ public class AgreementCollector extends Thread{
                 System.out.println(specialValidators.get(i));
             }
         }
+
+    }
+
+    public boolean isMandatoryPartyValid(String role, String pubKey) throws SQLException {
+        IdentityJDBC identityJDBC = new IdentityJDBC();
+        JSONObject jsonObject = identityJDBC.getIdentityByAddress(pubKey);
+
+        if (role.equals(jsonObject.getString("role"))){
+            return true;
+        }
+        return false;
 
     }
 
@@ -263,9 +312,8 @@ public class AgreementCollector extends Thread{
         return getAgreedNodes().size();
     }
 
-
     public ArrayList<String> getMandatoryValidators() {
-        return mandatoryValidators;
+                                                                                                                                        return mandatoryValidators;
     }
 
     public ArrayList<String> getSpecialValidators() {

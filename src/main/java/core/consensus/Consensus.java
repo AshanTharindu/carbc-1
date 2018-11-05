@@ -9,6 +9,7 @@ import core.connection.BlockJDBCDAO;
 import core.connection.HistoryDAO;
 import core.connection.Identity;
 import core.serviceStation.webSocketServer.webSocket.WebSocketMessageHandler;
+import core.smartContract.BlockValidity;
 import core.smartContract.TimeKeeper;
 import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
@@ -61,12 +62,13 @@ public class Consensus extends Observable {
         WebSocketMessageHandler.addBlockToNotificationArray(block);
     }
 
-    public synchronized void handleNonApprovedBlock(Block block) {
+    public synchronized void handleNonApprovedBlock(Block block) throws SQLException {
         if (!isDuplicateBlock(block)) {
             if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
                     block.getBlockHeader().getSignature(),block.getBlockHeader().getHash())) {
+
                 log.info("signature verified for block: ", block.getBlockHeader().getBlockNumber());
-                nonApprovedBlocks.add(block);
+
                 boolean isPresent = false;
                 if(getNonApprovedBlocks().size()>0) {
                     for (Block b : this.getNonApprovedBlocks()) {
@@ -76,32 +78,26 @@ public class Consensus extends Observable {
                         }
                     }
                 }
+
 //                getNonApprovedBlocks().add(block);
 //                addBlockToNonApprovedBlocks(block);
                 this.nonApprovedBlocks.add(block);
                 //TODO: should notify the ui
 //                WebSocketMessageHandler.testUpdate(nonApprovedBlocks);
-                WebSocketMessageHandler.addBlockToNotificationArray(block);
-
 
                 if (!isPresent) {
                     TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                     timeKeeper.start();
                 }
+
                 AgreementCollector agreementCollector = new AgreementCollector(block);
                 System.out.println("agreementcolletor ID: "+agreementCollector.getAgreementCollectorId());
                 agreementCollectors.add(agreementCollector);
-                agreementCollector.start();
                 log.info("agreement Collector added, size: {}", agreementCollectors.size());
-                //TODO: there is a problem here. Regardless of the block validity we anyway append the agreement collector to the arraylist. so whats the point of doing block validity below??
 
                 //now need to check the relevant party is registered as with desired roles
                 //if want, we can check the validity of the block creator/transaction creator
 
-//                BlockValidity blockValidity = new BlockValidity(block);
-//                if (blockValidity.isSecondaryPartyValid()) {
-//                    //pop up notification to confirm
-//                }
             }
 
         }

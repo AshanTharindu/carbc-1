@@ -1,8 +1,5 @@
 package core.blockchain;
 
-import org.json.JSONObject;
-
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;

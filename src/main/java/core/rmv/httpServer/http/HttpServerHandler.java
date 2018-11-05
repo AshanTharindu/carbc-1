@@ -1,10 +1,8 @@
-package core.serviceStation.httpServer.http;
+package core.rmv.httpServer.http;
 
 import com.google.common.cache.Cache;
 import com.google.common.io.Resources;
 import controller.Controller;
-import core.serviceStation.Service;
-import core.serviceStation.ServiceRecord;
 import core.serviceStation.ServiceType;
 import core.serviceStation.dao.ServiceJDBCDAO;
 import io.netty.buffer.ByteBuf;
@@ -20,8 +18,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -46,27 +42,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             System.out.println("closed");
             return;
         }
-//
-//        HttpMethod HttpPMethod = msg.method();
-//        System.out.println(msg);
-//        System.out.println(HttpPMethod);
-//
-//
-//        System.out.println("Recieved request!");
-//        System.out.println("HTTP Method: " + msg.method());
-//        System.out.println("HTTP Version: " + msg.protocolVersion());
-//        System.out.println("URI: " + msg.uri());
-//        System.out.println("Headers: " + msg.headers());
-//        System.out.println("Trailing headers: " + msg.trailingHeaders());
-//
-//        ByteBuf data = msg.content();
-//        System.out.println("POST/PUT length: " + data.readableBytes());
-//        System.out.println("POST/PUT as string: ");
-//        System.out.println("-- DATA --");
-//        System.out.println(data.toString(StandardCharsets.UTF_8));
-//        System.out.println("-- DATA END --");
-
-
 
         if (msg.uri().equals("/serviceStation")) {
             serveStatic(ctx, "/index.html");
