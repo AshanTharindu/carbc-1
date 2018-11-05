@@ -8,6 +8,8 @@ import java.sql.*;
 public class BlockJDBCDAO {
 
     public boolean addBlockToBlockchain(BlockInfo blockInfo, Identity identity) throws SQLException {
+        System.out.println("inside BlockJDBCDAO/addBlockToBlockchain()");
+
         Connection connection = null;
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
