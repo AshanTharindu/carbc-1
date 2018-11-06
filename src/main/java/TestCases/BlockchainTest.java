@@ -1,6 +1,7 @@
 package TestCases;
 
 import core.blockchain.Blockchain;
+import network.Node;
 import core.connection.BlockJDBCDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,9 +12,9 @@ import java.sql.SQLException;
 
 public class BlockchainTest {
     public static void main(String[] args) throws SQLException, UnsupportedEncodingException {
+        requestBlockchain();
         testGetBlockchain();
     }
-
     public static void testGetBlockchain() throws SQLException, UnsupportedEncodingException {
         JSONObject blockchainJSON = Blockchain.getBlockchainJSON(1);
 
@@ -23,5 +24,9 @@ public class BlockchainTest {
 
         BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
         blockJDBCDAO.saveBlockchain(blockchain);
+    }
+
+    public static void requestBlockchain() {
+        Node.getInstance().startNode();
     }
 }
