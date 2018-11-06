@@ -1,12 +1,15 @@
 package TestCases;
 
 import controller.Controller;
+import fakeAgreementSender.AgreementSender;
 import network.communicationHandler.MessageSender;
 import org.json.JSONObject;
 
 public class ExchangeOwnershipTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         startNodeTest();
+        Thread.sleep(3000);
+        sendAgreements();
 
     }
 
@@ -25,7 +28,7 @@ public class ExchangeOwnershipTest {
         JSONObject secondaryParty = new JSONObject();
         JSONObject newOwner = new JSONObject();
         newOwner.put("name", "Ashan");
-        newOwner.put("publicKey", "3081f03081a806072a8648ce38040130819c024100fca682ce8e12caba26efccf7110e526db078b05edecbcd1eb4a208f3ae1617ae01f35b91a47e6df63413c5e12ed0899bcd132acd50d99151bdc43ee737592e17021500962eddcc369cba8ebb260ee6b6a126d9346e38c50240678471b27a9cf44ee91a49c5147db1a9aaf244f05a434d6486931d2d14271b9e35030b71fd73da179069b32e2935630e1c2062354d0da20a6c416e50be794ca4034300024055252e55dd1c1c3c4ea9caa768717d451ede7f550136cab28bbdb46f57d2a670871b77b213f1905e45d5db9c16d0e46ff1f9e7c273a63754fe56cc753eb6bbab");
+        newOwner.put("publicKey", "3081f03081a806072a8648ce38040130819c024100fca682ce8e12caba26efccf7110e526db078b05edecbcd1eb4a208f3ae1617ae01f35b91a47e6df63413c5e12ed0899bcd132acd50d99151bdc43ee737592e17021500962eddcc369cba8ebb260ee6b6a126d9346e38c50240678471b27a9cf44ee91a49c5147db1a9aaf244f05a434d6486931d2d14271b9e35030b71fd73da179069b32e2935630e1c2062354d0da20a6c416e50be794ca4034300024056938402db3b8e488ebecc7c30f1776485b1daaed992ee02a09fe7a9ce9e5697693e0ca83e43fdfd0b0d63dc6219beca77dff284c2c9dec425ffca68b8a94cf9");
         JSONObject thirdParty = new JSONObject();
         secondaryParty.put("NewOwner", newOwner);
 
@@ -33,6 +36,15 @@ public class ExchangeOwnershipTest {
         ownership.put("ThirdParty", thirdParty);
 
         return ownership;
+    }
+
+    public static void sendAgreements(){
+        String[] orgs = {"ServiceStation", "RMV", "SparePartShop", "GodFather"};
+        AgreementSender agreementSender = new AgreementSender();
+        for( String org : orgs) {
+            System.out.println(org);
+            agreementSender.sendFakeAgreements(org);
+        }
     }
 
 }

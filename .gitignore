@@ -5,4 +5,13 @@ target/
 src/main/resources/db.json
 src/main/resources/private.key
 src/main/resources/public.key
+src/main/resources/RMVPrivate.key
+src/main/resources/RMVPublic.key
+src/main/resources/ServiceStationPrivate.key
+src/main/resources/ServiceStationPublic.key
+src/main/resources/SparePartShopPrivate.key
+src/main/resources/SparePartShopPublic.key
+src/main/resources/GodFatherPublic.key
+src/main/resources/GodFatherPrivate.key
+
 
