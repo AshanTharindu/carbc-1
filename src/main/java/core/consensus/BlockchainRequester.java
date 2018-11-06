@@ -3,6 +3,7 @@ package core.consensus;
 import chainUtil.ChainUtil;
 import core.blockchain.Block;
 import core.blockchain.Blockchain;
+import core.blockchain.TimeKeeperForBC;
 import core.connection.BlockJDBCDAO;
 import network.Neighbour;
 import network.communicationHandler.MessageSender;
@@ -73,7 +74,7 @@ public class BlockchainRequester {
     }
 
     public synchronized void handleReceivedSignedBlockchain(Neighbour peer, String signedBlockchain, String blockchainHash) {
-        if (ChainUtil.getInstance().signatureVerification(peer.getPublicKey(), signedBlockchain, blockchainHash)) {
+        if (ChainUtil.signatureVerification(peer.getPublicKey(), signedBlockchain, blockchainHash)) {
             BlockchainReceiver blockchainReceiver = new BlockchainReceiver(peer, signedBlockchain, blockchainHash);
             blockchainReceiveDetails.add(blockchainReceiver);
             blockchainRequest -= 1;
@@ -108,6 +109,8 @@ public class BlockchainRequester {
 
     public synchronized void setBlockchainRequest(int blockchainRequest) {
         this.blockchainRequest = blockchainRequest;
+        TimeKeeperForBC timeKeeperForBC = new TimeKeeperForBC();
+        timeKeeperForBC.start();
     }
 
     public synchronized String findCorrectBlockchain() {
