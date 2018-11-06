@@ -36,16 +36,16 @@ public class BlockchainRequester {
     }
 
     //blockchain request methods
-    public synchronized void handleBlockchainHashRequest(Neighbour blockchainRequeseter) {
+    public synchronized void handleBlockchainHashRequest(Neighbour blockchainRequeseter) throws SQLException {
         long blockChainLength = Blockchain.getRecentBlockNumber();
         if (blockChainLength > 1) {
             sendSignedBlockChain(blockchainRequeseter);
         }
     }
 
-    public synchronized void sendSignedBlockChain(Neighbour blockchainRequester) {
+    public synchronized void sendSignedBlockChain(Neighbour blockchainRequester) throws SQLException {
         BlockchainShare blockchainShare = new BlockchainShare(blockchainRequester);
-        String blockchainHash = ChainUtil.getHash(Blockchain.getBlockchain(0).toString());
+        String blockchainHash = ChainUtil.getHash(Blockchain.getBlockchainJSON(0).toString());
         blockchainShareDetails.add(blockchainShare);
         String signedBlockchainHash = ChainUtil.getInstance().digitalSignature(blockchainHash);
         MessageSender.sendSignedBlockChain(blockchainRequester, signedBlockchainHash, blockchainHash);
@@ -53,7 +53,7 @@ public class BlockchainRequester {
 
     //no need of synchronizing
     public void sendBlockchain(String ip, int listeningPort) throws Exception {
-        JSONObject blockchainInfo = Blockchain.getBlockchain(0);
+        JSONObject blockchainInfo = Blockchain.getBlockchainJSON(0);
         MessageSender.sendBlockchainToPeer(
                 ip,
                 listeningPort,
