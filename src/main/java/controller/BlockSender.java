@@ -70,6 +70,7 @@ public class BlockSender extends Thread {
         switch (event) {
             case "ServiceRepair":
                 jsonData = createServiceRepairJson(data);
+                break;
         }
 
         return jsonData;
@@ -84,7 +85,12 @@ public class BlockSender extends Thread {
                 sparePartProvider.put(serviceData.getJSONObject(part).get("seller"));
             }
         }
-        data.put("ThirdParty", sparePartProvider);
+        JSONObject thirdParty = new JSONObject();
+        thirdParty.put("SparePartProvider", sparePartProvider);
+        data.put("ThirdParty", thirdParty);
+
         return data.toString();
     }
+
+
 }

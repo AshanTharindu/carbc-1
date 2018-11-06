@@ -1,6 +1,7 @@
 package core.connection;
 
 import core.blockchain.BlockInfo;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.*;
@@ -71,10 +72,15 @@ public class BlockJDBCDAO {
 
     }
 
-    public ResultSet getBlockchain(long blockNumber) throws SQLException {
+    public void saveBlockchain(){
+
+    }
+
+    public JSONObject getBlockchain(long blockNumber) throws SQLException {
         Connection connection = null;
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
+        JSONObject convertedResultSet = null;
 
         String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
                 "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
@@ -86,24 +92,73 @@ public class BlockJDBCDAO {
             ptmt = connection.prepareStatement(queryString);
             ptmt.setLong(1, blockNumber);
             resultSet = ptmt.executeQuery();
+            convertedResultSet = convertResultSetIntoJSON(resultSet);
 
-//            if (resultSet.next()){
-//                blockchain = ChainUtil.getInstance().getBlockchainAsJsonString(resultSet);
-//            }
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (resultSet != null)
-                resultSet.close();
             if (ptmt != null)
                 ptmt.close();
+            if (resultSet != null)
+                resultSet.close();
             if (connection != null)
                 connection.close();
-            return resultSet;
+            return convertedResultSet;
         }
     }
+
+//    public static JSONObject getBlockchainJSON(int from) throws SQLException {
+//
+//        JSONObject blockchain = null;
+//        try {
+//            blockchain = blockJDBCDAO.getBlockchain(from);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }finally {
+//
+//        }
+//        return blockchain;
+//
+//    }
+
+    public static JSONObject convertResultSetIntoJSON(ResultSet resultSet) throws Exception {
+        JSONObject result = new JSONObject();
+        int count = 0;
+
+        JSONArray jsonArray = new JSONArray();
+        while (resultSet.next()) {
+            count++;
+            int total_rows = resultSet.getMetaData().getColumnCount();
+            JSONObject obj = new JSONObject();
+
+            for (int i = 0; i < total_rows; i++) {
+                String columnName = resultSet.getMetaData().getColumnLabel(i + 1).toLowerCase();
+                Object columnValue = resultSet.getObject(i + 1);
+                // if value in DB is null, then we set it to default value
+                if (columnValue == null){
+                    columnValue = "null";
+                }
+                /*
+                Next if block is a hack. In case when in db we have values like price and price1 there's a bug in jdbc -
+                both this names are getting stored as price in ResulSet. Therefore when we store second column value,
+                we overwrite original value of price. To avoid that, i simply add 1 to be consistent with DB.
+                 */
+                if (obj.has(columnName)){
+                    columnName += "1";
+                }
+                obj.put(columnName, columnValue);
+            }
+            jsonArray.put(obj);
+        }
+        result.put("blockchainSize", count);
+        result.put("blockchain", jsonArray.toString());
+        return result;
+    }
+
 
     //get an identity related transactions
     public void updateIdentityTableAtBlockchainReceipt() throws SQLException {
@@ -217,6 +272,37 @@ public class BlockJDBCDAO {
             if (connection != null)
                 connection.close();
             return blockNumber;
+        }
+    }
+
+    public JSONObject getPreviousBlockData() throws SQLException {
+        String queryString = "SELECT `block_hash`,`block_number`, `block_timestamp` FROM Blockchain WHERE `validity` = 1 ORDER BY id DESC LIMIT 1";
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet result = null;
+        JSONObject previousBlock = new JSONObject();
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            result = ptmt.executeQuery();
+            if(result.next()) {
+                previousBlock.put("blockHash", result.getString("block_hash"));
+                previousBlock.put("blockNumber", result.getString("block_number"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (result != null)
+                result.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return previousBlock;
         }
     }
 

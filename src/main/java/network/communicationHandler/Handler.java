@@ -149,7 +149,7 @@ public class Handler extends Thread{
         Node.getInstance().addActiveNeighbour(peerID, ip, listeningPort);
     }
 
-    public void handleBlockChainHashRequest() {
+    public void handleBlockChainHashRequest() throws SQLException {
         JSONObject clientInfo = new JSONObject(data);
         String ip = clientInfo.getString("ip");
         int listeningPort = clientInfo.getInt("ListeningPort");

@@ -48,7 +48,7 @@ public class AgreementCollector{
         this.identityJDBC = new IdentityJDBC();
         this.mandatoryValidators = new ArrayList<>();
         this.specialValidators = new ArrayList<>();
-        this.threshold = 1;
+        this.threshold = 3;
 
         setMandatoryAgreements();
 
@@ -74,8 +74,8 @@ public class AgreementCollector{
             //TODO: need to check whether parties are real or not before adding to the arrays
             switch (event){
                 case "ExchangeOwnership":
-//                    pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
-//                    getMandatoryValidators().add(pubKey);
+                    pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
+                    getMandatoryValidators().add(pubKey);
 //
 //                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
 //                        succeed = RmvValidation.validateBlock(block);
@@ -285,6 +285,8 @@ public class AgreementCollector{
                     getAgreements().add(agreement);
                     //check for mandatory
                     if (getMandatoryValidators().contains(agreement.getPublicKey())){
+                        System.out.println("mandatory validator received");
+                        System.out.println(agreement.getPublicKey());
                         getMandatoryValidators().remove(agreement.getPublicKey());
                         // add rating
                     }else if (getSpecialValidators().contains(agreement.getPublicKey())){
@@ -337,7 +339,7 @@ public class AgreementCollector{
     }
 
     public ArrayList<String> getMandatoryValidators() {
-                                                                                                                                        return mandatoryValidators;
+        return mandatoryValidators;
     }
 
     public ArrayList<String> getSpecialValidators() {
