@@ -51,24 +51,7 @@ public class Blockchain {
         }
     }
 
-//    public static JSONObject getBlockchainJSON(int from) throws SQLException {
-//        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
-//        ResultSet rs = null;
-//        JSONObject convertedResultSet = null;
-//        try {
-//            rs = blockJDBCDAO.getBlockchain(from);
-//            convertedResultSet = convertResultSetIntoJSON(rs);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }finally {
-////            if (rs != null)
-////                rs.close();
-//        }
-//        return convertedResultSet;
-//
-//    }
+
 
     public static JSONObject getBlockchainJSON(int from) throws SQLException {
         BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
@@ -86,39 +69,7 @@ public class Blockchain {
 
     }
 
-//    public static JSONObject convertResultSetIntoJSON(ResultSet resultSet) throws Exception {
-//        JSONObject result = new JSONObject();
-//        int count = 0;
-//
-//        JSONArray jsonArray = new JSONArray();
-//        while (resultSet.next()) {
-//            count++;
-//            int total_rows = resultSet.getMetaData().getColumnCount();
-//            JSONObject obj = new JSONObject();
-//
-//            for (int i = 0; i < total_rows; i++) {
-//                String columnName = resultSet.getMetaData().getColumnLabel(i + 1).toLowerCase();
-//                Object columnValue = resultSet.getObject(i + 1);
-//                // if value in DB is null, then we set it to default value
-//                if (columnValue == null){
-//                    columnValue = "null";
-//                }
-//                /*
-//                Next if block is a hack. In case when in db we have values like price and price1 there's a bug in jdbc -
-//                both this names are getting stored as price in ResulSet. Therefore when we store second column value,
-//                we overwrite original value of price. To avoid that, i simply add 1 to be consistent with DB.
-//                 */
-//                if (obj.has(columnName)){
-//                    columnName += "1";
-//                }
-//                obj.put(columnName, columnValue);
-//            }
-//            jsonArray.put(obj);
-//        }
-//        result.put("blockchainSize", count);
-//        result.put("blockchain", jsonArray.toString());
-//        return result;
-//    }
+
 
     public static String getPreviousHash() {
         BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();

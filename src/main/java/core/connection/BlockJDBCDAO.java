@@ -1,5 +1,6 @@
 package core.connection;
 
+import chainUtil.ChainUtil;
 import core.blockchain.BlockInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -72,8 +73,65 @@ public class BlockJDBCDAO {
 
     }
 
-    public void saveBlockchain(){
+    public void saveBlockchain(JSONArray blockchain) throws SQLException {
+        System.out.println("inside BlockJDBCDAO/addBlockToBlockchain()");
 
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        PreparedStatement psmt = null;
+        ResultSet resultSet = null;
+
+        final int batchSize = blockchain.length();
+        int count = 0;
+
+        try {
+            String queryString = "INSERT INTO `Blockchain`(`previous_hash`, " +
+                    "`block_hash`, `block_timestamp`, `block_number`, `validity`," +
+                    " `transaction_id`, `sender`, `event`, `data`, `address`) " +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+
+            for (int i = 0; i < blockchain.length(); i++){
+                JSONObject block = blockchain.getJSONObject(i);
+                ptmt.setString(1, block.getString("previous_hash"));
+                ptmt.setString(2, block.getString("block_hash"));
+                System.out.println(block.get("block_timestamp"));
+
+                ptmt.setTimestamp(3, (Timestamp) block.get("block_timestamp"));
+                ptmt.setLong(4, block.getLong("block_number"));
+                ptmt.setBoolean(5, true);
+                ptmt.setString(6, block.getString("transaction_id"));
+                ptmt.setString(7, block.getString("sender"));
+                ptmt.setString(8, block.getString("event"));
+
+                String data = block.getString("data");
+                String jsonFormattedString = data.replaceAll("\\\\", "");
+
+                ptmt.setString(9, jsonFormattedString);
+                ptmt.setString(10, block.getString("address"));
+
+                ptmt.addBatch();
+
+                if(++count % batchSize == 0) {
+                    ptmt.executeBatch();
+                }
+            }
+            ptmt.executeBatch();
+
+            System.out.println("Block is Added Successfully");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (ptmt != null)
+                ptmt.close();
+            if (psmt != null)
+                psmt.close();
+            if (connection != null)
+                connection.close();
+        }
     }
 
     public JSONObject getBlockchain(long blockNumber) throws SQLException {
@@ -109,21 +167,6 @@ public class BlockJDBCDAO {
         }
     }
 
-//    public static JSONObject getBlockchainJSON(int from) throws SQLException {
-//
-//        JSONObject blockchain = null;
-//        try {
-//            blockchain = blockJDBCDAO.getBlockchain(from);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }finally {
-//
-//        }
-//        return blockchain;
-//
-//    }
 
     public static JSONObject convertResultSetIntoJSON(ResultSet resultSet) throws Exception {
         JSONObject result = new JSONObject();
@@ -138,6 +181,14 @@ public class BlockJDBCDAO {
             for (int i = 0; i < total_rows; i++) {
                 String columnName = resultSet.getMetaData().getColumnLabel(i + 1).toLowerCase();
                 Object columnValue = resultSet.getObject(i + 1);
+
+//                if (columnName.equals("data")){
+////                    JSONObject data = new JSONObject()
+//                    columnValue = resultSet.getString("data");
+//                    System.out.println(columnValue);
+//                }
+
+
                 // if value in DB is null, then we set it to default value
                 if (columnValue == null){
                     columnValue = "null";
@@ -150,12 +201,20 @@ public class BlockJDBCDAO {
                 if (obj.has(columnName)){
                     columnName += "1";
                 }
-                obj.put(columnName, columnValue);
+//                if (columnName.equals("data")){
+//                    String colValue = resultSet.getString("data");
+//                    System.out.println(colValue);
+//                    obj.put(columnName, colValue.toString());
+//
+//                }else {
+                    obj.put(columnName, columnValue);
+//                }
+
             }
             jsonArray.put(obj);
         }
         result.put("blockchainSize", count);
-        result.put("blockchain", jsonArray.toString());
+        result.put("blockchain", jsonArray);
         return result;
     }
 
