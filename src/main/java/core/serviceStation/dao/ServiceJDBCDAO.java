@@ -35,17 +35,28 @@ public class ServiceJDBCDAO {
     }
 
     //add a service to service type
-    public boolean addServiceType(ServiceType serviceType) throws SQLException {
+    public boolean addServiceType(JSONArray serviceTypeArray) throws SQLException {
         String queryString = "INSERT INTO `ServiceType`(`service_type`) " +
                 "VALUES (?)";
         PreparedStatement ptmt = null;
         boolean succeed = false;
+        final int batchSize = serviceTypeArray.length();
+        int count = 0;
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(queryString);
-            ptmt.setString(1, serviceType.getService_type());
-            succeed = ptmt.execute();
+
+            for (int i = 0; i < serviceTypeArray.length(); i++){
+                ptmt.setString(1, serviceTypeArray.getString(i));
+                ptmt.addBatch();
+
+                if(++count % batchSize == 0) {
+                    ptmt.executeBatch();
+                }
+            }
+            ptmt.executeBatch();
+
 
         } catch (SQLException e) {
             e.printStackTrace();

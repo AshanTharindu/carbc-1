@@ -100,7 +100,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             if (msg.method().equals(HttpMethod.POST)){
                 getServiceRecordsPerVehicle(ctx, msg);
             }
-        }else if (msg.uri().equals("/serviceStation/setServiceType")) {
+        }else if (msg.uri().equals("/serviceStation/setServiceTypes")) {
             if (msg.method().equals(HttpMethod.OPTIONS)){
                 resolvePrefightedRequests(ctx, msg);
             }
@@ -237,10 +237,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         JSONObject jsonObject = new JSONObject(body);
         System.out.println(jsonObject);
 
-        String serviceType = jsonObject.getString("serviceType");
+        JSONArray serviceTypesArray = jsonObject.getJSONArray("serviceTypes");
+//        String serviceType = serviceTypesArray.getJSONArray("serviceType");
 
-        ServiceType serviceTypeObject = new ServiceType(serviceType);
-        ServiceJDBCDAO.getInstance().addServiceType(serviceTypeObject);
+        ServiceJDBCDAO.getInstance().addServiceType(serviceTypesArray);
 
         //writing response
         ByteBuf content = Unpooled.copiedBuffer("successful", CharsetUtil.UTF_8);

@@ -41,6 +41,82 @@
     ]
   }],
 
+  "data":{
+    "vehicle_id": "22222A",
+    "serviced_date": "2018-10-19 13:55:05.0",
+    "cost": "",
+    "services": [
+      {
+        "serviceType": "Change the engine oil",
+        "serviceData": [
+          {
+            "seller": "Theshan Ranasinghe",
+            "sparePart": "Break Oil"
+          },
+          {
+            "seller": "Madhushika Jayasinghe",
+            "sparePart": "head lights"
+          }
+        ]
+      },
+      {
+        "serviceType": "Check level and refill Automatic/Manual Transmission Fluid",
+        "serviceData": [
+          {
+            "seller": "Ashan Dewasiri",
+            "sparePart": "tire"
+          },
+          {
+            "seller": "Sajinie Ranasinghe",
+            "sparePart": "AC"
+          }
+        ]
+      }
+    ]
+  },
+  "data":{
+    "vehicle_id": "22222A",
+    "serviced_date": "2018-10-19 13:55:05.0",
+    "cost": "",
+    "services": [
+      {
+        "serviceType": "Change the engine oil",
+        "serviceData": [
+          {
+            "seller": "Theshan Ranasinghe",
+            "sparePart": "Break Oil"
+          },
+          {
+            "seller": "Madhushika Jayasinghe",
+            "sparePart": "head lights"
+          }
+        ]
+      },
+      {
+        "serviceType": "Check level and refill Automatic/Manual Transmission Fluid",
+        "serviceData": [
+          {
+            "seller": "Ashan Dewasiri",
+            "sparePart": "tire"
+          },
+          {
+            "seller": "Sajinie Ranasinghe",
+            "sparePart": "AC"
+          }
+        ]
+      }
+    ],
+    "SecondaryParty": {
+      "serviceStation": {
+        "name":"",
+        "publicKey":""
+      }
+    },
+    "ThirdParty": {
+      "SparePartProvider":["address1", "address2"]
+    }
+  },
+
   "data": {
     "insuranceType": "",
     "insuranceNumber": "",
@@ -160,6 +236,47 @@
       }
     },
     "ThirdParty": {}
+  },
+  "data":{
+    "serviced_date":"2018-10-19 13:55:05.0",
+    "cost":"",
+    "services":[
+      {
+        "serviceType":"Change the engine oil",
+        "serviceData":[
+          {
+            "seller":"Theshan Ranasinghe",
+            "sparePart":"Break Oil"},
+          {
+            "seller":"Madhushika Jayasinghe",
+            "sparePart":"head lights"
+          }
+        ]
+      },
+      {
+        "serviceType":"Check level and refill Automatic/Manual Transmission Fluid",
+        "serviceData":[
+          {
+            "seller":"Ashan Dewasiri",
+            "sparePart":"tire"
+          },
+          {
+            "seller":"Sajinie Ranasinghe",
+            "sparePart":"AC"
+          }
+        ]
+      }
+    ],
+    "vehicle_id":"22222A",
+    "ThirdParty":{
+      "SparePartProvider":[
+        "Theshan Ranasinghe",
+        "Madhushika Jayasinghe",
+        "Ashan Dewasiri",
+        "Sajinie Ranasinghe"
+      ]
+    }
   }
+
 
 }

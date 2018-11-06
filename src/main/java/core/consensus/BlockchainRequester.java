@@ -43,13 +43,12 @@ public class BlockchainRequester {
         }
     }
 
-    public synchronized void sendSignedBlockChain(Neighbour blockchainRequeseter) {
-        BlockchainShare blockchainShare = new BlockchainShare(blockchainRequeseter);
+    public synchronized void sendSignedBlockChain(Neighbour blockchainRequester) {
+        BlockchainShare blockchainShare = new BlockchainShare(blockchainRequester);
         String blockchainHash = ChainUtil.getHash(Blockchain.getBlockchain(0).toString());
         blockchainShareDetails.add(blockchainShare);
         String signedBlockchainHash = ChainUtil.getInstance().digitalSignature(blockchainHash);
-        MessageSender.sendSignedBlockChain(blockchainRequeseter, signedBlockchainHash, blockchainHash);
-
+        MessageSender.sendSignedBlockChain(blockchainRequester, signedBlockchainHash, blockchainHash);
     }
 
     //no need of synchronizing
