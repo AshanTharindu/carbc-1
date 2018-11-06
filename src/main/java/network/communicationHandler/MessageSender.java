@@ -11,6 +11,7 @@ import network.Client.RequestMessage;
 import network.Neighbour;
 import network.Node;
 import network.Protocol.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +113,7 @@ public class MessageSender {
         System.out.println("sendSignedBlockChain");
     }
 
-    public static void sendBlockchainToPeer(String ip, int listeningPort, String jsonBlockchain, int blockchainLength) {
+    public static void sendBlockchainToPeer(String ip, int listeningPort, JSONArray jsonBlockchain, int blockchainLength) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("blockchain", jsonBlockchain);
         jsonObject.put("blockchainLength", blockchainLength);
