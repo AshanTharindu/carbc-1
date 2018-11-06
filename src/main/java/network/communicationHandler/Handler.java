@@ -178,7 +178,6 @@ public class Handler extends Thread{
     public void handleReceivedBlockchainRequest() throws ParseException, NoSuchAlgorithmException, IOException, SQLException, NoSuchProviderException, InvalidKeySpecException {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
-        int listeningPort = jsonObject.getInt("ListeningPort");
         int blockchainLength = jsonObject.getInt("blockchainLength");
         JSONObject jsonBlockchain = new JSONObject(jsonObject.getString("blockchain"));
         BlockchainRequester.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
