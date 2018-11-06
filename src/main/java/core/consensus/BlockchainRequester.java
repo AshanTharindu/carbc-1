@@ -57,8 +57,8 @@ public class BlockchainRequester {
         MessageSender.sendBlockchainToPeer(
                 ip,
                 listeningPort,
-                blockchainInfo.getString("blockchain"),
-                blockchainInfo.getInt("count"));
+                blockchainInfo.getJSONArray("blockchain"),
+                blockchainInfo.getInt("blockchainLength"));
     }
 
     //no need of synchronizing

@@ -213,7 +213,7 @@ public class BlockJDBCDAO {
             }
             jsonArray.put(obj);
         }
-        result.put("blockchainSize", count);
+        result.put("blockchainLength", count);
         result.put("blockchain", jsonArray);
         return result;
     }
