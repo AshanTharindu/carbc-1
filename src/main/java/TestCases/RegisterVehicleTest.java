@@ -1,6 +1,7 @@
 package TestCases;
 
 import controller.Controller;
+import fakeAgreementSender.AgreementSender;
 import network.communicationHandler.MessageSender;
 import chainUtil.KeyGenerator;
 import com.google.gson.JsonObject;
@@ -9,8 +10,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class RegisterVehicleTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         startNodeTest();
+        Thread.sleep(3000);
+        sendAgreements();
 
     }
 
@@ -40,8 +43,13 @@ public class RegisterVehicleTest {
         return registration;
     }
 
-    public static void ttest(){
-
+    public static void sendAgreements(){
+        String[] orgs = {"ServiceStation", "RMV", "SparePartShop"};
+        AgreementSender agreementSender = new AgreementSender();
+        for( String org : orgs) {
+            System.out.println(org);
+            agreementSender.sendFakeAgreements(org);
+        }
     }
 
 
