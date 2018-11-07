@@ -48,7 +48,7 @@ public class Blockchain {
             addBlocktoBlockchain(createGenesis());
             log.info("Requesting Blockchain");
             MessageSender.requestBlockchainHash();
-        }else if(blockchainLength == 1) {
+        }if(blockchainLength == 1) {
             MessageSender.requestBlockchainHash();
         }
     }

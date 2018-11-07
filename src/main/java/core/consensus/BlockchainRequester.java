@@ -85,17 +85,15 @@ public class BlockchainRequester {
         if (ChainUtil.signatureVerification(peer.getPublicKey(), signedBlockchain, blockchainHash)) {
             BlockchainReceiver blockchainReceiver = new BlockchainReceiver(peer, signedBlockchain, blockchainHash);
             blockchainReceiveDetails.add(blockchainReceiver);
-            blockchainRequest -= 1;
-            if (blockchainRequest == 0) {
-                requestBlockchain();
-            }
+//            blockchainRequest -= 1;
+//            if (blockchainRequest == 0) {
+//                requestBlockchain();
+//            }
         }
     }
 
     public synchronized void addReceivedBlockchain(String publicKey, JSONArray blockchain) {
         String receivedBlockchainHash = ChainUtil.getHash(blockchain.toString());
-        System.out.println(blockchain);
-        System.out.println("calculatedHash: "+ receivedBlockchainHash);
         BlockchainReceiver blockchainReceiver = getBlockchainReceiverfromPK(receivedBlockchainHash);
         if (blockchainReceiver != null) {
             String blockchainHash = blockchainReceiver.getBlockchainHash();
@@ -129,7 +127,6 @@ public class BlockchainRequester {
                 counter.put(blockchainReceiver.getId(), 1);
             }
         }
-        System.out.println(counter);
         int max = 0;
         String publicKey = "";
         for (String key : counter.keySet()) {
