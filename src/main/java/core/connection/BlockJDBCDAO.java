@@ -256,6 +256,38 @@ public class BlockJDBCDAO {
         }
     }
 
+    public int getBLockchainSize() throws SQLException {
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        int blockchainSize = 0;
+
+        String queryString = "SELECT COUNT(id) AS size FROM `Blockchain` WHERE validity = '1'";
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            resultSet = ptmt.executeQuery();
+
+            if (resultSet.next()){
+                blockchainSize = resultSet.getInt("size");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return blockchainSize;
+        }
+    }
+
     public JSONObject getVehicleInfoByEvent(String vehicleId, String event) throws SQLException {
         Connection connection = null;
         PreparedStatement ptmt = null;

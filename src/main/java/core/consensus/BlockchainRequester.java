@@ -54,6 +54,7 @@ public class BlockchainRequester {
     public synchronized void sendSignedBlockChain(Neighbour blockchainRequester) throws SQLException {
         BlockchainShare blockchainShare = new BlockchainShare(blockchainRequester);
         String blockchainHash = ChainUtil.getHash(Blockchain.getBlockchainJSON(1).getJSONArray("blockchain").toString());
+        System.out.println(Blockchain.getBlockchainJSON(1).getJSONArray("blockchain").toString());
         blockchainShareDetails.add(blockchainShare);
         String signedBlockchainHash = ChainUtil.digitalSignature(blockchainHash);
         MessageSender.sendSignedBlockChain(blockchainRequester, signedBlockchainHash, blockchainHash);
