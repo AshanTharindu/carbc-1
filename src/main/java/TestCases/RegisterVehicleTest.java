@@ -12,8 +12,8 @@ import org.json.JSONObject;
 public class RegisterVehicleTest {
     public static void main(String[] args) throws InterruptedException {
         startNodeTest();
-        Thread.sleep(3000);
-        sendAgreements();
+//        Thread.sleep(3000);
+//        sendAgreements();
 
     }
 

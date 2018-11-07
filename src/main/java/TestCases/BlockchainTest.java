@@ -5,13 +5,15 @@ import network.Node;
 import core.connection.BlockJDBCDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
 public class BlockchainTest {
     public static void main(String[] args) throws SQLException, UnsupportedEncodingException {
+//        requestBlockchain();
+//        testGetBlockchain();
+
+        testGetVehicleInfoByEvent("ExchangeOwnership", "V-1234");
         requestBlockchain();
 //        testGetBlockchain();
     }
@@ -30,5 +32,11 @@ public class BlockchainTest {
 
     public static void requestBlockchain() {
         Node.getInstance().startNode();
+    }
+
+    public static void testGetVehicleInfoByEvent(String event, String vehicleId) throws SQLException {
+        BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
+        JSONObject jsonObject = blockJDBCDAO.getVehicleInfoByEvent(vehicleId, event);
+        System.out.println(jsonObject.getString("data"));
     }
 }

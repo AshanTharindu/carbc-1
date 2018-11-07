@@ -187,13 +187,6 @@ public class BlockJDBCDAO {
                 String columnName = resultSet.getMetaData().getColumnLabel(i + 1).toLowerCase();
                 Object columnValue = resultSet.getObject(i + 1);
 
-//                if (columnName.equals("data")){
-////                    JSONObject data = new JSONObject()
-//                    columnValue = resultSet.getString("data");
-//                    System.out.println(columnValue);
-//                }
-
-
                 // if value in DB is null, then we set it to default value
                 if (columnValue == null){
                     columnValue = "null";
@@ -206,15 +199,8 @@ public class BlockJDBCDAO {
                 if (obj.has(columnName)){
                     columnName += "1";
                 }
-//                if (columnName.equals("data")){
-//                    String colValue = resultSet.getString("data");
-//                    System.out.println(colValue);
-//                    obj.put(columnName, colValue.toString());
-//
-//                }else {
-                    obj.put(columnName, columnValue);
-//                }
 
+                obj.put(columnName, columnValue);
             }
             jsonArray.put(obj);
         }
@@ -270,26 +256,31 @@ public class BlockJDBCDAO {
         }
     }
 
-    public ResultSet getCompleteVehicleInfo(String vehicleId) throws SQLException {
+    public JSONObject getVehicleInfoByEvent(String vehicleId, String event) throws SQLException {
         Connection connection = null;
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
+        JSONObject vehicleInfo = new JSONObject();
 
         String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
                 "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
-                "FROM `Blockchain` WHERE `transaction_id` LIKE ? AND `event` = ? AND " +
-                "`address` >=  AND `validity` = `T`";
+                "FROM `Blockchain` WHERE `transaction_id` LIKE ? AND `address` = ? AND " +
+                "`event` = ? AND `validity` = 1 ORDER BY `block_number` DESC LIMIT 1";
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(queryString);
-            ptmt.setString(1, "V");
+            ptmt.setString(1, "V%");
             ptmt.setString(2, vehicleId);
-            ptmt.setString(2, "T");
+            ptmt.setString(3, event);
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
+                vehicleInfo.put("sender", resultSet.getString("sender"));
+                vehicleInfo.put("event", resultSet.getString("event"));
+                vehicleInfo.put("data", resultSet.getString("data"));
 
+                System.out.println(vehicleInfo);
             }
 
         } catch (SQLException e) {
@@ -303,8 +294,45 @@ public class BlockJDBCDAO {
                 ptmt.close();
             if (connection != null)
                 connection.close();
-            return resultSet;
+            return vehicleInfo;
         }
+    }
+
+    public ResultSet getCompleteVehicleInfo(String vehicleId) throws SQLException {
+//        Connection connection = null;
+//        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+//
+//        String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
+//                "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
+//                "FROM `Blockchain` WHERE `transaction_id` LIKE ? AND `event` = ? AND " +
+//                "`address` >=  AND `validity` = `T`";
+//
+//        try {
+//            connection = ConnectionFactory.getInstance().getConnection();
+//            ptmt = connection.prepareStatement(queryString);
+//            ptmt.setString(1, "V");
+//            ptmt.setString(2, vehicleId);
+//            ptmt.setString(3, "T");
+//            resultSet = ptmt.executeQuery();
+//
+//            if (resultSet.next()){
+//
+//            }
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (resultSet != null)
+//                resultSet.close();
+//            if (ptmt != null)
+//                ptmt.close();
+//            if (connection != null)
+//                connection.close();
+            return resultSet;
+//        }
     }
 
     public long getRecentBlockNumber() throws SQLException {
