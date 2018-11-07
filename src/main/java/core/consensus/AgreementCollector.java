@@ -98,6 +98,7 @@ public class AgreementCollector{
                 case "ServiceRepair":
                     pubKey = secondaryParties.getJSONObject("ServiceStation").getString("publicKey");
                     getMandatoryValidators().add(pubKey);
+                    System.out.println("mandatory validators size = " + getMandatoryValidators().size());
                     if (isMandatoryPartyValid("ServiceStation", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
 
@@ -105,7 +106,6 @@ public class AgreementCollector{
                     if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
                         ServiceStationValidation.validateBlock(block);
                     }
-                    getMandatoryValidators().add(pubKey);
 
                     JSONArray sparePartProvider = thirdParties.getJSONArray("SparePartProvider");
                     for (int i = 0; i < sparePartProvider.length(); i++){
@@ -291,7 +291,9 @@ public class AgreementCollector{
                     if (getMandatoryValidators().contains(agreement.getPublicKey())){
                         System.out.println("mandatory validator received");
                         System.out.println(agreement.getPublicKey());
+                        System.out.println("mandatory validators size = " + getMandatoryValidators().size());
                         getMandatoryValidators().remove(agreement.getPublicKey());
+                        System.out.println("mandatory validators size = " + getMandatoryValidators().size());
                         // add rating
                     }else if (getSpecialValidators().contains(agreement.getPublicKey())){
                         getSpecialValidators().remove(agreement.getPublicKey());
