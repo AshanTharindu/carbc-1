@@ -118,6 +118,44 @@
   },
 
   "data": {
+    "serviced_date":"AAA1111",
+    "cost":"Car",
+    "SecondaryParty":
+    {
+      "ServiceStation":
+      {
+        "name":"",
+        "publicKey":""
+      }
+    },
+    "services":
+    [
+      {
+        "serviceType":"Change the engine oil",
+        "serviceData":
+        [
+          {
+            "seller":"Break Oil"
+          },
+          {
+            "seller":"head lights"
+          }
+        ]
+      }
+    ],
+    "vehicle_id":"CAR-67890",
+    "ThirdParty":
+    {
+      "SparePartProvider":
+      [
+        "Theshan Ranasinghe",
+        "Madhushika Jayasinghe"
+      ]
+    }
+  }
+,
+
+  "data": {
     "insuranceType": "",
     "insuranceNumber": "",
     "validityPeriod": "",
