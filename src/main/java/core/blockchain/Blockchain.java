@@ -48,6 +48,8 @@ public class Blockchain {
             addBlocktoBlockchain(createGenesis());
             log.info("Requesting Blockchain");
             MessageSender.requestBlockchainHash();
+        }else if(blockchainLength == 1) {
+            MessageSender.requestBlockchainHash();
         }
     }
 
@@ -66,10 +68,7 @@ public class Blockchain {
 
         }
         return blockchain;
-
     }
-
-
 
     public static String getPreviousHash() {
         BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();

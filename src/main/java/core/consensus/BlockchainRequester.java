@@ -6,8 +6,12 @@ import core.blockchain.Blockchain;
 import core.blockchain.TimeKeeperForBC;
 import core.connection.BlockJDBCDAO;
 import network.Neighbour;
+import network.communicationHandler.Handler;
 import network.communicationHandler.MessageSender;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -22,6 +26,7 @@ public class BlockchainRequester {
     private ArrayList<BlockchainReceiver> blockchainReceiveDetails;
     private int blockchainRequest;
     private String requestedBlockchainHash;
+    private final Logger log = LoggerFactory.getLogger(Handler.class);
 
     private BlockchainRequester() {
         blockchainShareDetails = new ArrayList<>();
@@ -41,20 +46,22 @@ public class BlockchainRequester {
         long blockChainLength = Blockchain.getRecentBlockNumber();
         if (blockChainLength > 1) {
             sendSignedBlockChain(blockchainRequeseter);
+        } else {
+            log.info("Only Genesis Block Exist");
         }
     }
 
     public synchronized void sendSignedBlockChain(Neighbour blockchainRequester) throws SQLException {
         BlockchainShare blockchainShare = new BlockchainShare(blockchainRequester);
-        String blockchainHash = ChainUtil.getHash(Blockchain.getBlockchainJSON(0).toString());
+        String blockchainHash = ChainUtil.getHash(Blockchain.getBlockchainJSON(1).getJSONArray("blockchain").toString());
         blockchainShareDetails.add(blockchainShare);
-        String signedBlockchainHash = ChainUtil.getInstance().digitalSignature(blockchainHash);
+        String signedBlockchainHash = ChainUtil.digitalSignature(blockchainHash);
         MessageSender.sendSignedBlockChain(blockchainRequester, signedBlockchainHash, blockchainHash);
     }
 
     //no need of synchronizing
     public void sendBlockchain(String ip, int listeningPort) throws Exception {
-        JSONObject blockchainInfo = Blockchain.getBlockchainJSON(0);
+        JSONObject blockchainInfo = Blockchain.getBlockchainJSON(1);
         MessageSender.sendBlockchainToPeer(
                 ip,
                 listeningPort,
@@ -84,23 +91,22 @@ public class BlockchainRequester {
         }
     }
 
-    public synchronized void addReceivedBlockchain(String publicKey, JSONObject blockchain, int blockchainLength) throws SQLException, ParseException {
-//        LinkedList<Block> blockchainArray = new LinkedList<>();
-//        for(int i = 0; i< blockchainLength; i++) {
-//            blockchainArray.add(RequestHandler.getInstance().JSONStringToBlock(blockchain.getString(String.valueOf(i))));
-//        }
-//
-//        String blockchainHash = ChainUtil.getInstance().getBlockChainHash(blockchainArray);
-//        if(requestedBlockchainHash.equals(blockchainHash)) {
-//            addBlockchain(blockchainArray);
-//        }
-    }
-
-    public void addBlockchain(LinkedList<Block> blockchain) throws SQLException, ParseException {
-//        //add to blockchain
-//        for(int i = 1; i< blockchain.size(); i++ ) {
-//            Blockchain.getInstance().addBlock(blockchain.get(i));
-//        }
+    public synchronized void addReceivedBlockchain(String publicKey, JSONArray blockchain) {
+        String receivedBlockchainHash = ChainUtil.getHash(blockchain.toString());
+        System.out.println(blockchain);
+        System.out.println("calculatedHash: "+ receivedBlockchainHash);
+        BlockchainReceiver blockchainReceiver = getBlockchainReceiverfromPK(receivedBlockchainHash);
+        if (blockchainReceiver != null) {
+            String blockchainHash = blockchainReceiver.getBlockchainHash();
+            if (receivedBlockchainHash.equals(blockchainHash)) {
+                try{
+                    BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
+                    blockJDBCDAO.saveBlockchain(blockchain);
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public int getBlockchainRequest() {

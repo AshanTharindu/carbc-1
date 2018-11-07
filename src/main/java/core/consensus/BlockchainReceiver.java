@@ -12,6 +12,7 @@ public class BlockchainReceiver {
         this.peer = peer;
         this.signedBlockchain = signedBlockchain;
         this.id = blockchainHash;
+        System.out.println(blockchainHash);
     }
 
     public String getId() {

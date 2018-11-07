@@ -10,6 +10,7 @@ import core.blockchain.Block;
 import core.consensus.DataCollector;
 import network.Neighbour;
 import network.Node;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +166,7 @@ public class Handler extends Thread{
         String blockchainHash = jsonObject.getString("blockchainHash");
         String publicKey = jsonObject.getString("publicKey");
         Neighbour sender = new Neighbour(peerID, ip, listeningPort, publicKey);
+        System.out.println("receivedHash: "+ blockchainHash);
         BlockchainRequester.getInstance().handleReceivedSignedBlockchain(sender, signedBlockchain, blockchainHash);
     }
 
@@ -178,9 +180,8 @@ public class Handler extends Thread{
     public void handleReceivedBlockchainRequest() throws ParseException, NoSuchAlgorithmException, IOException, SQLException, NoSuchProviderException, InvalidKeySpecException {
         JSONObject jsonObject = new JSONObject(data);
         String ip = jsonObject.getString("ip");
-        int blockchainLength = jsonObject.getInt("blockchainLength");
-        JSONObject jsonBlockchain = new JSONObject(jsonObject.getString("blockchain"));
-        BlockchainRequester.getInstance().addReceivedBlockchain(peerID,jsonBlockchain,blockchainLength);
+        JSONArray jsonBlockchain = jsonObject.getJSONArray("blockchain");
+        BlockchainRequester.getInstance().addReceivedBlockchain(peerID,jsonBlockchain);
     }
 
     public void handleReceivedAgreement(){

@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.*;
+import java.text.ParseException;
 
 public class BlockJDBCDAO {
 
@@ -99,7 +100,11 @@ public class BlockJDBCDAO {
                 ptmt.setString(2, block.getString("block_hash"));
                 System.out.println(block.get("block_timestamp"));
 
-                ptmt.setTimestamp(3, (Timestamp) block.get("block_timestamp"));
+                ptmt.setTimestamp(3, ChainUtil.convertStringToTimestamp2(block.getString("block_timestamp")));
+
+//                ptmt.setLong(4, Long.valueOf(block.getString("block_number")));
+
+//                ptmt.setTimestamp(3, (Timestamp) block.get("block_timestamp"));
                 ptmt.setLong(4, block.getLong("block_number"));
                 ptmt.setBoolean(5, true);
                 ptmt.setString(6, block.getString("transaction_id"));
@@ -142,7 +147,7 @@ public class BlockJDBCDAO {
 
         String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
                 "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
-                "FROM `Blockchain` WHERE `block_number` >= ? AND `validity` = 1";
+                "FROM `Blockchain` WHERE `block_number` > ? AND `validity` = 1";
         String blockchain = "";
 
         try {
