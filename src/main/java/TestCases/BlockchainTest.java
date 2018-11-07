@@ -10,12 +10,10 @@ import java.sql.SQLException;
 
 public class BlockchainTest {
     public static void main(String[] args) throws SQLException, UnsupportedEncodingException {
-//        requestBlockchain();
-//        testGetBlockchain();
-
-        testGetVehicleInfoByEvent("ExchangeOwnership", "V-1234");
         requestBlockchain();
 //        testGetBlockchain();
+
+//        testGetVehicleInfoByEvent("ExchangeOwnership", "V-1234");
     }
 
 

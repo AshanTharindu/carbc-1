@@ -63,7 +63,8 @@ public class MessageSender {
 //        RequestMessage blockChainRequest = BlockChainHashRequestCreator.createBlockChainHashRequest(jsonObject);
         RequestMessage blockChainRequest = MessageCreator.createMessage(jsonObject,"BlockChainHashRequest");
         blockChainRequest.addHeader("keepActive", "false");
-        BlockchainRequester.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
+//        BlockchainRequester.getInstance().setBlockchainRequest(Node.getInstance().getNodeConfig().getNeighbours().size());
+        BlockchainRequester.getInstance().setBlockchainRequest(1);
         Node.getInstance().broadcast(blockChainRequest);
         log.info("requestBlockchainHash");
     }
