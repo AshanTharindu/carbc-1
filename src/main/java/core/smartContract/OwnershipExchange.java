@@ -16,14 +16,26 @@ public class OwnershipExchange {
 
     public boolean isAuthorizedToSeller() throws SQLException {
         BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
-        JSONObject vehicleInfo = blockJDBCDAO.getVehicleInfoByEvent(vehicleId, "ExchangeOwnership");
 
-        if (vehicleInfo.length()>0){
-            JSONObject data = new JSONObject(vehicleInfo.getString("data"));
+
+        JSONObject vehicleInfo2 = blockJDBCDAO.getVehicleInfoByEvent(vehicleId, "ExchangeOwnership");
+
+        if (vehicleInfo2.length()>0){
+            JSONObject data = new JSONObject(vehicleInfo2.getString("data"));
             if ((data.getString("NewOwner").equals(sender))){
                 return true;
             }
         }
+
+        JSONObject vehicleInfo1 = blockJDBCDAO.getVehicleInfoByEvent(vehicleId, "RegisterVehicle");
+
+        if (vehicleInfo1.length()>0){
+            JSONObject data = new JSONObject(vehicleInfo1.getString("data"));
+            if ((data.getString("current_owner").equals(sender))){
+                return true;
+            }
+        }
+
         return false;
     }
 

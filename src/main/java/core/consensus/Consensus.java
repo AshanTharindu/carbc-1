@@ -200,6 +200,7 @@ public class Consensus extends Observable {
             blockInfo.setData(block.getBlockBody().getTransaction().getData().toString());
             blockInfo.setAddress(block.getBlockBody().getTransaction().getAddress());
             blockInfo.setValidity(true);
+            blockInfo.setRating(block.getBlockHeader().getRating());
 
             Identity identity = null;
             if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
