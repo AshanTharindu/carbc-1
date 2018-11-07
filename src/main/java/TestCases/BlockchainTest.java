@@ -14,7 +14,11 @@ public class BlockchainTest {
 //        testGetBlockchain();
 
         testGetVehicleInfoByEvent("ExchangeOwnership", "V-1234");
+        requestBlockchain();
+//        testGetBlockchain();
     }
+
+
     public static void testGetBlockchain() throws SQLException, UnsupportedEncodingException {
         JSONObject blockchainJSON = Blockchain.getBlockchainJSON(1);
 
