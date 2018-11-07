@@ -138,6 +138,7 @@ public class Consensus extends Observable {
                             double rating = agreementCollector.getRating().calRating(agreementCollector.
                                     getMandatoryArraySize(),agreementCollector.getSecondaryArraySize());
                             b.getBlockHeader().setRating(rating);
+                            System.out.println("Rating of the block: " +b.getBlockHeader().getRating());
                             this.agreementCollectors.remove(agreementCollector);
                         }
                     } else {
