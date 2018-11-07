@@ -9,6 +9,7 @@ import core.connection.IdentityJDBC;
 import core.rmv.validation.RmvValidation;
 import core.serviceStation.validation.ServiceStationValidation;
 import core.serviceStation.webSocketServer.webSocket.WebSocketMessageHandler;
+import core.smartContract.OwnershipExchange;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -71,24 +72,27 @@ public class AgreementCollector{
             rating.setSpecialValidators(secondaryCount);
 
 
-            //TODO: need to check whether parties are real or not before adding to the arrays
             switch (event){
                 case "ExchangeOwnership":
-                    pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
-                    getMandatoryValidators().add(pubKey);
-//
-//                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-//                        succeed = RmvValidation.validateBlock(block);
-//                    }
+                    String vehicleId = block.getBlockBody().getTransaction().getAddress();
+                    String sender = block.getBlockBody().getTransaction().getSender();
+                    OwnershipExchange ownershipExchange = new OwnershipExchange(vehicleId, sender);
+                    if (ownershipExchange.isAuthorizedToSeller()){
+                        pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
+                        getMandatoryValidators().add(pubKey);
 
-                    JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
-                    pubKey = obj.getString("publicKey");
-                    getMandatoryValidators().add(pubKey);
+                        if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                            //show notification in android ui
+                        }
 
-                    if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        succeed = RmvValidation.validateBlock(block);
+                        JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
+                        pubKey = obj.getString("publicKey");
+                        getMandatoryValidators().add(pubKey);
+
+                        if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
+                            succeed = RmvValidation.validateBlock(block);
+                        }
                     }
-
                     break;
 
                 case "ServiceRepair":
