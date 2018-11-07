@@ -22,17 +22,18 @@ public class OwnershipExchange {
 
         if (vehicleInfo2.length()>0){
             JSONObject data = new JSONObject(vehicleInfo2.getString("data"));
-            if ((data.getString("NewOwner").equals(sender))){
+            JSONObject secondaryParty = data.getJSONObject("SecondaryParty").getJSONObject("NewOwner");
+            if ((secondaryParty.getString("publicKey").equals(sender))){
                 return true;
             }
-        }
+        }else {
+            JSONObject vehicleInfo1 = blockJDBCDAO.getVehicleInfoByEvent(vehicleId, "RegisterVehicle");
 
-        JSONObject vehicleInfo1 = blockJDBCDAO.getVehicleInfoByEvent(vehicleId, "RegisterVehicle");
-
-        if (vehicleInfo1.length()>0){
-            JSONObject data = new JSONObject(vehicleInfo1.getString("data"));
-            if ((data.getString("current_owner").equals(sender))){
-                return true;
+            if (vehicleInfo1.length()>0){
+                JSONObject data = new JSONObject(vehicleInfo1.getString("data"));
+                if ((data.getString("current_owner").equals(sender))){
+                    return true;
+                }
             }
         }
 
