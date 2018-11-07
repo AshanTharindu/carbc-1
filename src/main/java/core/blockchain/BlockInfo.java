@@ -18,12 +18,13 @@ public class BlockInfo {
     private String event;
     private String data;
     private String address;
+    private double rating;
 
     public BlockInfo(){}
 
     public BlockInfo(String previousHash, String hash, Timestamp blockTime, long blockNumber,
                      boolean validity, String transactionId, String sender, String event,
-                     JSONObject data, String address){
+                     JSONObject data, String address, double rating){
         this.previous_hash = previousHash;
         this.block_hash = hash;
         this.block_timestamp = blockTime;
@@ -34,6 +35,7 @@ public class BlockInfo {
         this.event = event;
         this.data = data.toString();
         this.address = address;
+        this.rating = rating;
     }
 
     public String getPreviousHash() {
@@ -114,5 +116,13 @@ public class BlockInfo {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 }

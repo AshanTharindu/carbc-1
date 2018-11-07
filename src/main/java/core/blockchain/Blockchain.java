@@ -122,6 +122,7 @@ public class Blockchain {
         blockInfo.setEvent(block.getBlockBody().getTransaction().getEvent());
         blockInfo.setData(block.getBlockBody().getTransaction().getData().toString());
         blockInfo.setAddress(block.getBlockBody().getTransaction().getAddress());
+        blockInfo.setRating(block.getBlockHeader().getRating());
         blockInfo.setValidity(true);
         BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
         try {

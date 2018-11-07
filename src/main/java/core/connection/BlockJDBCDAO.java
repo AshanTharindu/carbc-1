@@ -30,8 +30,8 @@ public class BlockJDBCDAO {
         try {
             String queryString = "INSERT INTO `Blockchain`(`previous_hash`, " +
                     "`block_hash`, `block_timestamp`, `block_number`, `validity`," +
-                    " `transaction_id`, `sender`, `event`, `data`, `address`) " +
-                    "VALUES (?,?,?,?,?,?,?,?,?,?)";
+                    " `transaction_id`, `sender`, `event`, `data`, `address`, `rating`) " +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(queryString);
@@ -46,6 +46,7 @@ public class BlockJDBCDAO {
             ptmt.setString(8, blockInfo.getEvent());
             ptmt.setString(9, blockInfo.getData());
             ptmt.setString(10, blockInfo.getAddress());
+            ptmt.setDouble(11, blockInfo.getRating());
             ptmt.executeUpdate();
 
             if (transactionType.equals("I")){
@@ -88,8 +89,8 @@ public class BlockJDBCDAO {
         try {
             String queryString = "INSERT INTO `Blockchain`(`previous_hash`, " +
                     "`block_hash`, `block_timestamp`, `block_number`, `validity`," +
-                    " `transaction_id`, `sender`, `event`, `data`, `address`) " +
-                    "VALUES (?,?,?,?,?,?,?,?,?,?)";
+                    " `transaction_id`, `sender`, `event`, `data`, `address`, `rating`) " +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(queryString);
@@ -98,24 +99,17 @@ public class BlockJDBCDAO {
                 JSONObject block = blockchain.getJSONObject(i);
                 ptmt.setString(1, block.getString("previous_hash"));
                 ptmt.setString(2, block.getString("block_hash"));
-                System.out.println(block.get("block_timestamp"));
-
                 ptmt.setTimestamp(3, ChainUtil.convertStringToTimestamp2(block.getString("block_timestamp")));
-
-//                ptmt.setLong(4, Long.valueOf(block.getString("block_number")));
-
-//                ptmt.setTimestamp(3, (Timestamp) block.get("block_timestamp"));
                 ptmt.setLong(4, block.getLong("block_number"));
                 ptmt.setBoolean(5, true);
                 ptmt.setString(6, block.getString("transaction_id"));
                 ptmt.setString(7, block.getString("sender"));
                 ptmt.setString(8, block.getString("event"));
-
                 String data = block.getString("data");
                 String jsonFormattedString = data.replaceAll("\\\\", "");
-
                 ptmt.setString(9, jsonFormattedString);
                 ptmt.setString(10, block.getString("address"));
+                ptmt.setDouble(11, block.getDouble("rating"));
 
                 ptmt.addBatch();
 
@@ -146,7 +140,7 @@ public class BlockJDBCDAO {
         JSONObject convertedResultSet = null;
 
         String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
-                "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
+                "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address`, `rating` " +
                 "FROM `Blockchain` WHERE `block_number` > ? AND `validity` = 1";
         String blockchain = "";
 
@@ -295,7 +289,7 @@ public class BlockJDBCDAO {
         JSONObject vehicleInfo = new JSONObject();
 
         String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
-                "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
+                "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address`, `rating` " +
                 "FROM `Blockchain` WHERE `transaction_id` LIKE ? AND `address` = ? AND " +
                 "`event` = ? AND `validity` = 1 ORDER BY `block_number` DESC LIMIT 1";
 
@@ -330,42 +324,6 @@ public class BlockJDBCDAO {
         }
     }
 
-    public ResultSet getCompleteVehicleInfo(String vehicleId) throws SQLException {
-//        Connection connection = null;
-//        PreparedStatement ptmt = null;
-        ResultSet resultSet = null;
-//
-//        String queryString = "SELECT `previous_hash`, `block_hash`, `block_timestamp`, " +
-//                "`block_number`, `transaction_id`, `sender`, `event`, `data`, `address` " +
-//                "FROM `Blockchain` WHERE `transaction_id` LIKE ? AND `event` = ? AND " +
-//                "`address` >=  AND `validity` = `T`";
-//
-//        try {
-//            connection = ConnectionFactory.getInstance().getConnection();
-//            ptmt = connection.prepareStatement(queryString);
-//            ptmt.setString(1, "V");
-//            ptmt.setString(2, vehicleId);
-//            ptmt.setString(3, "T");
-//            resultSet = ptmt.executeQuery();
-//
-//            if (resultSet.next()){
-//
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (resultSet != null)
-//                resultSet.close();
-//            if (ptmt != null)
-//                ptmt.close();
-//            if (connection != null)
-//                connection.close();
-            return resultSet;
-//        }
-    }
 
     public long getRecentBlockNumber() throws SQLException {
         String queryString = "SELECT `block_number` FROM Blockchain ORDER BY id DESC LIMIT 1";
