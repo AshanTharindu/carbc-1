@@ -76,13 +76,24 @@ public class AgreementCollector{
                 case "ExchangeOwnership":
                     String vehicleId = block.getBlockBody().getTransaction().getAddress();
                     String sender = block.getBlockBody().getTransaction().getSender();
+
                     OwnershipExchange ownershipExchange = new OwnershipExchange(vehicleId, sender);
-                    if (ownershipExchange.isAuthorizedToSeller()){
+
+                    try{
+                        boolean isAuthorized = false;
+                        if (ownershipExchange.isAuthorizedToSeller()){
+                            //show notification to me
+                            isAuthorized = true;
+                        }
+
                         pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
                         getMandatoryValidators().add(pubKey);
 
                         if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                            //show notification in android ui
+
+                            if (isAuthorized){
+                                //show notification in android ui
+                            }
                         }
 
                         JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
@@ -90,10 +101,18 @@ public class AgreementCollector{
                         getMandatoryValidators().add(pubKey);
 
                         if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                            succeed = RmvValidation.validateBlock(block);
+                            if (isAuthorized){
+                                //show notification in android ui
+                                succeed = RmvValidation.validateBlock(block);
+                            }
                         }
+
+                    }catch (NullPointerException e){
+                        System.out.println("error occured in smart contract");
+                    }finally {
+                        break;
                     }
-                    break;
+
 
                 case "ServiceRepair":
                     pubKey = secondaryParties.getJSONObject("ServiceStation").getString("publicKey");
