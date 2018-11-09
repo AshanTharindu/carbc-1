@@ -107,6 +107,8 @@ public class AgreementCollector{
                             }
                         }
 
+                        System.out.println("mandatory validators is = " + getMandatoryValidators().size());
+
                     }catch (NullPointerException e){
                         System.out.println("error occured in smart contract");
                     }finally {

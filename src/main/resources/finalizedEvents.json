@@ -314,7 +314,8 @@
         "Sajinie Ranasinghe"
       ]
     }
-  }
+  },"data":{"preOwner":"","registrationNumber":"CAR-12345","SecondaryParty":{"NewOwner":{"name":"Ashan","publicKey":""}},"vehicleId":"V -92960","ThirdParty":{}},
+  "data":{"current_owner":"","vehicle_class":"Car","registration_number":"CAR-12345","engine_number":"AAA1111","condition_and_note":"Full condition","model":"Toyota","SecondaryParty":{},"year_of_manufacture":"2012","make":"Vitz","ThirdParty":{}}
 
 
 }

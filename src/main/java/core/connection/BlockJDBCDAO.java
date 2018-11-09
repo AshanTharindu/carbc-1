@@ -2,6 +2,8 @@ package core.connection;
 
 import chainUtil.ChainUtil;
 import core.blockchain.BlockInfo;
+import core.rmv.Registration;
+import core.rmv.dao.RMVJDBCDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,11 +24,13 @@ public class BlockJDBCDAO {
         String transactionType = transactionId.substring(0, 1);
         String query = "";
 
+
         if (transactionType.equals("I")){
             query = "INSERT INTO `Identity`(`block_hash`, `role`, `name`) " +
                     "VALUES (?,?,?,?)";
         }
 
+        JSONObject data = new JSONObject(blockInfo.getData());
         try {
             String queryString = "INSERT INTO `Blockchain`(`previous_hash`, " +
                     "`block_hash`, `block_timestamp`, `block_number`, `validity`," +
@@ -58,6 +62,26 @@ public class BlockJDBCDAO {
                 psmt.executeUpdate();
             }
 
+            if (blockInfo.getEvent().equals("ExchangeOwnership")){
+                String query2 = "UPDATE `vehicle` SET `current_owner`= ? WHERE `vehicle_id` = ?";
+
+                psmt = connection.prepareStatement(query2);
+                psmt.setString(1, data.getJSONObject("SecondaryParty").getJSONObject("NewOwner").getString("publicKey"));
+                psmt.setString(2, blockInfo.getAddress());
+                psmt.executeUpdate();
+            }
+
+            if(blockInfo.getEvent().equals("RegisterVehicle")){
+                String query1 = "INSERT INTO `vehicle`(`registration_number`, `vehicle_id`, `current_owner`) " +
+                        "VALUES (?,?,?)";
+
+                psmt = connection.prepareStatement(query1);
+                psmt.setString(1, data.getString("registration_number"));
+                psmt.setString(2, blockInfo.getAddress());
+                psmt.setString(3, data.getString("current_owner"));
+                psmt.executeUpdate();
+            }
+
             System.out.println("Block is Added Successfully");
 
         } catch (SQLException e) {
@@ -73,6 +97,96 @@ public class BlockJDBCDAO {
             return true;
         }
 
+    }
+
+    public JSONObject getRegistrationInfoByRegistrationNumber(String registrationNumber) throws SQLException {
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        JSONObject vehicleInfo = new JSONObject();
+
+        String queryString = "SELECT `data`, `address`, `rating`, `current_owner` FROM `Blockchain` INNER JOIN `vehicle`" +
+                " ON Blockchain.address = vehicle.vehicle_id WHERE vehicle.registration_number = ?";
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, registrationNumber);
+            resultSet = ptmt.executeQuery();
+
+            if (resultSet.next()){
+                JSONObject data = new JSONObject(resultSet.getString("data"));
+
+                vehicleInfo.put("current_owner", resultSet.getString("current_owner"));
+                vehicleInfo.put("engine_number", data.getString("engine_number"));
+                vehicleInfo.put("vehicle_class", data.getString("vehicle_class"));
+                vehicleInfo.put("condition_and_note", data.getString("condition_and_note"));
+                vehicleInfo.put("make", data.getString("make"));
+                vehicleInfo.put("model", data.getString("model"));
+                vehicleInfo.put("year_of_manufacture", data.getString("year_of_manufacture"));
+                vehicleInfo.put("registration_number", data.getString("registration_number"));
+                vehicleInfo.put("rating", resultSet.getDouble("rating"));
+                vehicleInfo.put("address", resultSet.getDouble("address"));
+
+                System.out.println(vehicleInfo);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return vehicleInfo;
+        }
+    }
+
+    public JSONObject getVehicleInfoByRegistrationNumberAndEvent(String registrationNumber, String event) throws SQLException {
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        JSONObject vehicleInfo = new JSONObject();
+
+        String queryString = "SELECT `data`, `address`, `rating`, `current_owner` FROM `Blockchain` INNER JOIN `vehicle`" +
+                " ON Blockchain.address = vehicle.vehicle_id WHERE vehicle.registration_number = ? " +
+                "AND `event` = ? AND `validity` = 1 ORDER BY `block_number` DESC LIMIT 1";
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, registrationNumber);
+            ptmt.setString(2, event);
+            resultSet = ptmt.executeQuery();
+
+            if (resultSet.next()){
+                JSONObject data = new JSONObject(resultSet.getString("data"));
+
+                vehicleInfo.put("data", resultSet.getString("data"));
+                vehicleInfo.put("address", data.getString("address"));
+                vehicleInfo.put("rating", data.getString("rating"));
+                vehicleInfo.put("current_owner", data.getString("current_owner"));
+
+                System.out.println(vehicleInfo);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return vehicleInfo;
+        }
     }
 
     public void saveBlockchain(JSONArray blockchain) throws SQLException {
