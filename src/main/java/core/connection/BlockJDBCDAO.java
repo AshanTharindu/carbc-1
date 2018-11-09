@@ -147,11 +147,11 @@ public class BlockJDBCDAO {
         }
     }
 
-    public JSONObject getVehicleInfoByRegistrationNumber(String registrationNumber, String event) throws SQLException {
+    public JSONArray getVehicleInfoByRegistrationNumber(String registrationNumber, String event) throws SQLException {
         Connection connection = null;
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
-        JSONObject vehicleInfo = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
 
         String queryString = "SELECT `data`, `address`, `rating`, `current_owner` FROM `Blockchain` INNER JOIN `vehicle`" +
                 " ON Blockchain.address = vehicle.vehicle_id WHERE vehicle.registration_number = ? " +
@@ -164,12 +164,14 @@ public class BlockJDBCDAO {
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
+                JSONObject vehicleInfo = new JSONObject();
                 JSONObject data = new JSONObject(resultSet.getString("data"));
-
                 vehicleInfo.put("data", resultSet.getString("data"));
                 vehicleInfo.put("address", data.getString("address"));
                 vehicleInfo.put("rating", data.getString("rating"));
                 vehicleInfo.put("current_owner", data.getString("current_owner"));
+
+                jsonArray.put(vehicleInfo);
 
             }
 
@@ -184,15 +186,15 @@ public class BlockJDBCDAO {
                 ptmt.close();
             if (connection != null)
                 connection.close();
-            return vehicleInfo;
+            return jsonArray;
         }
     }
 
-    public JSONObject getVehicleInfoByRegistrationNumberAndEvent(String registrationNumber, String event) throws SQLException {
+    public JSONArray getVehicleInfoByRegistrationNumberAndEvent(String registrationNumber, String event) throws SQLException {
         Connection connection = null;
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
-        JSONObject vehicleInfo = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
 
         String queryString = "SELECT `data`, `address`, `rating`, `current_owner` FROM `Blockchain` INNER JOIN `vehicle`" +
                 " ON Blockchain.address = vehicle.vehicle_id WHERE vehicle.registration_number = ? " +
@@ -206,6 +208,7 @@ public class BlockJDBCDAO {
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
+                JSONObject vehicleInfo = new JSONObject();
                 JSONObject data = new JSONObject(resultSet.getString("data"));
 
                 vehicleInfo.put("data", resultSet.getString("data"));
@@ -213,6 +216,7 @@ public class BlockJDBCDAO {
                 vehicleInfo.put("rating", data.getString("rating"));
                 vehicleInfo.put("current_owner", data.getString("current_owner"));
 
+                jsonArray.put(vehicleInfo);
                 System.out.println(vehicleInfo);
             }
 
@@ -227,7 +231,7 @@ public class BlockJDBCDAO {
                 ptmt.close();
             if (connection != null)
                 connection.close();
-            return vehicleInfo;
+            return jsonArray;
         }
     }
 
