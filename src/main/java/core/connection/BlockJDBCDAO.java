@@ -106,7 +106,8 @@ public class BlockJDBCDAO {
         JSONObject vehicleInfo = new JSONObject();
 
         String queryString = "SELECT `data`, `address`, `rating`, `current_owner` FROM `Blockchain` INNER JOIN `vehicle`" +
-                " ON Blockchain.address = vehicle.vehicle_id WHERE vehicle.registration_number = ?";
+                " ON Blockchain.address = vehicle.vehicle_id WHERE `validity` = 1 AND `event` = 'RegisterVehicle' AND " +
+                "vehicle.registration_number = ?";
 
         try {
             connection = ConnectionFactory.getInstance().getConnection();
@@ -129,6 +130,47 @@ public class BlockJDBCDAO {
                 vehicleInfo.put("address", resultSet.getDouble("address"));
 
                 System.out.println(vehicleInfo);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return vehicleInfo;
+        }
+    }
+
+    public JSONObject getVehicleInfoByRegistrationNumber(String registrationNumber, String event) throws SQLException {
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        JSONObject vehicleInfo = new JSONObject();
+
+        String queryString = "SELECT `data`, `address`, `rating`, `current_owner` FROM `Blockchain` INNER JOIN `vehicle`" +
+                " ON Blockchain.address = vehicle.vehicle_id WHERE vehicle.registration_number = ? " +
+                "AND `validity` = 1 ORDER BY `block_number` DESC";
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, registrationNumber);
+            resultSet = ptmt.executeQuery();
+
+            if (resultSet.next()){
+                JSONObject data = new JSONObject(resultSet.getString("data"));
+
+                vehicleInfo.put("data", resultSet.getString("data"));
+                vehicleInfo.put("address", data.getString("address"));
+                vehicleInfo.put("rating", data.getString("rating"));
+                vehicleInfo.put("current_owner", data.getString("current_owner"));
+
             }
 
         } catch (SQLException e) {
