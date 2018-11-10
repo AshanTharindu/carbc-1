@@ -11,6 +11,26 @@ public class Registration {
     private String model;
     private String yearOfManufacture;
 
+    public Registration(String registrationNumber
+            , String currentOwner
+            , String engineNumber
+            , String vehicleClass
+            , String conditionAndNote
+            , String make
+            , String model
+            , String yearOfManufacture){
+
+        this.registrationNumber = registrationNumber;
+        this.currentOwner = currentOwner;
+        this.engineNumber = engineNumber;
+        this.vehicleClass = vehicleClass;
+        this.conditionAndNote = conditionAndNote;
+        this.make = make;
+        this.model = model;
+        this.yearOfManufacture = yearOfManufacture;
+
+    }
+
 
     public String getRegistrationNumber() {
         return registrationNumber;

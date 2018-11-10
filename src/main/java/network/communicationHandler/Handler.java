@@ -233,7 +233,7 @@ public class Handler extends Thread{
         String ip = jsonObject.getString("ip");
         int listeningPort = jsonObject.getInt("listeningPort");
 
-        if(transactionType.equals("repair&service")) {
+        if(transactionType.equals("ServiceRepair")) {
             ServiceStation serviceStation = new ServiceStation();
             serviceStation.getServiceRecord(vehicleID, signature, signedData, dataRequester, ip, listeningPort);
         }
