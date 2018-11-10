@@ -127,7 +127,7 @@ public class BlockJDBCDAO {
                 vehicleInfo.put("year_of_manufacture", data.getString("year_of_manufacture"));
                 vehicleInfo.put("registration_number", data.getString("registration_number"));
                 vehicleInfo.put("rating", resultSet.getDouble("rating"));
-                vehicleInfo.put("address", resultSet.getDouble("address"));
+                vehicleInfo.put("address", resultSet.getString("address"));
 
                 System.out.println(vehicleInfo);
             }
@@ -153,7 +153,7 @@ public class BlockJDBCDAO {
         ResultSet resultSet = null;
         JSONArray jsonArray = new JSONArray();
 
-        String queryString = "SELECT `data`, `address`, `rating`, `current_owner` FROM `Blockchain` INNER JOIN `vehicle`" +
+        String queryString = "SELECT `data`, `event`, `address`, `rating`, `current_owner` FROM `Blockchain` INNER JOIN `vehicle`" +
                 " ON Blockchain.address = vehicle.vehicle_id WHERE vehicle.registration_number = ? " +
                 "AND `validity` = 1 ORDER BY `block_number` DESC";
 
@@ -172,7 +172,6 @@ public class BlockJDBCDAO {
                 vehicleInfo.put("current_owner", data.getString("current_owner"));
 
                 jsonArray.put(vehicleInfo);
-
             }
 
         } catch (SQLException e) {

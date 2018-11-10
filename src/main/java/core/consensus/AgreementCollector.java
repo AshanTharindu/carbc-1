@@ -49,7 +49,7 @@ public class AgreementCollector{
         this.identityJDBC = new IdentityJDBC();
         this.mandatoryValidators = new ArrayList<>();
         this.specialValidators = new ArrayList<>();
-        this.threshold = 3;
+        this.threshold = 1;
 
         setMandatoryAgreements();
 
@@ -117,15 +117,18 @@ public class AgreementCollector{
 
 
                 case "ServiceRepair":
-                    pubKey = secondaryParties.getJSONObject("ServiceStation").getString("publicKey");
+                    pubKey = secondaryParties.getJSONObject("serviceStation").getString("publicKey");
                     getMandatoryValidators().add(pubKey);
                     System.out.println("mandatory validators size = " + getMandatoryValidators().size());
                     if (isMandatoryPartyValid("ServiceStation", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
 
                     }
+                    System.out.println("pubkey**********" + pubKey);
+                    System.out.println("myKey***********" + KeyGenerator.getInstance().getPublicKeyAsString());
                     if(pubKey.equals(KeyGenerator.getInstance().getPublicKeyAsString())) {
-                        ServiceStationValidation.validateBlock(block);
+                        System.out.println("service station is validating");
+                        succeed = ServiceStationValidation.validateBlock(block);
                     }
 
                     JSONArray sparePartProvider = thirdParties.getJSONArray("SparePartProvider");

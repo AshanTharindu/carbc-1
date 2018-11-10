@@ -124,11 +124,13 @@ public class Consensus extends Observable {
             System.out.println("inside for loop");
 
             if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)) {
+                System.out.println("b.getBlockHeader().getPreviousHash().equals(preBlockHash)");
                 String blockHash = b.getBlockHeader().getHash();
                 AgreementCollector agreementCollector = getAgreementCollector(blockHash);
 
                 synchronized (agreementCollectors) {
                     if (agreementCollector.getMandatoryValidators().size() == 0) {
+                        System.out.println("agreementCollector.getMandatoryValidators().size() == 0");
                         int agreementCount = agreementCollector.getAgreements().size();
                         if (agreementCount >= agreementCollector.getThreshold()) {
                             qualifiedBlocks.add(b);
