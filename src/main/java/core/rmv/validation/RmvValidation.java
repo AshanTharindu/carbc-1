@@ -76,18 +76,18 @@ public class RmvValidation {
         System.out.println("inside validateBlock/validateRegistrationBlock");
         JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
 
-        String registration_number = blockData.getString("registration_number");
+        String registration_number = blockData.getString("registrationNumber");
 
         JSONObject registrationData = RMVJDBCDAO.getInstance().getRegistrationInfoByRegistrationNumber(registration_number);
 
 
-        String current_owner = blockData.getString("current_owner");
-        String engine_number = blockData.getString("engine_number");
-        String vehicle_class = blockData.getString("vehicle_class");
-        String condition_and_note = blockData.getString("condition_and_note");
+        String current_owner = blockData.getString("currentOwner");
+        String engine_number = blockData.getString("engineNumber");
+        String vehicle_class = blockData.getString("vehicleClass");
+        String condition_and_note = blockData.getString("conditionAndNote");
         String make = blockData.getString("make");
         String model = blockData.getString("model");
-        String year_of_manufacture = blockData.getString("year_of_manufacture");
+        String year_of_manufacture = blockData.getString("yearOfManufacture");
 
 //        System.out.println(current_owner);
 //        System.out.println(engine_number);
