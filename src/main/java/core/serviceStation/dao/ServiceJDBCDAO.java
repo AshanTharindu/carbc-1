@@ -239,7 +239,7 @@ public class ServiceJDBCDAO {
                 }
 
                 String serviceType = resultSet.getString("service_type");
-                System.out.println(serviceType);
+//                System.out.println(serviceType);
 
                 if (!temp.equals(serviceType)){
                     if (count2 != 0){
