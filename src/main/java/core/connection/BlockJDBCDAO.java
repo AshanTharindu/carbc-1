@@ -76,9 +76,9 @@ public class BlockJDBCDAO {
                         "VALUES (?,?,?)";
 
                 psmt = connection.prepareStatement(query1);
-                psmt.setString(1, data.getString("registration_number"));
+                psmt.setString(1, data.getString("registrationNumber"));
                 psmt.setString(2, blockInfo.getAddress());
-                psmt.setString(3, data.getString("current_owner"));
+                psmt.setString(3, data.getString("currentOwner"));
                 psmt.executeUpdate();
             }
 

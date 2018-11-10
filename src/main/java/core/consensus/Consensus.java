@@ -94,8 +94,9 @@ public class Consensus extends Observable {
                 }
 
                 AgreementCollector agreementCollector = new AgreementCollector(block);
-                System.out.println("agreementcolletor ID: "+agreementCollector.getAgreementCollectorId());
+                System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
                 agreementCollectors.add(agreementCollector);
+
                 if (agreementCollector.succeed){
                     String blockHash = block.getBlockHeader().getHash();
                     String digitalSignature = ChainUtil.digitalSignature(block.getBlockHeader().getHash());
@@ -121,7 +122,7 @@ public class Consensus extends Observable {
 
         ArrayList<Block> qualifiedBlocks = new ArrayList<>();
         for (Block b : this.getNonApprovedBlocks()) {
-            System.out.println("inside for loop");
+            System.out.println("Inside for Loop");
 
             if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)) {
                 System.out.println("b.getBlockHeader().getPreviousHash().equals(preBlockHash)");

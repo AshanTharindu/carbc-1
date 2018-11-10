@@ -10,6 +10,7 @@ import core.rmv.validation.RmvValidation;
 import core.serviceStation.validation.ServiceStationValidation;
 import core.serviceStation.webSocketServer.webSocket.WebSocketMessageHandler;
 import core.smartContract.OwnershipExchange;
+import core.smartContract.Registration;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -182,14 +183,16 @@ public class AgreementCollector{
                     break;
 
                 case "RegisterVehicle":
-//                    pubKey = secondaryParties.getJSONObject("RMV")
-//                            .getString("publicKey");
+                    Registration registrationSmartContract = new Registration(blockData);
+
+                    if (registrationSmartContract.isAuthorized()){
+                        //show notification to me
+                    }
 
                     JSONObject object = getIdentityJDBC().getIdentityByRole("RMV");
                     pubKey = object.getString("publicKey");
                     getMandatoryValidators().add(object.getString("publicKey"));
 
-//                    getMandatoryValidators().add(pubKey);
                     if (isMandatoryPartyValid("RMV", pubKey)){
                         WebSocketMessageHandler.addBlockToNotificationArray(block);
                     }
