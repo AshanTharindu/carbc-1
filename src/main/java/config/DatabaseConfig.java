@@ -29,8 +29,8 @@ public class DatabaseConfig {
 //        JSONObject dbDetail = databaseConfig.getDBJson();
 //        String resourcePath = dbDetail.getString("path");
 
-//        String resourcePath = "/home/nicer/CSE/fyp/carbc-1_extended/src/main/resources/db.json";
-        String resourcePath = "/home/sajinie/Documents/fyp_stuff/CARbc/car-bc-extended/src/main/resources/db.json";
+        String resourcePath = "/home/nicer/CSE/fyp/carbc-1_extended/src/main/resources/db.json";
+//        String resourcePath = "/home/sajinie/Documents/fyp_stuff/CARbc/car-bc-extended/src/main/resources/db.json";
         this.dbConfig = new JSONObject(FileUtils.readFileContentAsText(resourcePath));
     }
 

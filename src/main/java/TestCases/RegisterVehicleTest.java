@@ -17,10 +17,12 @@ public class RegisterVehicleTest {
 
     }
 
-    public static void startNodeTest(){
+    public static void startNodeTest() throws InterruptedException {
         Controller controller = new Controller();
         controller.startNode();
         MessageSender.requestIP();
+        Thread.sleep(20000);
+        sendAgreements();
 //        controller.sendTransaction("RegisterVehicle", null, createRegisterJSON() );
     }
 
@@ -44,7 +46,7 @@ public class RegisterVehicleTest {
     }
 
     public static void sendAgreements(){
-        String[] orgs = {"ServiceStation", "RMV", "SparePartShop"};
+        String[] orgs = {"ServiceStation", "RMV", "SparePartShop", "GodFather"};
         AgreementSender agreementSender = new AgreementSender();
         for( String org : orgs) {
             System.out.println(org);

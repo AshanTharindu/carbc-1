@@ -20,7 +20,7 @@ public class ServiceRepairTest {
         Controller controller = new Controller();
         controller.startNode();
         MessageSender.requestIP();
-        controller.sendTransaction("ServiceRepair", "V-23456", createServiceJSON() );
+        controller.sendTransaction("ServiceRepair", "V -87901", createServiceJSON() );
     }
 
     public static JSONObject createServiceJSON(){
