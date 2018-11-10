@@ -16,6 +16,12 @@ import java.sql.SQLException;
 public class HistoryTest {
     public static void main(String[] args) throws SQLException {
 
+
+        testCase4();
+
+    }
+
+    public static void testcase1() throws SQLException {
         Node.getInstance().startNode();
         JSONObject jsonObject = new JSONObject();
         JSONObject jsonObjectNewOwner = new JSONObject();
@@ -45,6 +51,27 @@ public class HistoryTest {
 
         HistoryDAO historyDAO = new HistoryDAO();
         System.out.println(historyDAO.getAdditionalData(blockHash2));
+    }
 
+    public static void testCase2() {
+        HistoryDAO historyDAO = new HistoryDAO();
+        historyDAO.setValidity("01852e57018fcc8022ccbfba27b3a89d859fe0337c0b90b282108e26d4650a3a");
+    }
+
+    public static void testCase3() throws SQLException {
+//        HistoryDAO historyDAO = new HistoryDAO();
+//        String previoushHas = historyDAO.getPreviousHash();
+//        System.out.println(previoushHas);
+    }
+
+    public static void testisItMyBlock() {
+        boolean result = Consensus.getInstance().isItMyBlock("01852e57018fcc8022ccbfba27b3a89d859fe0337c0b90b282108e26d4650a3a");
+        System.out.println(result);
+    }
+
+    public static void testCase4() throws SQLException {
+        HistoryDAO historyDAO = new HistoryDAO();
+        boolean previoushHas = historyDAO.checkExistence("01852e57018fcc8022ccbfba27b3a89d859fe0337c0b90b282108e26d4650a3a");
+        System.out.println(previoushHas);
     }
 }

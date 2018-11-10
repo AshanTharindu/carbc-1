@@ -138,4 +138,54 @@ public class HistoryDAO {
             return additonalData;
         }
     }
+
+    public void setValidity(String blockhash) {
+        String queryString = "UPDATE `History` SET `validity` = ? WHERE  `block_hash` = ?";
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setBoolean(1, true);
+            ptmt.setString(2, blockhash);
+            ptmt.executeUpdate();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            log.info("History Table Updated For: {}", blockhash);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean checkExistence(String blockHash) throws SQLException {
+        String queryString = "SELECT EXISTS(SELECT * FROM History WHERE `block_hash` = ? AND `validity` = 0)";
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet result = null;
+        boolean exists = false;
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, blockHash);
+            result = ptmt.executeQuery();
+            if(result.next()) {
+                exists = result.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (result != null)
+                result.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return exists;
+        }
+    }
 }
