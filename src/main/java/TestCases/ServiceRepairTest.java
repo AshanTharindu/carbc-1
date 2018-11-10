@@ -11,8 +11,8 @@ import javax.xml.bind.util.JAXBSource;
 public class ServiceRepairTest {
     public static void main(String[] args) throws InterruptedException {
         startNodeTest();
-        Thread.sleep(5000);
-        sendAgreements();
+//        Thread.sleep(5000);
+//        sendAgreements();
         System.out.println(createServiceJSON());
     }
 
@@ -59,7 +59,7 @@ public class ServiceRepairTest {
         JSONObject serviceStation = new JSONObject();
         serviceStation.put("name", "ServiceStation");
         serviceStation.put("publicKey", "3081f03081a806072a8648ce38040130819c024100fca682ce8e12caba26efccf7110e526db078b05edecbcd1eb4a208f3ae1617ae01f35b91a47e6df63413c5e12ed0899bcd132acd50d99151bdc43ee737592e17021500962eddcc369cba8ebb260ee6b6a126d9346e38c50240678471b27a9cf44ee91a49c5147db1a9aaf244f05a434d6486931d2d14271b9e35030b71fd73da179069b32e2935630e1c2062354d0da20a6c416e50be794ca403430002402d0bc188cd1412351212d1a73c6bd13f80ce53c23fec0ee894083f2ba7067024cb75a32a27b727aa2ae5f3e7a672b9128ee0ff091ba6146cb6d3be857e03352f");
-        secondaryParty.put("ServiceStation", serviceStation);
+        secondaryParty.put("serviceStation", serviceStation);
 
         JSONArray sparePart = new JSONArray();
         sparePart.put("3081f03081a806072a8648ce38040130819c024100fca682ce8e12caba26efccf7110e526db078b05edecbcd1eb4a208f3ae1617ae01f35b91a47e6df63413c5e12ed0899bcd132acd50d99151bdc43ee737592e17021500962eddcc369cba8ebb260ee6b6a126d9346e38c50240678471b27a9cf44ee91a49c5147db1a9aaf244f05a434d6486931d2d14271b9e35030b71fd73da179069b32e2935630e1c2062354d0da20a6c416e50be794ca403430002401c967adabaa96d9107d4a8bee79d6cb526f1a6a901228b2a15d72b5076fc3dadfc852d768b4d49b984d6568a56b4778ea2467c8c39b81e11498341df97936174");
