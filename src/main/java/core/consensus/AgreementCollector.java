@@ -82,28 +82,27 @@ public class AgreementCollector{
                     OwnershipExchange ownershipExchange = new OwnershipExchange(vehicleId, sender);
 
                     try{
-                        boolean isAuthorized = false;
                         if (ownershipExchange.isAuthorizedToSeller()){
-                            //show notification to me to confirm
-                            isAuthorized = true;
+
+                            String newOwnerPubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
+                            getMandatoryValidators().add(newOwnerPubKey);
+
+                            JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
+                            String RmvPubKey = obj.getString("publicKey");
+                            getMandatoryValidators().add(RmvPubKey);
+
+
+                            if(newOwnerPubKey.equals(myPubKey)) {
+                                //show notification icon 2
+                            }else if(RmvPubKey.equals(myPubKey)) {
+                                //show notification in service station
+                                succeed = RmvValidation.validateBlock(block);
+                            }else{
+                                //show notification icon 1
+                                WebSocketMessageHandler.addBlockToNotificationArray(block);
+                            }
+
                         }
-
-                        pubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
-                        getMandatoryValidators().add(pubKey);
-
-                        if(pubKey.equals(myPubKey) && isAuthorized) {
-                            //show notification in android ui in second notification icon
-                        }
-
-                        JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
-                        pubKey = obj.getString("publicKey");
-                        getMandatoryValidators().add(pubKey);
-
-                        if(pubKey.equals(myPubKey) && isAuthorized) {
-                            //show notification in android ui
-                            succeed = RmvValidation.validateBlock(block);
-                        }
-
                         System.out.println("mandatory validators is = " + getMandatoryValidators().size());
 
                     }catch (NullPointerException e){
@@ -113,30 +112,31 @@ public class AgreementCollector{
                     }
 
                 case "ServiceRepair":
-                    pubKey = secondaryParties.getJSONObject("serviceStation").getString("publicKey");
-                    getMandatoryValidators().add(pubKey);
+                    boolean show = true;
+                    String serviceStationPubKey = secondaryParties.getJSONObject("serviceStation").getString("publicKey");
+                    getMandatoryValidators().add(serviceStationPubKey);
 
-                    System.out.println("mandatory validators size = " + getMandatoryValidators().size());
-
-                    boolean isMandatoryValid = isMandatoryPartyValid("ServiceStation", pubKey);
-
-                    if (isMandatoryValid){
-                        //show notification in notification icon 1
-                        WebSocketMessageHandler.addBlockToNotificationArray(block);
-
-                        if(pubKey.equals(myPubKey)) {
+                    if (isMandatoryPartyValid("ServiceStation", serviceStationPubKey)){
+                        if(serviceStationPubKey.equals(myPubKey)) {
                             System.out.println("service station is validating");
+                            show = false;
                             succeed = ServiceStationValidation.validateBlock(block);
                         }
-                    }
 
-                    JSONArray sparePartProvider = thirdParties.getJSONArray("SparePartProvider");
-                    for (int i = 0; i < sparePartProvider.length(); i++){
-                        getSpecialValidators().add(sparePartProvider.getString(i));
+                        JSONArray sparePartProvider = thirdParties.getJSONArray("SparePartProvider");
+                        for (int i = 0; i < sparePartProvider.length(); i++){
+                            String sparePartPubKey = sparePartProvider.getString(i);
+                            getSpecialValidators().add(sparePartPubKey);
 
-                        if(pubKey.equals(myPubKey)) {
-                            System.out.println("I am a spare part provider");
-                            //show notification in notification icon 2
+                            if(sparePartPubKey.equals(myPubKey)) {
+                                System.out.println("I am a spare part provider");
+                                show = false;
+                                //show notification in notification icon 2
+                            }
+                        }
+                        if (show){
+                            //show notification in notification icon 1
+                            WebSocketMessageHandler.addBlockToNotificationArray(block);
                         }
                     }
                     break;
