@@ -39,7 +39,8 @@ public class ExchangeOwnershipTest {
     }
 
     public static void sendAgreements(){
-        String[] orgs = {"ServiceStation", "RMV", "SparePartShop", "GodFather"};
+//        String[] orgs = {"ServiceStation", "RMV", "SparePartShop", "GodFather"};
+        String[] orgs = {"ServiceStation","SparePartShop", "GodFather"};
         AgreementSender agreementSender = new AgreementSender();
         for( String org : orgs) {
             System.out.println(org);
