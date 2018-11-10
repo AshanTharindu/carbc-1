@@ -79,14 +79,7 @@ public class Consensus extends Observable {
                         }
                     }
                 }
-
-//                getNonApprovedBlocks().add(block);
-//                addBlockToNonApprovedBlocks(block);
                 this.nonApprovedBlocks.add(block);
-                //TODO: should notify the ui
-//                WebSocketMessageHandler.testUpdate(nonApprovedBlocks);
-
-
 
                 if (!isPresent) {
                     TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
@@ -95,22 +88,23 @@ public class Consensus extends Observable {
 
                 AgreementCollector agreementCollector = new AgreementCollector(block);
                 System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
-                agreementCollectors.add(agreementCollector);
 
-                if (agreementCollector.succeed){
-                    String blockHash = block.getBlockHeader().getHash();
-                    String digitalSignature = ChainUtil.digitalSignature(block.getBlockHeader().getHash());
-                    String signedBlock = digitalSignature;
-                    Agreement agreement = new Agreement(digitalSignature, signedBlock, blockHash,
-                            KeyGenerator.getInstance().getPublicKeyAsString());
+                if (agreementCollector.isExistence()){
+                    agreementCollectors.add(agreementCollector);
 
-                    Consensus.getInstance().handleAgreement(agreement);
+                    if (agreementCollector.succeed){
+                        String blockHash = block.getBlockHeader().getHash();
+                        String digitalSignature = ChainUtil.digitalSignature(block.getBlockHeader().getHash());
+                        String signedBlock = digitalSignature;
+                        Agreement agreement = new Agreement(digitalSignature, signedBlock, blockHash,
+                                KeyGenerator.getInstance().getPublicKeyAsString());
+
+                        Consensus.getInstance().handleAgreement(agreement);
+                    }
+
+                    log.info("agreement Collector added, size: {}", agreementCollectors.size());
+
                 }
-
-                log.info("agreement Collector added, size: {}", agreementCollectors.size());
-
-                //now need to check the relevant party is registered as with desired roles
-                //if want, we can check the validity of the block creator/transaction creator
 
             }
 
@@ -249,7 +243,11 @@ public class Consensus extends Observable {
     //no need of synchronizing
     public void handleAgreement(Agreement agreement) {
         System.out.println("agreement.getBlockHash()" + agreement.getBlockHash());
-        getAgreementCollector(agreement.getBlockHash()).addAgreementForBlock(agreement);
+        System.out.println();
+
+        if (getAgreementCollector(agreement.getBlockHash()) != null){
+            getAgreementCollector(agreement.getBlockHash()).addAgreementForBlock(agreement);
+        }
     }
 
     //no need of synchronizing

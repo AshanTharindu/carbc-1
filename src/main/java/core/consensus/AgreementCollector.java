@@ -39,6 +39,7 @@ public class AgreementCollector{
     private final Logger log = LoggerFactory.getLogger(AgreementCollector.class);
 
     boolean succeed = false;
+    private boolean existence = true;
 
 
     public AgreementCollector(Block block) throws SQLException {
@@ -91,7 +92,6 @@ public class AgreementCollector{
                             String RmvPubKey = obj.getString("publicKey");
                             getMandatoryValidators().add(RmvPubKey);
 
-
                             if(newOwnerPubKey.equals(myPubKey)) {
                                 //show notification icon 2
                             }else if(RmvPubKey.equals(myPubKey)) {
@@ -101,7 +101,6 @@ public class AgreementCollector{
                                 //show notification icon 1
                                 WebSocketMessageHandler.addBlockToNotificationArray(block);
                             }
-
                         }
                         System.out.println("mandatory validators is = " + getMandatoryValidators().size());
 
@@ -189,21 +188,22 @@ public class AgreementCollector{
                     Registration registrationSmartContract = new Registration(blockData);
 
                     if (registrationSmartContract.isAuthorized()){
-                        //show notification to me in notification icon 1
+                        //show notification in notification icon 1
 
                         JSONObject object = getIdentityJDBC().getIdentityByRole("RMV");
-                        pubKey = object.getString("publicKey");
+                        String rmvPubKey = object.getString("publicKey");
 
-                        if (isMandatoryPartyValid("RMV", pubKey)){
+                        if (isMandatoryPartyValid("RMV", rmvPubKey)){
                             getMandatoryValidators().add(object.getString("publicKey"));
                             WebSocketMessageHandler.addBlockToNotificationArray(block);
 
-                            if(pubKey.equals(myPubKey)) {
+                            if(rmvPubKey.equals(myPubKey)) {
+                                //show notification in RMV node
                                 succeed = RmvValidation.validateBlock(block);
                             }
                         }
                     }else{
-
+                        existence = false;
                     }
 
                     break;
@@ -419,5 +419,9 @@ public class AgreementCollector{
 
     public int getSecondaryArraySize() {
         return specialValidators.size();
+    }
+
+    public boolean isExistence() {
+        return existence;
     }
 }
