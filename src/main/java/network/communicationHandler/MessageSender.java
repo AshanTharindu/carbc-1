@@ -26,6 +26,7 @@ public class MessageSender {
 
     private static  MessageSender messageSender;
     private final static Logger log = LoggerFactory.getLogger(MessageSender.class);
+    private static String bootsrappingNodeID = "192.168.8.21";
 
 
     private MessageSender() {};
@@ -48,7 +49,7 @@ public class MessageSender {
 //        RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
         RequestMessage requestIPMessage = MessageCreator.createSpecificMessage(jsonObject, "Register", "0");
         requestIPMessage.addHeader("keepActive", "false");
-        Node.getInstance().sendMessageToPeer("192.168.8.103", 49154,requestIPMessage);
+        Node.getInstance().sendMessageToPeer(bootsrappingNodeID, 49154,requestIPMessage);
     }
 
     public static void sendHelloResponse(int listeningPort, String clientIP, int clientPort, String peerID) {
@@ -183,7 +184,7 @@ public class MessageSender {
         jsonObject.put("peerID", peerID);
         jsonObject.put("listeningPort",Node.getInstance().getNodeConfig().getListenerPort());
         RequestMessage peerDetailsRequestMessage = MessageCreator.createMessage(jsonObject, "RequestPeerDetails");
-        Node.getInstance().sendMessageToPeer("127.0.0.1", 49154, peerDetailsRequestMessage);
+        Node.getInstance().sendMessageToPeer(bootsrappingNodeID, 49154, peerDetailsRequestMessage);
         log.info("Peer Details Requested");
     }
 

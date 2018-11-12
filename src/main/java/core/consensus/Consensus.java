@@ -31,6 +31,7 @@ public class Consensus extends Observable {
     private ArrayList<Block> approvedBlocks;
     //to automate agreement process
     private ArrayList<Transaction> addedTransaction;
+    private String blockBroadcasted = null;
 
     private Consensus() {
         nonApprovedBlocks = new ArrayList<>();
@@ -53,6 +54,7 @@ public class Consensus extends Observable {
             historyDAO.saveBlockWithAdditionalData(block, data);
             handleNonApprovedBlock(block);
             MessageSender.broadCastBlock(block);
+            setBlockBroadcasted(block.getBlockHeader().getHash());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -79,14 +81,7 @@ public class Consensus extends Observable {
                         }
                     }
                 }
-
-//                getNonApprovedBlocks().add(block);
-//                addBlockToNonApprovedBlocks(block);
                 this.nonApprovedBlocks.add(block);
-                //TODO: should notify the ui
-//                WebSocketMessageHandler.testUpdate(nonApprovedBlocks);
-
-
 
                 if (!isPresent) {
                     TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
@@ -95,22 +90,23 @@ public class Consensus extends Observable {
 
                 AgreementCollector agreementCollector = new AgreementCollector(block);
                 System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
-                agreementCollectors.add(agreementCollector);
 
-                if (agreementCollector.succeed){
-                    String blockHash = block.getBlockHeader().getHash();
-                    String digitalSignature = ChainUtil.digitalSignature(block.getBlockHeader().getHash());
-                    String signedBlock = digitalSignature;
-                    Agreement agreement = new Agreement(digitalSignature, signedBlock, blockHash,
-                            KeyGenerator.getInstance().getPublicKeyAsString());
+                if (agreementCollector.isExistence()){
+                    agreementCollectors.add(agreementCollector);
 
-                    Consensus.getInstance().handleAgreement(agreement);
+                    if (agreementCollector.succeed){
+                        String blockHash = block.getBlockHeader().getHash();
+                        String digitalSignature = ChainUtil.digitalSignature(block.getBlockHeader().getHash());
+                        String signedBlock = digitalSignature;
+                        Agreement agreement = new Agreement(digitalSignature, signedBlock, blockHash,
+                                KeyGenerator.getInstance().getPublicKeyAsString());
+
+                        Consensus.getInstance().handleAgreement(agreement);
+                    }
+
+                    log.info("agreement Collector added, size: {}", agreementCollectors.size());
+
                 }
-
-                log.info("agreement Collector added, size: {}", agreementCollectors.size());
-
-                //now need to check the relevant party is registered as with desired roles
-                //if want, we can check the validity of the block creator/transaction creator
 
             }
 
@@ -220,7 +216,7 @@ public class Consensus extends Observable {
             blockJDBCDAO.addBlockToBlockchain(blockInfo, identity);
 
             //updating in history table
-            updateHistory(block.getBlockHeader().getHash());
+            manageStatus(block.getBlockHeader().getHash());
         }
     }
 
@@ -249,7 +245,11 @@ public class Consensus extends Observable {
     //no need of synchronizing
     public void handleAgreement(Agreement agreement) {
         System.out.println("agreement.getBlockHash()" + agreement.getBlockHash());
-        getAgreementCollector(agreement.getBlockHash()).addAgreementForBlock(agreement);
+        System.out.println();
+
+        if (getAgreementCollector(agreement.getBlockHash()) != null){
+            getAgreementCollector(agreement.getBlockHash()).addAgreementForBlock(agreement);
+        }
     }
 
     //no need of synchronizing
@@ -335,13 +335,51 @@ public class Consensus extends Observable {
         return myBlock;
     }
 
-    public void updateHistory(String blockHash) {
-        if(isItMyBlock(blockHash)) {
-            HistoryDAO historyDAO = new HistoryDAO();
-            historyDAO.setValidity(blockHash);
-            log.info("History Updated for: ", blockHash);
-        }else {
-            log.info("Not My Block");
+    public boolean isItMyBlock2(String blockHash) {
+        if(blockHash.equals(isBlockBroadcasted())) {
+            return true;
         }
+        return false;
+    }
+
+    public void updateHistory(String blockHash) {
+        HistoryDAO historyDAO = new HistoryDAO();
+        historyDAO.setValidity(blockHash);
+        log.info("History Updated for: ", blockHash);
+    }
+
+    public void setBlockBroadcasted(String blockHash) {
+        this.blockBroadcasted = blockHash;
+    }
+
+    public String isBlockBroadcasted() {
+        return blockBroadcasted;
+    }
+
+    public void manageStatus(String blockHash) {
+        String blockStatus = isBlockBroadcasted();
+        try{
+            if(blockStatus != null) {
+                if(isItMyBlock2(blockHash)) {
+                    updateHistory(blockHash);
+                    setBlockBroadcasted(null);
+                }else {
+                    //block failed
+                    Thread.sleep(5000);
+                    HistoryDAO historyDAO = new HistoryDAO();
+                    JSONObject failedBlockDetails = historyDAO.getFailedBlockDetails(blockHash);
+                    if(failedBlockDetails.length() != 0) {
+                        Controller controller = new Controller();
+                        controller.sendTransaction(failedBlockDetails.getString("event"),
+                                failedBlockDetails.getString("vehicleId"),
+                                new JSONObject(failedBlockDetails.getString("data")));
+                    }
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

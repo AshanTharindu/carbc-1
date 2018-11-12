@@ -39,6 +39,7 @@ public class AgreementCollector{
     private final Logger log = LoggerFactory.getLogger(AgreementCollector.class);
 
     boolean succeed = false;
+    private boolean existence = true;
 
 
     public AgreementCollector(Block block) throws SQLException {
@@ -91,9 +92,13 @@ public class AgreementCollector{
                             String RmvPubKey = obj.getString("publicKey");
                             getMandatoryValidators().add(RmvPubKey);
 
-
                             if(newOwnerPubKey.equals(myPubKey)) {
                                 //show notification icon 2
+
+                                //TODO for temporary purpose - remove this
+                                Thread.sleep(6000);
+                                Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
+                                System.out.println("here");
                             }else if(RmvPubKey.equals(myPubKey)) {
                                 //show notification in service station
                                 succeed = RmvValidation.validateBlock(block);
@@ -101,13 +106,14 @@ public class AgreementCollector{
                                 //show notification icon 1
                                 WebSocketMessageHandler.addBlockToNotificationArray(block);
                             }
-
                         }
                         System.out.println("mandatory validators is = " + getMandatoryValidators().size());
 
                     }catch (NullPointerException e){
                         System.out.println("error occurred in smart contract");
-                    }finally {
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
                         break;
                     }
 
@@ -189,21 +195,22 @@ public class AgreementCollector{
                     Registration registrationSmartContract = new Registration(blockData);
 
                     if (registrationSmartContract.isAuthorized()){
-                        //show notification to me in notification icon 1
+                        //show notification in notification icon 1
 
                         JSONObject object = getIdentityJDBC().getIdentityByRole("RMV");
-                        pubKey = object.getString("publicKey");
+                        String rmvPubKey = object.getString("publicKey");
 
-                        if (isMandatoryPartyValid("RMV", pubKey)){
+                        if (isMandatoryPartyValid("RMV", rmvPubKey)){
                             getMandatoryValidators().add(object.getString("publicKey"));
                             WebSocketMessageHandler.addBlockToNotificationArray(block);
 
-                            if(pubKey.equals(myPubKey)) {
+                            if(rmvPubKey.equals(myPubKey)) {
+                                //show notification in RMV node
                                 succeed = RmvValidation.validateBlock(block);
                             }
                         }
                     }else{
-
+                        existence = false;
                     }
 
                     break;
@@ -316,8 +323,7 @@ public class AgreementCollector{
         System.out.println("Inside addAgreementForBlock method");
         if(agreementCollectorId.equals(agreement.getBlockHash())) {
             if(!isDuplicateAgreement(agreement)) {
-                PublicKey publicKey = KeyGenerator.getInstance().getInstance().getPublicKey(agreement.getPublicKey());
-                if(ChainUtil.getInstance().signatureVerification(agreement.getPublicKey(), agreement.getSignedBlock(),
+                if(ChainUtil.signatureVerification(agreement.getPublicKey(), agreement.getSignedBlock(),
                                 agreement.getBlockHash())) {
                     getAgreements().add(agreement);
                     //check for mandatory
@@ -419,5 +425,9 @@ public class AgreementCollector{
 
     public int getSecondaryArraySize() {
         return specialValidators.size();
+    }
+
+    public boolean isExistence() {
+        return existence;
     }
 }

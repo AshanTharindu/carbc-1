@@ -17,7 +17,7 @@ public class HistoryTest {
     public static void main(String[] args) throws SQLException {
 
 
-        testCase4();
+        testGetFailedBlockDetails();
 
     }
 
@@ -38,7 +38,7 @@ public class HistoryTest {
 
         String sender = KeyGenerator.getInstance().getPublicKeyAsString();
         String nodeID = Node.getInstance().getNodeConfig().getNodeID();
-        Transaction transaction = new Transaction("V",sender,"ExchangeOwnership", jsonObject.toString(), nodeID);
+        Transaction transaction = new Transaction("V", sender, "ExchangeOwnership", jsonObject.toString(), nodeID);
 
         BlockBody blockBody = new BlockBody();
         blockBody.setTransaction(transaction);
@@ -55,7 +55,7 @@ public class HistoryTest {
 
     public static void testCase2() {
         HistoryDAO historyDAO = new HistoryDAO();
-        historyDAO.setValidity("01852e57018fcc8022ccbfba27b3a89d859fe0337c0b90b282108e26d4650a3a");
+        historyDAO.setValidity("3bf6973a6e403e8813e07b18eed9502b919ab004785fb1f0e9e6aa107fe20a91");
     }
 
     public static void testCase3() throws SQLException {
@@ -73,5 +73,15 @@ public class HistoryTest {
         HistoryDAO historyDAO = new HistoryDAO();
         boolean previoushHas = historyDAO.checkExistence("01852e57018fcc8022ccbfba27b3a89d859fe0337c0b90b282108e26d4650a3a");
         System.out.println(previoushHas);
+    }
+
+    public static void testGetFailedBlockDetails() throws SQLException {
+        HistoryDAO historyDAO = new HistoryDAO();
+        JSONObject jsonObject = historyDAO.getFailedBlockDetails("3bf6973a6e403e8813e07b18eed9502b919ab004785fb1f0e9e6aa107fe20a91");
+        System.out.println(jsonObject.length());
+        System.out.println(jsonObject.getString("event"));
+        System.out.println(jsonObject.getString("vehicleId"));
+        System.out.println(jsonObject.getString("data"));
+
     }
 }

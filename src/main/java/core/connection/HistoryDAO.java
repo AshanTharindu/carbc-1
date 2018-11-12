@@ -188,4 +188,41 @@ public class HistoryDAO {
             return exists;
         }
     }
+
+    public JSONObject getFailedBlockDetails(String blockHash) throws SQLException {
+        String queryString = "SELECT `event`, `address`, `data` FROM `History` WHERE `block_hash` = ?";
+
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        ResultSet result = null;
+        JSONObject failedBlock = new JSONObject();
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, blockHash);
+            result = ptmt.executeQuery();
+            if(result.next()) {
+                String event = result.getString("event");
+                String vehicleId = result.getString("address");
+                String data = result.getString("data");
+
+                failedBlock.put("event", event);
+                failedBlock.put("vehicleId", vehicleId);
+                failedBlock.put("data", data);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (result != null)
+                result.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return failedBlock;
+        }
+    }
 }
