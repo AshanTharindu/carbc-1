@@ -2,15 +2,18 @@ package core.serviceStation.validation;
 
 import core.blockchain.Block;
 import core.consensus.Consensus;
+import core.rmv.validation.RmvValidation;
 import core.serviceStation.dao.ServiceJDBCDAO;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 
 public class ServiceStationValidation {
 
+    private static final Logger log = LoggerFactory.getLogger(ServiceStationValidation.class);
     public static boolean validateBlock(Block block) {
-        System.out.println("----------------------Begin of ServiceStationValidation/validateBlock---------------------------------");
 
         try {
             String serviceData = ServiceJDBCDAO.getInstance().getLastServiceRecord(block.getBlockBody().getTransaction().getAddress()).toString();
@@ -27,16 +30,15 @@ public class ServiceStationValidation {
                     (dataFromBlock.getJSONArray("services").toString()).equals((dataFromServiceStation.getJSONArray("services")).toString())){
 
 
-                System.out.println("Service data is true. Validated by Service Station");
+                log.info("RMV successfully validated the transaction");
+                log.info("service station sending agreements");
                 Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
-
                 return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
-            System.out.println("----------------------End of ServiceStationValidation/validateBlock---------------------------------");
         }
+        log.info("service station validation failed");
         return false;
     }
 

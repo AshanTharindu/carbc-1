@@ -1,11 +1,15 @@
 package core.smartContract;
 
 import core.consensus.Consensus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.SQLException;
 import java.text.ParseException;
 
 public class TimeKeeper extends Thread{
     String blockHash;
+    private final Logger log = LoggerFactory.getLogger(TimeKeeper.class);
 
     public TimeKeeper(String blockHash){
         this.blockHash = blockHash;
@@ -14,9 +18,9 @@ public class TimeKeeper extends Thread{
     @Override
     public void run() {
         try {
-            System.out.println("Inside TimeKeeper");
+            log.info("Starting count down. Inside TimeKeeper");
             Thread.sleep(20000);
-            System.out.println("time expired");
+            System.out.println("Count down finished");
             Consensus.getInstance().checkAgreementsForBlock(blockHash);
 
         } catch (InterruptedException e) {

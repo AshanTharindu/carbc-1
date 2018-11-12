@@ -1,19 +1,15 @@
 package core.rmv.validation;
 
-import chainUtil.ChainUtil;
-import chainUtil.KeyGenerator;
 import core.blockchain.Block;
-import core.consensus.Agreement;
 import core.consensus.Consensus;
 import core.rmv.dao.RMVJDBCDAO;
-import core.serviceStation.dao.ServiceJDBCDAO;
 import org.json.JSONObject;
-
-import javax.xml.bind.util.JAXBSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 
 public class RmvValidation {
-
+    private static final Logger log = LoggerFactory.getLogger(RmvValidation.class);
     public static boolean validateBlock(Block block) {
         try {
             Boolean succeed = false;
@@ -21,54 +17,59 @@ public class RmvValidation {
 
             switch (event){
                 case "ExchangeOwnership":
-                    System.out.println("inside ownership exchange switch case in validate block");
                     succeed = validateOwnershipExchangeBlock(block);
                     break;
 
                 case "RegisterVehicle":
-                    System.out.println("inside register vehicle switch case in validate block");
                     succeed = validateRegistrationBlock(block);
                     break;
             }
             if(succeed) {
+                log.info("sending agreements by RMV for block {}", block.getBlockHeader().getHash());
+                Thread.sleep(5000);
                 Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
-//                String blockHash = block.getBlockHeader().getHash();
-//                String digitalSignature = ChainUtil.digitalSignature(block.getBlockHeader().getHash());
-//                String signedBlock = digitalSignature;
-//                Agreement agreement = new Agreement(digitalSignature, signedBlock, blockHash,
-//                        KeyGenerator.getInstance().getPublicKeyAsString());
-//
-//                Consensus.getInstance().handleAgreement(agreement);
                 return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return false;
 
     }
 
     public static boolean validateOwnershipExchangeBlock(Block block) throws SQLException {
-        System.out.println("inside validateBlock/validateOwnershipExchangeBlock");
         JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
-        String registration_number = blockData.getString("registrationNumber");
-
-        JSONObject ownershipData = RMVJDBCDAO.getInstance().getOwnershipInfo(registration_number);
+        String vehicleId = blockData.getString("vehicleId");
 
         String pre_owner = blockData.getString("preOwner");
         String new_owner = blockData.getJSONObject("SecondaryParty").getJSONObject("NewOwner").getString("publicKey");
-//        String date = blockData.getString("date");
 
-        String vehicleRegistrationNumber = ownershipData.getString("registrationNumber");
-        String preOwner = ownershipData.getString("preOwner");
-        String newOwner = ownershipData.getString("newOwner");
-//        String date1 = ownershipData.getString("date");
+        JSONObject ownershipData = RMVJDBCDAO.getInstance().getOwnershipInfo(vehicleId);
 
-        if (registration_number.equals(vehicleRegistrationNumber) && pre_owner.equals(preOwner) && new_owner.equals(newOwner)){
-            System.out.println("succeeded in validateBlock/validateOwnershipExchangeBlock");
-            return true;
+        if (ownershipData.length() == 0){
+            JSONObject registrationData = RMVJDBCDAO.getInstance().getRegistrationInfo(vehicleId);
+            String currentOwner = registrationData.getString("currentOwner");
+            String vid = registrationData.getString("vehicleId");
+
+            if (vehicleId.equals(vid) && pre_owner.equals(currentOwner)){
+                log.info("RMV successfully validated the transaction");
+                return true;
+            }
+
+        }else{
+            String preOwner = ownershipData.getString("preOwner");
+            String newOwner = ownershipData.getString("newOwner");
+            String vid = ownershipData.getString("vehicleId");
+
+            if (vehicleId.equals(vid) && pre_owner.equals(preOwner) && new_owner.equals(newOwner)){
+                log.info("RMV successfully validated the transaction");
+                return true;
+            }
         }
+        log.info("RMV validation failed");
         return false;
     }
 

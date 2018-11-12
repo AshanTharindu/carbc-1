@@ -2,23 +2,26 @@ package core.connection;
 
 import chainUtil.ChainUtil;
 import core.blockchain.BlockInfo;
+import core.consensus.Consensus;
 import core.rmv.Registration;
 import core.rmv.dao.RMVJDBCDAO;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.text.ParseException;
 
 public class BlockJDBCDAO {
+    private final Logger log = LoggerFactory.getLogger(BlockJDBCDAO.class);
 
     public boolean addBlockToBlockchain(BlockInfo blockInfo, Identity identity) throws SQLException {
-        System.out.println("inside BlockJDBCDAO/addBlockToBlockchain()");
+        log.info("trying to add the block {} to blockchain:", blockInfo.getHash());
 
         Connection connection = null;
         PreparedStatement ptmt = null;
         PreparedStatement psmt = null;
-        ResultSet resultSet = null;
 
         String transactionId = blockInfo.getTransactionId();
         String transactionType = transactionId.substring(0, 1);
@@ -52,6 +55,7 @@ public class BlockJDBCDAO {
             ptmt.setString(10, blockInfo.getAddress());
             ptmt.setDouble(11, blockInfo.getRating());
             ptmt.executeUpdate();
+            log.info("successfully updated Blockchain table");
 
             if (transactionType.equals("I")){
                 psmt = connection.prepareStatement(query);
@@ -60,6 +64,7 @@ public class BlockJDBCDAO {
                 psmt.setString(3, identity.getRole());
                 psmt.setString(4, identity.getName());
                 psmt.executeUpdate();
+                log.info("successfully updated Identity table");
             }
 
             if (blockInfo.getEvent().equals("ExchangeOwnership")){
@@ -69,6 +74,7 @@ public class BlockJDBCDAO {
                 psmt.setString(1, data.getJSONObject("SecondaryParty").getJSONObject("NewOwner").getString("publicKey"));
                 psmt.setString(2, blockInfo.getAddress());
                 psmt.executeUpdate();
+                log.info("successfully updated Vehicle table");
             }
 
             if(blockInfo.getEvent().equals("RegisterVehicle")){
@@ -80,9 +86,8 @@ public class BlockJDBCDAO {
                 psmt.setString(2, blockInfo.getAddress());
                 psmt.setString(3, data.getString("currentOwner"));
                 psmt.executeUpdate();
+                log.info("successfully updated Vehicle table");
             }
-
-            System.out.println("Block is Added Successfully");
 
         } catch (SQLException e) {
             e.printStackTrace();

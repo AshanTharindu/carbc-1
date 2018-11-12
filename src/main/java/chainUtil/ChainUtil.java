@@ -2,15 +2,13 @@ package chainUtil;
 
 import core.blockchain.Block;
 import core.blockchain.BlockBody;
-import core.connection.BlockJDBCDAO;
-import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.sql.Timestamp;
-import java.sql.ResultSet;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,6 +17,7 @@ import java.util.LinkedList;
 public class ChainUtil {
 
     private static ChainUtil chainUtil;
+    private static final Logger log = LoggerFactory.getLogger(ChainUtil.class);
 
     //change to private after changes
     public ChainUtil() {}
@@ -53,6 +52,7 @@ public class ChainUtil {
     }
 
     public static boolean signatureVerification(String publicKey, String signature, String data) {
+        log.info("verifying signature: {}", publicKey);
         return verify(KeyGenerator.getInstance().getPublicKey(publicKey),hexStringToByteArray(signature),data);
     }
 
