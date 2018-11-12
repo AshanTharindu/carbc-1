@@ -535,6 +535,7 @@ public class BlockJDBCDAO {
             if(result.next()) {
                 previousBlock.put("blockHash", result.getString("block_hash"));
                 previousBlock.put("blockNumber", result.getString("block_number"));
+                previousBlock.put("blockTimeStamp", result.getString("block_timestamp"));
             }
 
         } catch (SQLException e) {
@@ -581,6 +582,62 @@ public class BlockJDBCDAO {
             if (connection != null)
                 connection.close();
             return previousHash;
+        }
+    }
+
+    public JSONObject checkPossibilityToAddBlock(String previousHash) throws SQLException {
+        String queryString = "SELECT `block_hash`, `block_timestamp` FROM `Blockchain` WHERE `previous_hash`= ?";
+        Connection connection = null;
+        PreparedStatement ptmt = null;
+        ResultSet result = null;
+        JSONObject previousBlock = new JSONObject();
+
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, previousHash);
+            result = ptmt.executeQuery();
+
+            if(result.next()) {
+                previousBlock.put("blockHash", result.getString("block_hash"));
+                previousBlock.put("blockTimeStamp", result.getString("block_timestamp"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (result != null)
+                result.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return previousBlock;
+        }
+    }
+
+    public void setValidity(boolean validity, String blockhash) throws SQLException {
+        String queryString = "UPDATE `Blockchain` SET `validity` = ? WHERE  `block_hash` = ?";
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setBoolean(1, validity);
+            ptmt.setString(2, blockhash);
+            ptmt.executeUpdate();
+
+            log.info("Blockchain Table Updated For: {}", blockhash);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
         }
     }
 
