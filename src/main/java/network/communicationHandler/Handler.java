@@ -41,85 +41,88 @@ public class Handler extends Thread{
             switch (messageType) {
                 //request of the new protocol
                 case "BlockBroadcast":
+                    log.info("Handler invoked: Block Broadcast");
                     handleBroadcastBlock();
                     break;
 
                 case "IPResponse":
+                    log.info("Handler invoked: IPResponse");
                     handleIPResponse();
                     break;
 
                 case "Hello":
+                    log.info("Handler invoked: Hello Request");
                     handleHelloRequest();
-
                     break;
 
                 case "HelloResponse":
+                    log.info("Handler invoked: Hello Response");
                     handleHelloResponse();
                     break;
 
                 case "BlockChainHashRequest":
-                    System.out.println("BlockChainHashRequest");
+                    log.info("Handler invoked: Blockchain Request");
                     handleBlockChainHashRequest();
                     break;
 
                 case "BlockChainSign":
-                    System.out.println("BlockChainSign");
+                    log.info("Handler invoked: Blockchain Sign");
                     handleReceivedSignedBlockchain();
                     break;
 
                 case "BlockChainRequest":
-                    System.out.println("BlockChainRequest");
+                    log.info("Handler invoked: Blockchain Request");
                     handleBlockChainRequest();
                     break;
 
 
                 case "BlockchainSend":
-                    System.out.println("BlockchainSend");
+                    log.info("Handler invoked: Blockchain Send");
                     handleReceivedBlockchainRequest();
                     break;
 
 
                 case "Agreement":
-                    System.out.println("Agreement");
+                    log.info("Handler invoked: Agreement");
                     handleReceivedAgreement();
                     break;
 
 
                 case "RequestedPeerDetails":
-                    System.out.println("RequestedPeerDetails");
+                    log.info("Handler invoked: Request Peer Details");
                     handleRequestedPeerDetails(data);
                     break;
 
                 case "RequestTransactionData":
-                    log.info("RequestedPeerDetails");
+                    log.info("Handler invoked: Request Transaction Data");
                     handleRequestTransactionData(data);
                     break;
 
                 case "TransactionDetails":
-                    log.info("TransactionDetails");
+                    log.info("Handler invoked: Transaction Details");
                     handleReceivedTransactionData(data);
                     break;
 
                 case "RequestAdditionalData":
-                    log.info("RequestAdditionalData");
+                    log.info("Handler invoked: Request Additional Data");
                     handleAdditionalDataRequest(data);
                     break;
 
                 case "AdditionalData":
-                    log.info("AdditionalData");
-                    System.out.println(data);
+                    log.info("Handler invoked: Additional Data");
                     handleReceivedAdditionalData(data);
                     break;
                 case "Test":
-                    log.info("Test Message Received");
+                    log.info("Handler invoked: Test");
                     break;
 
                 case "TestSignature":
+                    log.info("Handler invoked: Test Signature");
                     checkSignatureVerfication(data);
                     break;
 
                 default:
-                    System.out.println("default");
+                    log.info("Handler invoked: Default Request");
 
             }
         } catch (Exception e) {
@@ -195,7 +198,7 @@ public class Handler extends Thread{
 
     // 0-> block comes
     public void handleBroadcastBlock() throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException, IOException, ParseException, SQLException {
-        log.debug("Inside Handler/handleBroadcastBlock");
+        log.info("Handling block broadcast: Inside Handler/handleBroadcastBlock");
         JSONObject receivedJSONObject = new JSONObject(data);
         String JSONBlock = (String)receivedJSONObject.get("block");
         Block decodedBlock = JSONStringToBlock(JSONBlock);

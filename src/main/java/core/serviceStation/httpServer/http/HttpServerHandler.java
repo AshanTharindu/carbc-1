@@ -69,7 +69,14 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
 
         if (msg.uri().equals("/serviceStation")) {
-            serveStatic(ctx, "/index.html");
+//            serveStatic(ctx, "/index.html");
+            if (msg.method().equals(HttpMethod.OPTIONS)){
+                resolvePrefightedRequests(ctx, msg);
+            }
+            if (msg.method().equals(HttpMethod.POST)){
+                testArduino(ctx, msg);
+            }
+
         } else if (msg.uri().equals("/serviceStation/storeServiceData")) {
             if (msg.method().equals(HttpMethod.OPTIONS)){
                 resolvePrefightedRequests(ctx, msg);
@@ -197,6 +204,41 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         writeResponse(ctx, stringVehicleData);
     }
 
+    private void testArduino(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException, UnsupportedEncodingException {
+        //decode request
+        ByteBuf data = msg.content();
+        int readableBytes = data.readableBytes();
+        String body = data.toString(StandardCharsets.UTF_8);
+
+        System.out.println(body);
+
+        String stringArr[] = body.split(",");
+
+        String vehicleId = stringArr[0];
+        String serviceTypes[] = stringArr[1].split("");
+
+
+        ServiceRecord serviceRecord = new ServiceRecord();
+        serviceRecord.setVehicle_id(vehicleId);
+        serviceRecord.setServiced_date(new Timestamp(System.currentTimeMillis()));
+        int count = 0;
+
+        for (int i = 0; i < serviceTypes.length; i++) {
+
+            if ((serviceTypes[i]).equals("1")){
+                ArrayList<String> spareParts = new ArrayList<>();
+
+                Service service = new Service(count, spareParts);
+                serviceRecord.setService(service);
+            }
+            count++;
+
+        }
+        ServiceJDBCDAO.getInstance().addServiceRecord(serviceRecord);
+
+        writeResponse(ctx, "hello from service station");
+    }
+
     private void getServiceRecords(ChannelHandlerContext ctx, FullHttpRequest msg) throws SQLException {
         //decode request
         ByteBuf data = msg.content();
@@ -308,8 +350,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             ByteBuf content = Unpooled.wrappedBuffer(raw);
 
             FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-            response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/html");
-            response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html");
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
             ctx.write(response);
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();

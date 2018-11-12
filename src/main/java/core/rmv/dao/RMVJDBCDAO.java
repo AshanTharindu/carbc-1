@@ -117,9 +117,9 @@ public class RMVJDBCDAO {
         return getRegistrationInfo(queryString, registrationNumber);
     }
 
-    public JSONObject getOwnershipInfo(String registrationNumber) throws SQLException {
-        String queryString = "SELECT `id`, `vehicle_registration_number`, `pre_owner`, `new_owner`, `date` FROM `Ownership`" +
-                " WHERE `vehicle_registration_number` = ?";
+    public JSONObject getRegistrationInfo(String vehicleId) throws SQLException {
+        String queryString = "SELECT Registration.registration_number, Registration.current_owner, `vehicle_id` FROM " +
+                "`Registration` INNER JOIN `vehicle` ON vehicle.registration_number = Registration.registration_number WHERE `vehicle_id` = ?";
 
         PreparedStatement ptmt = null;
         ResultSet resultSet = null;
@@ -128,7 +128,42 @@ public class RMVJDBCDAO {
         try{
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(queryString);
-            ptmt.setString(1, registrationNumber);
+            ptmt.setString(1, vehicleId);
+            resultSet = ptmt.executeQuery();
+
+            if (resultSet.next()){
+                ownershipInfo.put("registrationNumber", resultSet.getString("registration_number"));
+                ownershipInfo.put("currentOwner", resultSet.getString("current_owner"));
+                ownershipInfo.put("vehicleId", resultSet.getString("vehicle_id"));
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (resultSet != null)
+                resultSet.close();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            return ownershipInfo;
+        }
+    }
+
+    public JSONObject getOwnershipInfo(String vehicleId) throws SQLException {
+        String queryString = "SELECT `vehicle_registration_number`, `pre_owner`, `new_owner`, `date`, `vehicle_id` FROM `Ownership` INNER " +
+                "JOIN `vehicle` ON vehicle.vehicle_id = Ownership.vehicle_registration_number WHERE `vehicle_id` = ?";
+
+        PreparedStatement ptmt = null;
+        ResultSet resultSet = null;
+        JSONObject ownershipInfo = new JSONObject();
+
+        try{
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, vehicleId);
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
@@ -136,6 +171,7 @@ public class RMVJDBCDAO {
                 ownershipInfo.put("preOwner", resultSet.getString("pre_owner"));
                 ownershipInfo.put("newOwner", resultSet.getString("new_owner"));
                 ownershipInfo.put("date", resultSet.getTimestamp("date"));
+                ownershipInfo.put("vehicleId", resultSet.getTimestamp("vehicle_id"));
             }
 
         }catch (SQLException e) {

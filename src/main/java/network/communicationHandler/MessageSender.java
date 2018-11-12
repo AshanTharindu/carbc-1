@@ -41,10 +41,7 @@ public class MessageSender {
     //messages of new protocol
     public static void requestIP() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().
-
-
-                getListenerPort());
+        jsonObject.put("ListeningPort",Node.getInstance().getNodeConfig().getListenerPort());
         jsonObject.put("nodeID", Node.getInstance().getNodeConfig().getNodeID());
 //        RequestMessage requestIPMessage = RequestIPMessageCreator.createRequestIPMessage(jsonObject);
         RequestMessage requestIPMessage = MessageCreator.createSpecificMessage(jsonObject, "Register", "0");

@@ -66,11 +66,13 @@ public class Consensus extends Observable {
     }
 
     public synchronized void handleNonApprovedBlock(Block block) throws SQLException {
+        log.info("Handling non approved blocks: Inside Consensus/handleNonApprovedBlock() method");
+
         if (!isDuplicateBlock(block)) {
             if(ChainUtil.signatureVerification(block.getBlockBody().getTransaction().getSender(),
                     block.getBlockHeader().getSignature(),block.getBlockHeader().getHash())) {
 
-                log.info("signature verified for block: ", block.getBlockHeader().getBlockNumber());
+                log.info("signature verification successful: {}", block.getBlockHeader().getBlockNumber());
 
                 boolean isPresent = false;
                 if(getNonApprovedBlocks().size()>0) {
@@ -82,6 +84,8 @@ public class Consensus extends Observable {
                     }
                 }
                 this.nonApprovedBlocks.add(block);
+                log.info("Received block id added to nonApprovedBlocks array");
+                log.info("size of nonApprovedBlocks: {}", nonApprovedBlocks.size());
 
                 if (!isPresent) {
                     TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
@@ -114,34 +118,43 @@ public class Consensus extends Observable {
     }
 
     public void checkAgreementsForBlock(String preBlockHash) throws SQLException, ParseException {
-        System.out.println("Inside checkAgreementsForBlock method");
+        log.info("checking agreements for block: {}", preBlockHash);
 
         ArrayList<Block> qualifiedBlocks = new ArrayList<>();
+        log.info("size of qualified blocks array: {}", qualifiedBlocks.size());
+
         for (Block b : this.getNonApprovedBlocks()) {
-            System.out.println("Inside for Loop");
+            log.info("checking non approved blocks array. size: {}", getNonApprovedBlocks().size());
 
             if (b.getBlockHeader().getPreviousHash().equals(preBlockHash)) {
-                System.out.println("b.getBlockHeader().getPreviousHash().equals(preBlockHash)");
+                log.info("matching block found for block hash: {}", preBlockHash);
                 String blockHash = b.getBlockHeader().getHash();
                 AgreementCollector agreementCollector = getAgreementCollector(blockHash);
 
                 synchronized (agreementCollectors) {
+                    log.info("remaining mandatory validators for this transaction: {}", agreementCollector.getMandatoryValidators().size());
                     if (agreementCollector.getMandatoryValidators().size() == 0) {
-                        System.out.println("agreementCollector.getMandatoryValidators().size() == 0");
                         int agreementCount = agreementCollector.getAgreements().size();
+                        log.info("total agreements received for block: {}", agreementCount);
                         if (agreementCount >= agreementCollector.getThreshold()) {
+                            log.info("consensus achieved");
                             qualifiedBlocks.add(b);
+                            log.info("size of the qualified block array: {}", qualifiedBlocks.size());
 
                             //rating calculations
+                            log.info("calculating rating");
                             agreementCollector.getRating().setAgreementCount(agreementCount);
                             double rating = agreementCollector.getRating().calRating(agreementCollector.
                                     getMandatoryArraySize(),agreementCollector.getSecondaryArraySize());
                             b.getBlockHeader().setRating(rating);
-                            System.out.println("Rating of the block: " +b.getBlockHeader().getRating());
+                            log.info("rating of the block:{}", b.getBlockHeader().getRating());
+
+                            log.info("removing agreement collector: {}", agreementCollector);
                             this.agreementCollectors.remove(agreementCollector);
+                            log.info("size of the agreement collector array: {}", agreementCollectors.size());
                         }
                     } else {
-                        //blocks with insufficient agreements
+                        log.info("block has insufficient agreements");
                     }
                 }
             }
@@ -150,8 +163,8 @@ public class Consensus extends Observable {
     }
 
     public Block selectQualifiedBlock(ArrayList<Block> qualifiedBlocks) throws SQLException, ParseException {
-        System.out.println("inside consensus/selectQualifiedBlock");
-
+        log.info("no of qualified blocks: {}", qualifiedBlocks.size());
+        log.info("selecting the qualified block to be added to the blockchain");
         Block qualifiedBlock = null;
 
         if (qualifiedBlocks.size() != 0) {
@@ -163,31 +176,31 @@ public class Consensus extends Observable {
             synchronized (getNonApprovedBlocks()) {
                 for (Block b : qualifiedBlocks) {
                     if (blockTimestamp.after(ChainUtil.convertStringToTimestamp(b.getBlockHeader().getBlockTime()))) {
-//                        this.getNonApprovedBlocks().remove(qualifiedBlock);
+                        log.info("not the qualified block: {}", qualifiedBlock);
                         removeBlockFromNonApprovedBlocks(qualifiedBlock);
                         qualifiedBlock = b;
                         blockTimestamp = ChainUtil.convertStringToTimestamp(b.getBlockHeader().getBlockTime());
                     } else {
-//                        this.getNonApprovedBlocks().remove(b);
+                        log.info("not the qualified block: {}", b);
                         removeBlockFromNonApprovedBlocks(b);
                     }
                 }
             }
             //TODO: for now we discard all delayed blocks. only consider blocks that got enough agreements within the specific time period
-//            this.approvedBlocks.add(qualifiedBlock);
         } else {
             //need to restart the timer again
+            log.info("no qualified blocks");
         }
         return qualifiedBlock;
     }
 
     public void addBlockToBlockchain(ArrayList<Block> qualifiedBlocks) throws SQLException, ParseException {
-        System.out.println("inside Consensus/addBlockToBlockchain()");
+        log.info("adding block to blockchain: inside Consensus/addBlockToBlockchain(");
         Block block = selectQualifiedBlock(qualifiedBlocks);
+        log.info("qualified block: {}", block);
 
         if (block != null) {
-            System.out.println("if (block != null)");
-
+            log.info("creating block info object");
             BlockInfo blockInfo = new BlockInfo();
             blockInfo.setPreviousHash(block.getBlockHeader().getPreviousHash());
             blockInfo.setHash(block.getBlockHeader().getHash());
@@ -203,6 +216,7 @@ public class Consensus extends Observable {
 
             Identity identity = null;
             if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
+                log.info("identity related transaction.");
                 JSONObject body = new JSONObject(block.getBlockBody().getTransaction().getData());
                 String publicKey = body.getString("publicKey");
                 String role = body.getString("role");
@@ -223,8 +237,10 @@ public class Consensus extends Observable {
     //no need of synchronizing
     public boolean isDuplicateBlock(Block block) {
         if (getNonApprovedBlocks().contains(block)) {
+            log.info("This is a duplicate block");
             return true;
         }
+        log.info("This is not a duplicate block");
         return false;
     }
 
@@ -254,9 +270,12 @@ public class Consensus extends Observable {
 
     //no need of synchronizing
     private AgreementCollector getAgreementCollector(String id) {
+        log.info("size of the agreement collector array: {}", agreementCollectors.size());
+        log.info("searching for matching agreement collector with id: {}", id);
+
         for (AgreementCollector agreementCollector : this.agreementCollectors) {
-            System.out.println(agreementCollector.getAgreementCollectorId());
             if (agreementCollector.getAgreementCollectorId().equals(id)) {
+                log.info("found agreement collector");
                 return agreementCollector;
             }
         }

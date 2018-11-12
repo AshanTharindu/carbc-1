@@ -62,11 +62,14 @@ public class AgreementCollector{
 
 
     public void setMandatoryAgreements() throws SQLException {
-
+        log.info("setting mandatory validators");
         synchronized (this){
             String event = this.block.getBlockBody().getTransaction().getEvent();
+            log.info("block event", event);
+
             JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
-            System.out.println(blockData);
+            log.info("block data", blockData);
+
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONObject thirdParties = blockData.getJSONObject("ThirdParty");
             String pubKey;
@@ -74,23 +77,28 @@ public class AgreementCollector{
             rating.setSpecialValidators(secondaryCount);
             String myPubKey = KeyGenerator.getInstance().getPublicKeyAsString();
 
-
             switch (event){
                 case "ExchangeOwnership":
                     String vehicleId = block.getBlockBody().getTransaction().getAddress();
                     String sender = block.getBlockBody().getTransaction().getSender();
 
+                    log.info("executing OwnershipExchange smart contract");
                     OwnershipExchange ownershipExchange = new OwnershipExchange(vehicleId, sender);
 
                     try{
                         if (ownershipExchange.isAuthorizedToSeller()){
-
+                            log.info("seller is authorized");
                             String newOwnerPubKey = secondaryParties.getJSONObject("NewOwner").getString("publicKey");
                             getMandatoryValidators().add(newOwnerPubKey);
+                            log.info("added new owner to mandatory validator array");
+                            log.info("no of mandatory validators: {}", getMandatoryValidators().size());
 
                             JSONObject obj = getIdentityJDBC().getIdentityByRole("RMV");
                             String RmvPubKey = obj.getString("publicKey");
                             getMandatoryValidators().add(RmvPubKey);
+                            log.info("added RMV to mandatory validator array");
+                            log.info("no of mandatory validators: {}", getMandatoryValidators().size());
+
 
                             if(newOwnerPubKey.equals(myPubKey)) {
                                 //show notification icon 2
@@ -101,13 +109,16 @@ public class AgreementCollector{
                                 System.out.println("here");
                             }else if(RmvPubKey.equals(myPubKey)) {
                                 //show notification in service station
+                                log.info("RMV validating ownership exchange transaction");
                                 succeed = RmvValidation.validateBlock(block);
                             }else{
                                 //show notification icon 1
                                 WebSocketMessageHandler.addBlockToNotificationArray(block);
                             }
+                        }else{
+                            log.info("seller is not authorized");
+                            log.info("smart contract failed");
                         }
-                        System.out.println("mandatory validators is = " + getMandatoryValidators().size());
 
                     }catch (NullPointerException e){
                         System.out.println("error occurred in smart contract");
@@ -120,9 +131,12 @@ public class AgreementCollector{
                 case "ServiceRepair":
                     boolean show = true;
                     String serviceStationPubKey = secondaryParties.getJSONObject("serviceStation").getString("publicKey");
-                    getMandatoryValidators().add(serviceStationPubKey);
 
                     if (isMandatoryPartyValid("ServiceStation", serviceStationPubKey)){
+                        getMandatoryValidators().add(serviceStationPubKey);
+                        log.info("added service station to mandatory validator array");
+                        log.info("no of mandatory validators: {}", getMandatoryValidators().size());
+
                         if(serviceStationPubKey.equals(myPubKey)) {
                             System.out.println("service station is validating");
                             show = false;
@@ -133,9 +147,11 @@ public class AgreementCollector{
                         for (int i = 0; i < sparePartProvider.length(); i++){
                             String sparePartPubKey = sparePartProvider.getString(i);
                             getSpecialValidators().add(sparePartPubKey);
+                            log.info("added spare part provider to mandatory validator array");
+                            log.info("no of special validators: {}", getSpecialValidators().size());
 
                             if(sparePartPubKey.equals(myPubKey)) {
-                                System.out.println("I am a spare part provider");
+                                log.info("I am a spare part provider");
                                 show = false;
                                 //show notification in notification icon 2
                             }
@@ -192,10 +208,12 @@ public class AgreementCollector{
                     break;
 
                 case "RegisterVehicle":
+                    log.info("executing Registration smart contract");
                     Registration registrationSmartContract = new Registration(blockData);
 
                     if (registrationSmartContract.isAuthorized()){
                         //show notification in notification icon 1
+                        log.info("Registration is authorized");
 
                         JSONObject object = getIdentityJDBC().getIdentityByRole("RMV");
                         String rmvPubKey = object.getString("publicKey");
@@ -203,13 +221,17 @@ public class AgreementCollector{
                         if (isMandatoryPartyValid("RMV", rmvPubKey)){
                             getMandatoryValidators().add(object.getString("publicKey"));
                             WebSocketMessageHandler.addBlockToNotificationArray(block);
+                            log.info("added RMV to mandatory validator array");
+                            log.info("no of mandatory validators: {}", getMandatoryValidators().size());
 
                             if(rmvPubKey.equals(myPubKey)) {
                                 //show notification in RMV node
+                                log.info("RMV validating registration transaction");
                                 succeed = RmvValidation.validateBlock(block);
                             }
                         }
                     }else{
+                        log.info("Registration is not authorized");
                         existence = false;
                     }
 
