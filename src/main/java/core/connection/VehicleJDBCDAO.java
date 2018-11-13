@@ -25,7 +25,9 @@ public class VehicleJDBCDAO {
             resultSet = ptmt.executeQuery();
 
             if (resultSet.next()){
-                if (resultSet.getInt(1) < 0){
+                if (resultSet.getInt(1) > 0){
+                    isPresent = true;
+                }else{
                     isPresent = false;
                 }
             }
