@@ -90,6 +90,10 @@ public class Consensus extends Observable {
                 log.info("Received block id added to nonApprovedBlocks array");
                 log.info("size of nonApprovedBlocks: {}", nonApprovedBlocks.size());
 
+                AgreementCollector agreementCollector = new AgreementCollector(block);
+                System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
+
+
                 TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                 timeKeeper.start();
 
@@ -97,8 +101,6 @@ public class Consensus extends Observable {
 //
 //                }
 
-                AgreementCollector agreementCollector = new AgreementCollector(block);
-                System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
 
                 if (agreementCollector.isExistence()){
                     agreementCollectors.add(agreementCollector);
@@ -221,33 +223,35 @@ public class Consensus extends Observable {
             if (addedBlock.length() != 0){
                 String blockHashInDB = addedBlock.getString("blockHash");
 
-//                Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(block.getBlockHeader().getBlockTime());
-//                Timestamp blockTimestampInDB = ChainUtil.convertStringToTimestamp(addedBlock.getString("blockTimeStamp"));
-//
-//                if (blockTimestampInDB.after(blockTimestamp)) {
-//                    //timestamp in block in db > timestamp in this block
-//                    //set validity = 0 in block in db
-//                    blockJDBCDAO.setValidity(false, blockHashInDB);
-//                    //add this block with validity = 1
-//                    blockInfo.setValidity(true);
-//
-//                    if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
-//                        log.info("identity related transaction.");
-//                        JSONObject body = new JSONObject(block.getBlockBody().getTransaction().getData());
-//                        String publicKey = body.getString("publicKey");
-//                        String role = body.getString("role");
-//                        String name = body.getString("name");
-//                        String location = body.getString("location");
-//
-//                        identity = new Identity(block.getBlockHeader().getHash(), publicKey, role, name, location);
-//                    }
-//
-//                }else{
-//                    //timestamp in block in db < timestamp in this block
-//                    //add this block with validity = 0
-//                    blockInfo.setValidity(false);
-//
-//                }
+                Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(block.getBlockHeader().getBlockTime());
+                Timestamp blockTimestampInDB = ChainUtil.convertStringToTimestamp(addedBlock.getString("blockTimeStamp"));
+
+                if (blockTimestampInDB.after(blockTimestamp)) {
+                    //timestamp in block in db > timestamp in this block
+                    //set validity = 0 in block in db
+                    blockJDBCDAO.setValidity(false, blockHashInDB);
+                    //add this block with validity = 1
+                    blockInfo.setValidity(true);
+
+                    if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
+                        log.info("identity related transaction.");
+                        JSONObject body = new JSONObject(block.getBlockBody().getTransaction().getData());
+                        String publicKey = body.getString("publicKey");
+                        String role = body.getString("role");
+                        String name = body.getString("name");
+                        String location = body.getString("location");
+
+                        identity = new Identity(block.getBlockHeader().getHash(), publicKey, role, name, location);
+                    }
+                    log.info("timestamp in block in db > timestamp in this block");
+
+                }else{
+                    //timestamp in block in db < timestamp in this block
+                    //add this block with validity = 0
+                    blockInfo.setValidity(false);
+                    log.info("timestamp in block in db < timestamp in this block");
+
+                }
             }
 
             log.info("creating block info object");

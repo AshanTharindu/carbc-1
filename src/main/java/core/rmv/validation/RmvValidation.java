@@ -24,6 +24,9 @@ public class RmvValidation {
                 case "RegisterVehicle":
                     succeed = validateRegistrationBlock(block);
                     break;
+
+                case "BuyVehicle":
+                    succeed = validateBuyVehicleBlock(block);
             }
             if(succeed) {
                 log.info("sending agreements by RMV for block {}", block.getBlockHeader().getHash());
@@ -71,7 +74,40 @@ public class RmvValidation {
                 return true;
             }
         }
-        log.info("RMV validation failed");
+        log.info(".....RMV validation failed");
+        return false;
+    }
+
+    public static boolean validateBuyVehicleBlock(Block block) throws SQLException {
+        JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
+        String vehicleId = blockData.getString("vehicleId");
+
+        String new_owner = blockData.getString("newOwner");
+        String pre_owner = blockData.getJSONObject("SecondaryParty").getJSONObject("PreOwner").getString("publicKey");
+
+        JSONObject ownershipData = RMVJDBCDAO.getInstance().getOwnershipInfo(vehicleId);
+
+        if (ownershipData.length() == 0){
+            JSONObject registrationData = RMVJDBCDAO.getInstance().getRegistrationInfo(vehicleId);
+            String currentOwner = registrationData.getString("currentOwner");
+            String vid = registrationData.getString("vehicleId");
+
+            if (vehicleId.equals(vid) && pre_owner.equals(currentOwner)){
+                log.info("RMV successfully validated the transaction");
+                return true;
+            }
+
+        }else{
+            String preOwner = ownershipData.getString("preOwner");
+            String newOwner = ownershipData.getString("newOwner");
+            String vid = ownershipData.getString("vehicleId");
+
+            if (vehicleId.equals(vid) && pre_owner.equals(preOwner) && new_owner.equals(newOwner)){
+                log.info("RMV successfully validated the transaction");
+                return true;
+            }
+        }
+        log.info(".....RMV validation failed");
         return false;
     }
 
@@ -104,13 +140,41 @@ public class RmvValidation {
              model1 = registrationData.getString("model");
         }
 
-        if (registration_number.equals(registrationNumber) && current_owner.equals(currentOwner) && engine_number.equals(engineNumber) && chassis_number.equals(chassisNumber)
-                && make.equals(make1) && model.equals(model1)){
-            System.out.println("succeeded in validateBlock/validateRegistrationBlock");
-            return true;
+//        if (registration_number.equals(registrationNumber) &&
+//                current_owner.equals(currentOwner) &&
+//                engine_number.equals(engineNumber) &&
+//                chassis_number.equals(chassisNumber)
+//                && make.equals(make1) && model.equals(model1)){
+//            System.out.println("succeeded in validateBlock/validateRegistrationBlock");
+//            return true;
+//        }
+
+        if (!registration_number.equals(registrationNumber)){
+            log.info("registration not number matched");
+            return false;
+        }
+        if (!current_owner.equals(currentOwner)){
+            log.info("current owner not matched");
+            return false;
+        }
+        if (!engine_number.equals(engineNumber)){
+            log.info("engine number not matched");
+            return false;
+        }
+        if (!chassis_number.equals(chassisNumber)){
+            log.info("chassis number not matched");
+            return false;
+        }
+        if (!make.equals(make1)){
+            log.info("make not matched");
+            return false;
+        }
+        if (!model.equals(model1)){
+            log.info("model not matched");
+            return false;
         }
 
-        return false;
+        return true;
     }
 
 }
