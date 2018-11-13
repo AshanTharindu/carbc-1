@@ -641,4 +641,68 @@ public class BlockJDBCDAO {
         }
     }
 
+    public void deleteblockchain() throws SQLException {
+        String queryString = "DELETE FROM `Blockchain` WHERE  NOT `block_hash` = ?";
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, "e7c5145e03476b7e8469da691698aaa39bd03d5639494bce82078fe2fb896562");
+            ptmt.executeUpdate();
+
+            log.info("Blockchain Table Reset");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+        }
+    }
+
+    public void deleteVehicles() throws SQLException {
+        String queryString = "DELETE FROM `vehicle`";
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.executeUpdate();
+
+            log.info("Vehicles Deleted");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+        }
+    }
+
+    public void deleteHistory() throws SQLException {
+        String queryString = "DELETE FROM `vehicle`";
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.executeUpdate();
+
+            log.info("History Deleted");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+        }
+    }
+
 }
