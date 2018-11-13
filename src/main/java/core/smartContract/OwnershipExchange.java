@@ -43,9 +43,7 @@ public class OwnershipExchange {
                 }
             }
         }
-
         return false;
     }
-
 
 }
