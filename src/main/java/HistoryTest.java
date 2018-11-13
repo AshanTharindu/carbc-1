@@ -16,8 +16,7 @@ import java.sql.SQLException;
 public class HistoryTest {
     public static void main(String[] args) throws SQLException {
 
-
-        testGetFailedBlockDetails();
+        testHandlePendingBlocks();
 
     }
 
@@ -83,5 +82,10 @@ public class HistoryTest {
         System.out.println(jsonObject.getString("vehicleId"));
         System.out.println(jsonObject.getString("data"));
 
+    }
+
+    public static void testHandlePendingBlocks() throws SQLException {
+        HistoryDAO historyDAO = new HistoryDAO();
+        historyDAO.handlePendingBlocks("e7c5145e03476b7e8469da691698aaa39bd03d5639494bce82078fe2fb896562");
     }
 }
