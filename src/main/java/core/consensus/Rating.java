@@ -117,7 +117,7 @@ public class Rating {
         int mandatoryCount = this.mandatory - mandatory;
         int other = agreementCount - mandatoryCount;
         if(other > 20) { other = 20; }
-        value = 80 * mandatoryCount + 1 * other ;
+        value = 50 * mandatoryCount + 1 * other ;
     }
 
 }

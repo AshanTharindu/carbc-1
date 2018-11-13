@@ -5,29 +5,23 @@ public class Registration {
     private String registrationNumber;
     private String currentOwner;
     private String engineNumber;
-    private String vehicleClass;
-    private String conditionAndNote;
+    private String chassisNumber;
     private String make;
     private String model;
-    private String yearOfManufacture;
 
     public Registration(String registrationNumber
             , String currentOwner
             , String engineNumber
-            , String vehicleClass
-            , String conditionAndNote
+            , String chassisNumber
             , String make
-            , String model
-            , String yearOfManufacture){
+            , String model){
 
         this.registrationNumber = registrationNumber;
         this.currentOwner = currentOwner;
         this.engineNumber = engineNumber;
-        this.vehicleClass = vehicleClass;
-        this.conditionAndNote = conditionAndNote;
+        this.chassisNumber = chassisNumber;
         this.make = make;
         this.model = model;
-        this.yearOfManufacture = yearOfManufacture;
 
     }
 
@@ -56,20 +50,12 @@ public class Registration {
         this.engineNumber = engineNumber;
     }
 
-    public String getVehicleClass() {
-        return vehicleClass;
+    public String getChassisNumber() {
+        return chassisNumber;
     }
 
-    public void setVehicleClass(String vehicleClass) {
-        this.vehicleClass = vehicleClass;
-    }
-
-    public String getCondition() {
-        return conditionAndNote;
-    }
-
-    public void setCondition(String conditionAndNote) {
-        this.conditionAndNote = conditionAndNote;
+    public void setChassisNumber(String chassisNumber) {
+        this.chassisNumber = chassisNumber;
     }
 
     public String getMake() {
@@ -88,11 +74,5 @@ public class Registration {
         this.model = model;
     }
 
-    public String getYearOfManufacture() {
-        return yearOfManufacture;
-    }
 
-    public void setYearOfManufacture(String yearOfManufacture) {
-        this.yearOfManufacture = yearOfManufacture;
-    }
 }

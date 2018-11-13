@@ -80,49 +80,23 @@ public class RmvValidation {
         JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
 
         String registration_number = blockData.getString("registrationNumber");
-
-        JSONObject registrationData = RMVJDBCDAO.getInstance().getRegistrationInfoByRegistrationNumber(registration_number);
-
-
         String current_owner = blockData.getString("currentOwner");
         String engine_number = blockData.getString("engineNumber");
-        String vehicle_class = blockData.getString("vehicleClass");
-        String condition_and_note = blockData.getString("conditionAndNote");
+        String chassis_number = blockData.getString("chassisNumber");
         String make = blockData.getString("make");
         String model = blockData.getString("model");
-        String year_of_manufacture = blockData.getString("yearOfManufacture");
 
-//        System.out.println(current_owner);
-//        System.out.println(engine_number);
-//        System.out.println(vehicle_class);
-//        System.out.println(condition_and_note);
-//        System.out.println(make);
-//        System.out.println(model);
-//        System.out.println(year_of_manufacture);
-
+        JSONObject registrationData = RMVJDBCDAO.getInstance().getRegistrationInfoByRegistrationNumber(registration_number);
 
         String registrationNumber = registrationData.getString("registrationNumber");
         String currentOwner = registrationData.getString("currentOwner");
         String engineNumber = registrationData.getString("engineNumber");
-        String vehicleClass = registrationData.getString("vehicleClass");
-        String conditionAndNote = registrationData.getString("conditionAndNote");
+        String chassisNumber = registrationData.getString("chassisNumber");
         String make1 = registrationData.getString("make");
         String model1 = registrationData.getString("model");
-        String yearOfManufacture = registrationData.getString("yearOfManufacture");
 
-//        System.out.println(registrationNumber);
-//        System.out.println(currentOwner);
-//        System.out.println(engineNumber);
-//        System.out.println(vehicleClass);
-//        System.out.println(conditionAndNote);
-//        System.out.println(make1);
-//        System.out.println(model1);
-//        System.out.println(yearOfManufacture);
-
-
-        if (registration_number.equals(registrationNumber) && current_owner.equals(currentOwner) && engine_number.equals(engineNumber) && vehicle_class.equals(vehicleClass)
-                && condition_and_note.equals(conditionAndNote) && make.equals(make1) && model.equals(model1)
-                && year_of_manufacture.equals(yearOfManufacture)){
+        if (registration_number.equals(registrationNumber) && current_owner.equals(currentOwner) && engine_number.equals(engineNumber) && chassis_number.equals(chassisNumber)
+                && make.equals(make1) && model.equals(model1)){
             System.out.println("succeeded in validateBlock/validateRegistrationBlock");
             return true;
         }
