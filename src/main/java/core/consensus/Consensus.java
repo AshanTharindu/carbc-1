@@ -90,12 +90,14 @@ public class Consensus extends Observable {
                 log.info("Received block id added to nonApprovedBlocks array");
                 log.info("size of nonApprovedBlocks: {}", nonApprovedBlocks.size());
 
-                AgreementCollector agreementCollector = new AgreementCollector(block);
-                System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
 
 
                 TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                 timeKeeper.start();
+
+                AgreementCollector agreementCollector = new AgreementCollector(block);
+                System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
+
 
 //                if (!isPresent) {
 //
