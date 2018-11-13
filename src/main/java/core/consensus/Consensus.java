@@ -137,32 +137,37 @@ public class Consensus extends Observable {
                 String blockHash = b.getBlockHeader().getHash();
                 AgreementCollector agreementCollector = getAgreementCollector(blockHash);
 
-                synchronized (agreementCollectors) {
-                    log.info("remaining mandatory validators for this transaction: {}", agreementCollector.getMandatoryValidators().size());
-                    if (agreementCollector.getMandatoryValidators().size() == 0) {
-                        int agreementCount = agreementCollector.getAgreements().size();
-                        log.info("total agreements received for block: {}", agreementCount);
-                        if (agreementCount >= agreementCollector.getThreshold()) {
-                            log.info("consensus achieved");
-                            qualifiedBlocks.add(b);
-                            log.info("size of the qualified block array: {}", qualifiedBlocks.size());
+                if (agreementCollector != null){
+                    synchronized (agreementCollectors) {
+                        if (agreementCollector.getMandatoryValidators().size() == 0) {
+                            log.info("remaining mandatory validators for this transaction: {}", agreementCollector.getMandatoryValidators().size());
+                            int agreementCount = agreementCollector.getAgreements().size();
+                            log.info("total agreements received for block: {}", agreementCount);
+                            if (agreementCount >= agreementCollector.getThreshold()) {
+                                log.info("consensus achieved");
+                                qualifiedBlocks.add(b);
+                                log.info("size of the qualified block array: {}", qualifiedBlocks.size());
 
-                            //rating calculations
-                            log.info("calculating rating");
-                            agreementCollector.getRating().setAgreementCount(agreementCount);
-                            double rating = agreementCollector.getRating().calRating(agreementCollector.
-                                    getMandatoryArraySize(),agreementCollector.getSecondaryArraySize());
-                            b.getBlockHeader().setRating(rating);
-                            log.info("rating of the block:{}", b.getBlockHeader().getRating());
+                                //rating calculations
+                                log.info("calculating rating");
+                                agreementCollector.getRating().setAgreementCount(agreementCount);
+                                double rating = agreementCollector.getRating().calRating(agreementCollector.
+                                        getMandatoryArraySize(),agreementCollector.getSecondaryArraySize());
+                                b.getBlockHeader().setRating(rating);
+                                log.info("rating of the block:{}", b.getBlockHeader().getRating());
 
-                            log.info("removing agreement collector: {}", agreementCollector);
-                            this.agreementCollectors.remove(agreementCollector);
-                            log.info("size of the agreement collector array: {}", agreementCollectors.size());
+                                log.info("removing agreement collector: {}", agreementCollector);
+                                this.agreementCollectors.remove(agreementCollector);
+                                log.info("size of the agreement collector array: {}", agreementCollectors.size());
+                            }
+                        } else {
+                            log.info("block has insufficient agreements");
                         }
-                    } else {
-                        log.info("block has insufficient agreements");
                     }
+                }else{
+                    log.info("no agreement collector found. Smart contract failure may occurred");
                 }
+
             }
         }
         addBlockToBlockchain(qualifiedBlocks);
