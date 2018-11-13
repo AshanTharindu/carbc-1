@@ -88,12 +88,21 @@ public class RmvValidation {
 
         JSONObject registrationData = RMVJDBCDAO.getInstance().getRegistrationInfoByRegistrationNumber(registration_number);
 
-        String registrationNumber = registrationData.getString("registrationNumber");
-        String currentOwner = registrationData.getString("currentOwner");
-        String engineNumber = registrationData.getString("engineNumber");
-        String chassisNumber = registrationData.getString("chassisNumber");
-        String make1 = registrationData.getString("make");
-        String model1 = registrationData.getString("model");
+        String registrationNumber ="";
+        String currentOwner="";
+        String engineNumber="";
+        String chassisNumber="";
+        String make1="";
+        String model1="";
+
+        if(registrationData.length() > 0){
+             registrationNumber = registrationData.getString("registrationNumber");
+             currentOwner = registrationData.getString("currentOwner");
+             engineNumber = registrationData.getString("engineNumber");
+             chassisNumber = registrationData.getString("chassisNumber");
+             make1 = registrationData.getString("make");
+             model1 = registrationData.getString("model");
+        }
 
         if (registration_number.equals(registrationNumber) && current_owner.equals(currentOwner) && engine_number.equals(engineNumber) && chassis_number.equals(chassisNumber)
                 && make.equals(make1) && model.equals(model1)){
