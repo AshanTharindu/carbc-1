@@ -212,29 +212,34 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
         System.out.println(body);
 
-        String stringArr[] = body.split(",");
+        try{
+            String stringArr[] = body.split(",");
 
-        String vehicleId = stringArr[0];
-        String serviceTypes[] = stringArr[1].split("");
+            String vehicleId = stringArr[0];
+            String serviceTypes[] = stringArr[1].split("");
 
+            ServiceRecord serviceRecord = new ServiceRecord();
+            serviceRecord.setVehicle_id(vehicleId);
+            serviceRecord.setServiced_date(new Timestamp(System.currentTimeMillis()));
+            int count = 0;
 
-        ServiceRecord serviceRecord = new ServiceRecord();
-        serviceRecord.setVehicle_id(vehicleId);
-        serviceRecord.setServiced_date(new Timestamp(System.currentTimeMillis()));
-        int count = 0;
+            for (int i = 0; i < serviceTypes.length; i++) {
 
-        for (int i = 0; i < serviceTypes.length; i++) {
+                if ((serviceTypes[i]).equals("1")){
+                    ArrayList<String> spareParts = new ArrayList<>();
 
-            if ((serviceTypes[i]).equals("1")){
-                ArrayList<String> spareParts = new ArrayList<>();
+                    Service service = new Service(count, spareParts);
+                    serviceRecord.setService(service);
+                }
+                count++;
 
-                Service service = new Service(count, spareParts);
-                serviceRecord.setService(service);
             }
-            count++;
+            ServiceJDBCDAO.getInstance().addServiceRecord(serviceRecord);
 
+        }catch (ArrayIndexOutOfBoundsException e){
+            System.out.println("caught exception");
+            e.printStackTrace();
         }
-        ServiceJDBCDAO.getInstance().addServiceRecord(serviceRecord);
 
         writeResponse(ctx, "hello from service station");
     }

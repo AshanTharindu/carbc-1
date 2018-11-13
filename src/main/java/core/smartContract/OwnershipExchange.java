@@ -28,6 +28,7 @@ public class OwnershipExchange {
         }else {
             JSONObject vehicleInfo1 = blockJDBCDAO.getVehicleInfoByEvent(vehicleId, "RegisterVehicle");
 
+            System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++");
             if (vehicleInfo1.length()>0){
 
 
