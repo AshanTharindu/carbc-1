@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.text.BadLocationException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -74,23 +75,27 @@ public class Consensus extends Observable {
 
                 log.info("signature verification successful: {}", block.getBlockHeader().getBlockNumber());
 
-                boolean isPresent = false;
-                if(getNonApprovedBlocks().size()>0) {
-                    for (Block b : this.getNonApprovedBlocks()) {
-                        if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
-                            isPresent = true;
-                            break;
-                        }
-                    }
-                }
+//                boolean isPresent = false;
+//                if(getNonApprovedBlocks().size()>0) {
+//                    for (Block b : this.getNonApprovedBlocks()) {
+//                        if (b.getBlockHeader().getPreviousHash().equals(block.getBlockHeader().getPreviousHash())) {
+//                            isPresent = true;
+//                            break;
+//                        }
+//                    }
+//                }
+
+
                 this.nonApprovedBlocks.add(block);
                 log.info("Received block id added to nonApprovedBlocks array");
                 log.info("size of nonApprovedBlocks: {}", nonApprovedBlocks.size());
 
-                if (!isPresent) {
-                    TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
-                    timeKeeper.start();
-                }
+                TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
+                timeKeeper.start();
+
+//                if (!isPresent) {
+//
+//                }
 
                 AgreementCollector agreementCollector = new AgreementCollector(block);
                 System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
@@ -99,6 +104,7 @@ public class Consensus extends Observable {
                     agreementCollectors.add(agreementCollector);
 
                     if (agreementCollector.succeed){
+                        log.info("Sending agreements from me");
                         String blockHash = block.getBlockHeader().getHash();
                         String digitalSignature = ChainUtil.digitalSignature(block.getBlockHeader().getHash());
                         String signedBlock = digitalSignature;
@@ -200,8 +206,45 @@ public class Consensus extends Observable {
         log.info("qualified block: {}", block);
 
         if (block != null) {
-            log.info("creating block info object");
+            BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
+            JSONObject addedBlock = blockJDBCDAO.checkPossibilityToAddBlock(block.getBlockHeader().getPreviousHash());
+
             BlockInfo blockInfo = new BlockInfo();
+            Identity identity = null;
+
+            if (addedBlock.length() != 0){
+                String blockHashInDB = addedBlock.getString("blockHash");
+
+                Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(block.getBlockHeader().getBlockTime());
+                Timestamp blockTimestampInDB = ChainUtil.convertStringToTimestamp(addedBlock.getString("blockTimeStamp"));
+
+                if (blockTimestampInDB.after(blockTimestamp)) {
+                    //timestamp in block in db > timestamp in this block
+                    //set validity = 0 in block in db
+                    blockJDBCDAO.setValidity(false, blockHashInDB);
+                    //add this block with validity = 1
+                    blockInfo.setValidity(true);
+
+                    if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
+                        log.info("identity related transaction.");
+                        JSONObject body = new JSONObject(block.getBlockBody().getTransaction().getData());
+                        String publicKey = body.getString("publicKey");
+                        String role = body.getString("role");
+                        String name = body.getString("name");
+                        String location = body.getString("location");
+
+                        identity = new Identity(block.getBlockHeader().getHash(), publicKey, role, name, location);
+                    }
+
+                }else{
+                    //timestamp in block in db < timestamp in this block
+                    //add this block with validity = 0
+                    blockInfo.setValidity(false);
+
+                }
+            }
+
+            log.info("creating block info object");
             blockInfo.setPreviousHash(block.getBlockHeader().getPreviousHash());
             blockInfo.setHash(block.getBlockHeader().getHash());
             blockInfo.setBlockTime(ChainUtil.convertStringToTimestamp(block.getBlockHeader().getBlockTime()));
@@ -211,22 +254,10 @@ public class Consensus extends Observable {
             blockInfo.setEvent(block.getBlockBody().getTransaction().getEvent());
             blockInfo.setData(block.getBlockBody().getTransaction().getData().toString());
             blockInfo.setAddress(block.getBlockBody().getTransaction().getAddress());
-            blockInfo.setValidity(true);
             blockInfo.setRating(block.getBlockHeader().getRating());
 
-            Identity identity = null;
-            if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
-                log.info("identity related transaction.");
-                JSONObject body = new JSONObject(block.getBlockBody().getTransaction().getData());
-                String publicKey = body.getString("publicKey");
-                String role = body.getString("role");
-                String name = body.getString("name");
-                String location = body.getString("location");
 
-                identity = new Identity(block.getBlockHeader().getHash(), publicKey, role, name, location);
-            }
             //TODO: need to check that this is the right block to add based on the previous hash
-            BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
             blockJDBCDAO.addBlockToBlockchain(blockInfo, identity);
 
             //updating in history table

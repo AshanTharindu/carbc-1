@@ -16,7 +16,11 @@ public class ServiceStationValidation {
     public static boolean validateBlock(Block block) {
 
         try {
-            String serviceData = ServiceJDBCDAO.getInstance().getLastServiceRecord(block.getBlockBody().getTransaction().getAddress()).toString();
+            JSONObject data = new JSONObject(block.getBlockBody().getTransaction().getData());
+            String regNo = data.getString("vehicle_id");
+
+//            String serviceData = ServiceJDBCDAO.getInstance().getLastServiceRecord(block.getBlockBody().getTransaction().getAddress()).toString();
+            String serviceData = ServiceJDBCDAO.getInstance().getLastServiceRecord(regNo).toString();
 
             System.out.println(block.getBlockBody().getTransaction().getData());
             System.out.println(serviceData);

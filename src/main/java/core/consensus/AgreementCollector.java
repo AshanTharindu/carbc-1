@@ -65,10 +65,10 @@ public class AgreementCollector{
         log.info("setting mandatory validators");
         synchronized (this){
             String event = this.block.getBlockBody().getTransaction().getEvent();
-            log.info("block event", event);
+            log.info("block event {}", event);
 
             JSONObject blockData = new JSONObject(block.getBlockBody().getTransaction().getData());
-            log.info("block data", blockData);
+            log.info("block data {}", blockData);
 
             JSONObject secondaryParties = blockData.getJSONObject("SecondaryParty");
             JSONObject thirdParties = blockData.getJSONObject("ThirdParty");
