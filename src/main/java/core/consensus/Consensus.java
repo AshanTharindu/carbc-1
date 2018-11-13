@@ -211,6 +211,7 @@ public class Consensus extends Observable {
 
             BlockInfo blockInfo = new BlockInfo();
             Identity identity = null;
+            blockInfo.setValidity(true);
 
             if (addedBlock.length() != 0){
                 String blockHashInDB = addedBlock.getString("blockHash");

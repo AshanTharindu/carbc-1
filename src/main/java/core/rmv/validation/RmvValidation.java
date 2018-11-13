@@ -11,6 +11,7 @@ import java.sql.SQLException;
 public class RmvValidation {
     private static final Logger log = LoggerFactory.getLogger(RmvValidation.class);
     public static boolean validateBlock(Block block) {
+        log.info("Inside validateBlock by RMV method");
         try {
             Boolean succeed = false;
             String event = block.getBlockBody().getTransaction().getEvent();
@@ -36,6 +37,7 @@ public class RmvValidation {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        log.info("RMV validation failed");
         return false;
 
     }
