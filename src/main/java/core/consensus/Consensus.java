@@ -267,7 +267,7 @@ public class Consensus extends Observable {
             blockJDBCDAO.addBlockToBlockchain(blockInfo, identity);
 
             //updating in history table
-            manageStatus(block.getBlockHeader().getHash());
+            manageStatus2(block.getBlockHeader().getHash());
         }
     }
 
@@ -440,21 +440,24 @@ public class Consensus extends Observable {
     }
 
     public void manageStatus2(String blockHash) {
+        HistoryDAO historyDAO = new HistoryDAO();
         try{
             if(isItMyBlock(blockHash)) {
                 updateHistory(blockHash);
-                setBlockBroadcasted(null);
+                historyDAO.setStatus(blockHash, "Accepted");
             }else {
                 //block failed
-                Thread.sleep(5000);
-                HistoryDAO historyDAO = new HistoryDAO();
-                JSONObject failedBlockDetails = historyDAO.getFailedBlockDetails(blockHash);
-                if(failedBlockDetails.length() != 0) {
-                    Controller controller = new Controller();
-                    controller.sendTransaction(failedBlockDetails.getString("event"),
-                            failedBlockDetails.getString("vehicleId"),
-                            new JSONObject(failedBlockDetails.getString("data")));
-                }
+                historyDAO.setStatus(blockHash, "Failed");
+
+                //auto resending commented out
+//                Thread.sleep(5000);
+//                JSONObject failedBlockDetails = historyDAO.getFailedBlockDetails(blockHash);
+//                if(failedBlockDetails.length() != 0) {
+//                    Controller controller = new Controller();
+//                    controller.sendTransaction(failedBlockDetails.getString("event"),
+//                            failedBlockDetails.getString("vehicleId"),
+//                            new JSONObject(failedBlockDetails.getString("data")));
+//                }
             }
         }catch (Exception e) {
             e.printStackTrace();
