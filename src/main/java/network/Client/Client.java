@@ -62,7 +62,8 @@ public class Client extends Thread{
 
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            System.out.println("here");
             e.printStackTrace();
         } finally {
             workerGroup.shutdownGracefully();

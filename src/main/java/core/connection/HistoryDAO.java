@@ -159,6 +159,28 @@ public class HistoryDAO {
         }
     }
 
+    public void setStatus(String blockhash, String status) {
+        String queryString = "UPDATE `History` SET `status` = ? WHERE  `block_hash` = ?";
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, status);
+            ptmt.setString(2, blockhash);
+            ptmt.executeUpdate();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+            log.info("Block Status Updated For: {}", blockhash + " " + status);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     public boolean checkExistence(String blockHash) throws SQLException {
         String queryString = "SELECT EXISTS(SELECT * FROM History WHERE `block_hash` = ? AND `validity` = 0)";
         Connection connection = null;

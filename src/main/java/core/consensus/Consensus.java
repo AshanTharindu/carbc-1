@@ -218,14 +218,14 @@ public class Consensus extends Observable {
 
 //                Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(block.getBlockHeader().getBlockTime());
 //                Timestamp blockTimestampInDB = ChainUtil.convertStringToTimestamp(addedBlock.getString("blockTimeStamp"));
-
+//
 //                if (blockTimestampInDB.after(blockTimestamp)) {
 //                    //timestamp in block in db > timestamp in this block
 //                    //set validity = 0 in block in db
 //                    blockJDBCDAO.setValidity(false, blockHashInDB);
 //                    //add this block with validity = 1
 //                    blockInfo.setValidity(true);
-
+//
 //                    if (block.getBlockBody().getTransaction().getTransactionId().substring(0, 1).equals("I")) {
 //                        log.info("identity related transaction.");
 //                        JSONObject body = new JSONObject(block.getBlockBody().getTransaction().getData());
@@ -236,7 +236,7 @@ public class Consensus extends Observable {
 //
 //                        identity = new Identity(block.getBlockHeader().getHash(), publicKey, role, name, location);
 //                    }
-
+//
 //                }else{
 //                    //timestamp in block in db < timestamp in this block
 //                    //add this block with validity = 0
@@ -425,6 +425,30 @@ public class Consensus extends Observable {
                                 failedBlockDetails.getString("vehicleId"),
                                 new JSONObject(failedBlockDetails.getString("data")));
                     }
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public void manageStatus2(String blockHash) {
+        try{
+            if(isItMyBlock(blockHash)) {
+                updateHistory(blockHash);
+                setBlockBroadcasted(null);
+            }else {
+                //block failed
+                Thread.sleep(5000);
+                HistoryDAO historyDAO = new HistoryDAO();
+                JSONObject failedBlockDetails = historyDAO.getFailedBlockDetails(blockHash);
+                if(failedBlockDetails.length() != 0) {
+                    Controller controller = new Controller();
+                    controller.sendTransaction(failedBlockDetails.getString("event"),
+                            failedBlockDetails.getString("vehicleId"),
+                            new JSONObject(failedBlockDetails.getString("data")));
                 }
             }
         }catch (Exception e) {
