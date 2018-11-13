@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class HistoryDAO {
     private final Logger log = LoggerFactory.getLogger(HistoryDAO.class);
 
-    public boolean saveBlockWithAdditionalData(Block block, String data) throws SQLException {
+    public boolean saveBlockWithAdditionalData(Block block, String data, String status) throws SQLException {
 
         if (block != null) {
             BlockInfo blockInfo = new BlockInfo();
@@ -37,8 +37,8 @@ public class HistoryDAO {
             try {
                 String queryString = "INSERT INTO `History`(`previous_hash`, " +
                         "`block_hash`, `block_timestamp`, `block_number`, `validity`," +
-                        " `transaction_id`, `sender`, `event`, `data`, `address`, `additional_data`) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+                        " `transaction_id`, `sender`, `event`, `data`, `address`, `additional_data`, `status`) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
                 connection = ConnectionFactory.getInstance().getConnection();
                 ptmt = connection.prepareStatement(queryString);
@@ -54,6 +54,7 @@ public class HistoryDAO {
                 ptmt.setString(9, blockInfo.getData());
                 ptmt.setString(10, blockInfo.getAddress());
                 ptmt.setString(11, data.toString());
+                ptmt.setString(12, status);
                 ptmt.executeUpdate();
 
                 log.info("Block Added to History");
@@ -245,6 +246,27 @@ public class HistoryDAO {
             if (connection != null)
                 connection.close();
             return failedBlock;
+        }
+    }
+
+    public void handlePendingBlocks(String PreviousBlockHah) throws SQLException {
+        String queryString = "UPDATE `History` SET `status` = ? WHERE  `previous_hash` = ? AND `status` = ?";
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, "Failed");
+            ptmt.setString(2, PreviousBlockHah);
+            ptmt.setString(3, "Pending");
+            ptmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
         }
     }
 }
