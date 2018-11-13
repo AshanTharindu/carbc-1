@@ -56,6 +56,7 @@ public class Consensus extends Observable {
             handleNonApprovedBlock(block);
             MessageSender.broadCastBlock(block);
             setBlockBroadcasted(block.getBlockHeader().getHash());
+            historyDAO.setStatus(block.getBlockHeader().getHash(), "Pending");
         } catch (SQLException e) {
             e.printStackTrace();
         }
