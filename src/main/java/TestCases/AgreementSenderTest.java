@@ -7,12 +7,12 @@ import network.communicationHandler.MessageSender;
 public class AgreementSenderTest {
     public static void main(String[] args) throws InterruptedException {
         startNode();
-        Thread.sleep(30000);
+        Thread.sleep(20000);
         sendAgreements();
     }
 
     public static void sendAgreements() {
-        String[] orgs = {"ServiceStation", "RMV", "SparePartShop", "GodFather"};
+        String[] orgs = {"RMV"};
         AgreementSender agreementSender = new AgreementSender();
         for( String org : orgs) {
             System.out.println(org);

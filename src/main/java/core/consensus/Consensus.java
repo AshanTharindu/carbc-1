@@ -186,6 +186,8 @@ public class Consensus extends Observable {
             System.out.println("inside if block; qualifiedBlocks.size() != 0");
             qualifiedBlock = qualifiedBlocks.get(0);
 
+            System.out.println("77777777777777777777777777777777777");
+            System.out.println(qualifiedBlock.getBlockHeader().getBlockTime());
             Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(qualifiedBlock.getBlockHeader().getBlockTime());
 
             synchronized (getNonApprovedBlocks()) {
@@ -224,9 +226,8 @@ public class Consensus extends Observable {
 
             if (addedBlock.length() != 0){
                 String blockHashInDB = addedBlock.getString("blockHash");
-
                 Timestamp blockTimestamp = ChainUtil.convertStringToTimestamp(block.getBlockHeader().getBlockTime());
-                Timestamp blockTimestampInDB = ChainUtil.convertStringToTimestamp(addedBlock.getString("blockTimeStamp"));
+                Timestamp blockTimestampInDB = ChainUtil.convertStringToTimestamp2(addedBlock.getString("blockTimeStamp").substring(0, 19));
 
                 if (blockTimestampInDB.after(blockTimestamp)) {
                     //timestamp in block in db > timestamp in this block

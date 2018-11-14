@@ -22,7 +22,7 @@ public class AgreementSenderTest {
 
 
         generateOrgsKeyPairs();
-        serviceStationAgreement();
+//        serviceStationAgreement();
     }
 
     public static void serviceStationAgreement() {

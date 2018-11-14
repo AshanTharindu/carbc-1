@@ -648,7 +648,7 @@ public class BlockJDBCDAO {
         try {
             connection = ConnectionFactory.getInstance().getConnection();
             ptmt = connection.prepareStatement(queryString);
-            ptmt.setString(1, "e7c5145e03476b7e8469da691698aaa39bd03d5639494bce82078fe2fb896562");
+            ptmt.setString(1, "115b7f26ca16e04ec8f93a26a71f9a5bf9608f3aba5add4b6182c47670c3f737");
             ptmt.executeUpdate();
 
             log.info("Blockchain Table Reset");
