@@ -33,7 +33,7 @@ public class Transaction {
         this.transactionId = "0-0000";
         this.sender = "CAR.BC";
         this.event = "genesisBlock";
-        this.data = "Initial Data";
+        this.data = "{'data':'Initial Data'}";
         this.address = "0000";
         this.time = new SimpleDateFormat("YYYY.MM.dd.HH.mm.ss").format(new Date(0));
     }

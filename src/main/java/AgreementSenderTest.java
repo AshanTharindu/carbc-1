@@ -22,6 +22,7 @@ public class AgreementSenderTest {
 
 
         generateOrgsKeyPairs();
+//        serviceStationAgreement();
         //serviceStationAgreement();
     }
 

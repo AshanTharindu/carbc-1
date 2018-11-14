@@ -12,7 +12,7 @@ public class AgreementSenderTest {
     }
 
     public static void sendAgreements() {
-        String[] orgs = {"ServiceStation", "RMV", "SparePartShop", "GodFather"};
+        String[] orgs = {"RMV"};
         AgreementSender agreementSender = new AgreementSender();
         for( String org : orgs) {
             System.out.println(org);
