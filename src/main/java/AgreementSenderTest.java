@@ -22,7 +22,7 @@ public class AgreementSenderTest {
 
 
         generateOrgsKeyPairs();
-        serviceStationAgreement();
+        //serviceStationAgreement();
     }
 
     public static void serviceStationAgreement() {
@@ -44,8 +44,8 @@ public class AgreementSenderTest {
 
         System.out.println("service Station: "+agreementSender.getPublicKeyAsString("ServiceStation"));
         System.out.println("rmv :" + agreementSender.getPublicKeyAsString("RMV"));
-        System.out.println("spare parts: " +agreementSender.getPublicKeyAsString("SparePartShop"));
-        System.out.println("GodFather: " +agreementSender.getPublicKeyAsString("GodFather"));
+//        System.out.println("spare parts: " +agreementSender.getPublicKeyAsString("SparePartShop"));
+//        System.out.println("GodFather: " +agreementSender.getPublicKeyAsString("GodFather"));
     }
 
 

@@ -7,7 +7,7 @@ import network.communicationHandler.MessageSender;
 public class AgreementSenderTest {
     public static void main(String[] args) throws InterruptedException {
         startNode();
-        Thread.sleep(30000);
+        Thread.sleep(20000);
         sendAgreements();
     }
 
