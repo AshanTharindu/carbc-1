@@ -19,7 +19,7 @@ public class TimeKeeper extends Thread{
     public void run() {
         try {
             log.info("Starting count down. Inside TimeKeeper");
-            Thread.sleep(20000);
+            Thread.sleep(40000);
             System.out.println("Count down finished");
             Consensus.getInstance().checkAgreementsForBlock(blockHash);
 

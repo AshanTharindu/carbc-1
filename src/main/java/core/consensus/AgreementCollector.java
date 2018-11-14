@@ -263,7 +263,7 @@ public class AgreementCollector{
 //                    String preOwner = blockData.getString("preOwner");
                     String preOwner = secondaryParties.getJSONObject("PreOwner").getString("publicKey");
 
-                    log.info("executing OwnershipExchange smart contract");
+                    log.info("initializing OwnershipExchange smart contract");
                     OwnershipExchange ownershipExchge = new OwnershipExchange(vehicleNumber, preOwner);
 
                     try{
@@ -283,9 +283,11 @@ public class AgreementCollector{
                             if(preOwnerPubKey.equals(myPubKey)) {
                                 //show notification icon 2
                                 Thread.sleep(6000);
+                                log.info("pre owner sending agreements");
                                 Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
                             }else if(RmvPubKey.equals(myPubKey)) {
                                 //show notification in service station
+//                                Thread.sleep(6000);
                                 log.info("RMV validating ownership exchange transaction");
                                 succeed = RmvValidation.validateBlock(block);
                             }else{
