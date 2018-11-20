@@ -106,7 +106,6 @@ public class AgreementCollector{
                                 //TODO for temporary purpose - remove this
                                 Thread.sleep(6000);
                                 Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
-                                System.out.println("here");
                             }else if(RmvPubKey.equals(myPubKey)) {
                                 //show notification in service station
                                 log.info("RMV validating ownership exchange transaction");
@@ -121,7 +120,7 @@ public class AgreementCollector{
                         }
 
                     }catch (NullPointerException e){
-                        System.out.println("error occurred in smart contract");
+                        log.info("error occurred in smart contract");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } finally {
@@ -138,7 +137,7 @@ public class AgreementCollector{
                         log.info("no of mandatory validators: {}", getMandatoryValidators().size());
 
                         if(serviceStationPubKey.equals(myPubKey)) {
-                            System.out.println("service station is validating");
+                            log.info("service station is validating");
                             show = false;
                             succeed = ServiceStationValidation.validateBlock(block);
                         }
@@ -263,7 +262,7 @@ public class AgreementCollector{
 //                    String preOwner = blockData.getString("preOwner");
                     String preOwner = secondaryParties.getJSONObject("PreOwner").getString("publicKey");
 
-                    log.info("executing OwnershipExchange smart contract");
+                    log.info("initializing OwnershipExchange smart contract");
                     OwnershipExchange ownershipExchge = new OwnershipExchange(vehicleNumber, preOwner);
 
                     try{
@@ -283,9 +282,11 @@ public class AgreementCollector{
                             if(preOwnerPubKey.equals(myPubKey)) {
                                 //show notification icon 2
                                 Thread.sleep(6000);
+                                log.info("pre owner sending agreements");
                                 Consensus.getInstance().sendAgreementForBlock(block.getBlockHeader().getHash());
                             }else if(RmvPubKey.equals(myPubKey)) {
                                 //show notification in service station
+//                                Thread.sleep(6000);
                                 log.info("RMV validating ownership exchange transaction");
                                 succeed = RmvValidation.validateBlock(block);
                             }else{
@@ -298,7 +299,7 @@ public class AgreementCollector{
                         }
 
                     }catch (NullPointerException e){
-                        System.out.println("error occurred in smart contract");
+                        log.info("error occurred in smart contract");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } finally {
@@ -389,12 +390,13 @@ public class AgreementCollector{
 
     //adding agreements
     public synchronized boolean addAgreementForBlock(Agreement agreement) {
-        System.out.println("Inside addAgreementForBlock method");
+        log.info("Inside addAgreementForBlock Method", agreement.getBlockHash());
         if(agreementCollectorId.equals(agreement.getBlockHash())) {
             if(!isDuplicateAgreement(agreement)) {
                 if(ChainUtil.signatureVerification(agreement.getPublicKey(), agreement.getSignedBlock(),
                                 agreement.getBlockHash())) {
                     getAgreements().add(agreement);
+                    log.info("Signature Verified for Agreement: ", agreement.getBlockHash());
                     //check for mandatory
                     if (getMandatoryValidators().contains(agreement.getPublicKey())){
                         System.out.println("mandatory validator received");

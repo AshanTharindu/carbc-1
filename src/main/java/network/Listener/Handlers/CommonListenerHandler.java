@@ -38,13 +38,21 @@ public class CommonListenerHandler extends ChannelInboundHandlerAdapter {
             receivedObject.put("ip", clientIP);
             RequestHandler.getInstance().handleRequest(headers,receivedObject.toString());
 
-            log.info("=====================================");
-            log.info("        at the server side           ");
-            log.info("=====================================");
-            log.info("----------headers----------------");
-            log.info(headers.toString());
-            log.info("----------data----------------");
-            log.info(data);
+//            log.info("=====================================");
+//            log.info("        at the server side           ");
+//            log.info("=====================================");
+//            log.info("----------headers----------------");
+//            log.info(headers.toString());
+//            log.info("----------data----------------");
+//            log.info(data);
+
+            System.out.println("=====================================");
+            System.out.println("        at the server side           ");
+            System.out.println("=====================================");
+            System.out.println("----------headers----------------");
+            System.out.println(headers.toString());
+            System.out.println("----------data----------------");
+            System.out.println(data);
 
             String messageType = (String)headers.get("messageType");
             String sender = (String)headers.get("sender");

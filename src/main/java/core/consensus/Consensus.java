@@ -84,25 +84,16 @@ public class Consensus extends Observable {
 //                        }
 //                    }
 //                }
-
-
                 this.nonApprovedBlocks.add(block);
+
                 log.info("Received block id added to nonApprovedBlocks array");
                 log.info("size of nonApprovedBlocks: {}", nonApprovedBlocks.size());
-
-
 
                 TimeKeeper timeKeeper = new TimeKeeper(block.getBlockHeader().getPreviousHash());
                 timeKeeper.start();
 
                 AgreementCollector agreementCollector = new AgreementCollector(block);
-                System.out.println("agreement colletor ID: "+agreementCollector.getAgreementCollectorId());
-
-
-//                if (!isPresent) {
-//
-//                }
-
+                log.info("Agreement Collector Added. ID: ", agreementCollector.getAgreementCollectorId());
 
                 if (agreementCollector.isExistence()){
                     agreementCollectors.add(agreementCollector);
@@ -304,11 +295,10 @@ public class Consensus extends Observable {
 
     //no need of synchronizing
     public void handleAgreement(Agreement agreement) {
-        System.out.println("agreement.getBlockHash()" + agreement.getBlockHash());
-        System.out.println();
-
         if (getAgreementCollector(agreement.getBlockHash()) != null){
             getAgreementCollector(agreement.getBlockHash()).addAgreementForBlock(agreement);
+        }else {
+            log.info("Block hash not found for Agreement");
         }
     }
 
@@ -408,7 +398,7 @@ public class Consensus extends Observable {
     public void updateHistory(String blockHash) {
         HistoryDAO historyDAO = new HistoryDAO();
         historyDAO.setValidity(blockHash);
-        log.info("History Updated for: ", blockHash);
+        log.info("History Updated for: {}", blockHash);
     }
 
     public void setBlockBroadcasted(String blockHash) {

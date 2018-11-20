@@ -269,4 +269,22 @@ public class HistoryDAO {
                 connection.close();
         }
     }
+
+    public void deleteRecord(String blockHash) {
+        String queryString = "DELETE FROM `History` WHERE `block_hash` = ?";
+        PreparedStatement ptmt = null;
+        Connection connection = null;
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.setString(1, blockHash);
+            ptmt.execute();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

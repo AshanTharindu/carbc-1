@@ -18,9 +18,9 @@ public class TimeKeeper extends Thread{
     @Override
     public void run() {
         try {
-            log.info("Starting count down. Inside TimeKeeper");
+            log.info("Starting count down. Inside TimeKeeper for block: {}", blockHash);
             Thread.sleep(40000);
-            System.out.println("Count down finished");
+            log.info("Count down finished for block: {}", blockHash);
             Consensus.getInstance().checkAgreementsForBlock(blockHash);
 
         } catch (InterruptedException e) {

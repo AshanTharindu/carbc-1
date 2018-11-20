@@ -3,6 +3,7 @@ package TestCases;
 import config.CommonConfigHolder;
 import constants.Constants;
 import core.connection.BlockJDBCDAO;
+import core.connection.IdentityJDBC;
 import org.slf4j.impl.SimpleLogger;
 
 import java.sql.SQLException;
@@ -11,7 +12,7 @@ public class ResetSystem {
     public static void main(String[] args) throws SQLException {
         setPaths();
         resetBlockchainAndVehicle();
-
+        deletePeers();
     }
 
     public static void setPaths() {
@@ -33,5 +34,10 @@ public class ResetSystem {
         BlockJDBCDAO blockJDBCDAO = new BlockJDBCDAO();
         blockJDBCDAO.deleteblockchain();
         blockJDBCDAO.deleteVehicles();
+    }
+
+    public static void deletePeers() {
+        IdentityJDBC identityJDBC = new IdentityJDBC();
+        identityJDBC.deletePeersFromDB();
     }
 }

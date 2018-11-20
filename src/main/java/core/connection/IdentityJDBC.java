@@ -112,6 +112,20 @@ public class IdentityJDBC {
                 connection.close();
             return nodes;
         }
+    }
 
+    public void deletePeersFromDB() {
+        String queryString = "DELETE FROM `PeerDetails`";
+        try {
+            connection = ConnectionFactory.getInstance().getConnection();
+            ptmt = connection.prepareStatement(queryString);
+            ptmt.execute();
+            if (ptmt != null)
+                ptmt.close();
+            if (connection != null)
+                connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

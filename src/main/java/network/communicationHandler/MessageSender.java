@@ -26,7 +26,7 @@ public class MessageSender {
 
     private static  MessageSender messageSender;
     private final static Logger log = LoggerFactory.getLogger(MessageSender.class);
-    private static String bootsrappingNodeID = "192.168.8.101";
+    private static String bootsrappingNodeID = "192.168.8.21";
 
 
     private MessageSender() {};
@@ -112,7 +112,6 @@ public class MessageSender {
                 blockchainRequeseter.getPeerID());
         Node.getInstance().sendMessageToPeer(blockchainRequeseter.getIp(), blockchainRequeseter.getPort(), blockSignMessage);
         log.info("sendSignedBlockChain");
-        System.out.println("sendSignedBlockChain");
     }
 
     public static void sendBlockchainToPeer(String ip, int listeningPort, JSONArray jsonBlockchain, int blockchainLength) {
@@ -122,7 +121,6 @@ public class MessageSender {
         RequestMessage blockchainSendMessage = BlockchainSendMessageCreator.createBlockchainSendMessage(jsonObject);
         Node.getInstance().sendMessageToPeer(ip,listeningPort,blockchainSendMessage);
         log.info("blockchain sent");
-        System.out.println("blockchain sent");
     }
 
 
@@ -186,7 +184,6 @@ public class MessageSender {
     }
 
     public static void requestTransactionData(JSONObject requestDetails, Neighbour dataOwner) {
-        System.out.println(requestDetails);
         requestDetails.put("listeningPort", Node.getInstance().getNodeConfig().getListenerPort());
         requestDetails.put("nodeID", Node.getInstance().getNodeId());
         RequestMessage transactionDataRequestMessage = MessageCreator.createSpecificMessage(requestDetails

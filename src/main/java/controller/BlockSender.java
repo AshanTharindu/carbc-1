@@ -11,12 +11,15 @@ import core.blockchain.BlockBody;
 import core.blockchain.BlockHeader;
 import core.blockchain.Transaction;
 import core.consensus.Consensus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BlockSender extends Thread {
 
     private JSONObject data;
     private String vehicleID;
     private String event;
+    private final Logger log = LoggerFactory.getLogger(BlockSender.class);
 
     public BlockSender(String event, String vehicleID, JSONObject data) {
         this.vehicleID = vehicleID;
@@ -63,6 +66,7 @@ public class BlockSender extends Thread {
         String blockHash = ChainUtil.getInstance().getBlockHash(blockBody);
         BlockHeader blockHeader = new BlockHeader(blockHash);
         Block block = new Block(blockHeader, blockBody);
+        log.info("Transaction Created. Event: ", event);
         Consensus.getInstance().broadcastBlock(block, data.toString());
     }
 

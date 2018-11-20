@@ -169,7 +169,6 @@ public class Handler extends Thread{
         String blockchainHash = jsonObject.getString("blockchainHash");
         String publicKey = jsonObject.getString("publicKey");
         Neighbour sender = new Neighbour(peerID, ip, listeningPort, publicKey);
-        System.out.println("receivedHash: "+ blockchainHash);
         BlockchainRequester.getInstance().handleReceivedSignedBlockchain(sender, signedBlockchain, blockchainHash);
     }
 

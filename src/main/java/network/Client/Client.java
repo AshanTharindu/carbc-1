@@ -13,8 +13,11 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import network.Client.Handlers.CommonClientHandler;
 import network.Neighbour;
+import network.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.NoRouteToHostException;
 
 public class Client extends Thread{
     private final Logger log = LoggerFactory.getLogger(Client.class);
@@ -59,13 +62,15 @@ public class Client extends Thread{
             ChannelFuture f = b.connect(neighbourIP, port).sync();
             log.info("Connecting to neighbour: {}:{}", neighbourIP, port);
 
-
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
-        } catch (Exception e) {
-            System.out.println("here");
+        } catch (InterruptedException e) {
             e.printStackTrace();
-        } finally {
+        } catch (Exception e) {
+            log.info("Cannot Fine Node: ", neighbourIP);
+            //todo remove peer
+        }
+        finally {
             workerGroup.shutdownGracefully();
         }
     }

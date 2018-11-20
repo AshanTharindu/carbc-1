@@ -10,11 +10,11 @@ import org.slf4j.impl.SimpleLogger;
 public class NodeStartTest {
 
     public static void main(String[] args) {
-        setPaths();
-        createGensis();
-//        Controller controller = new Controller();
-//        controller.startNode();
-//        MessageSender.requestIP();
+//        setPaths();
+//        createGensis();
+        Controller controller = new Controller();
+        controller.startNode();
+        MessageSender.requestIP();
     }
 
     public static void setPaths() {
